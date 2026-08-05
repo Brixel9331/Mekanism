@@ -1,8 +1,8 @@
 ![Mekanism Logo](logo.png)
 
-# Mekanism for Minecraft 1.20 #
+# Mekanism Fabric for Minecraft 1.20.1 #
 
-Mekanism is an independent Minecraft add-on featuring high-tech machinery that can be used to create powerful tools, 
+Mekanism Fabric is a Fabric port of Mekanism, an independent Minecraft add-on featuring high-tech machinery that can be used to create powerful tools, 
 armor, and weapons. You can find more detail on the features on the [**Official Website**](http://aidancbrady.com/mekanism/).
 With features ranging from jetpacks and balloons to factories and energy cubes, the mod does not have a single unifying goal.
 Nevertheless, these features combine coherently to create a rich gameplay experience that players will enjoy.
@@ -36,31 +36,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # Maven #
-Mekansim v10+ is also available via [ModMaven](https://modmaven.dev/) for developers wishing to make use of our API. Big thanks to K4Unl for hosting.
 
-Update your `build.gradle` file to include the following: 
-
-```groovy
-repositories {
-    maven { url 'https://modmaven.dev/' }
-}
-
-dependencies {
-    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    
-    // If you want to test/use Mekanism & its modules during `runClient` invocation, use the following
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")// core
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")// Mekanism: Additions
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")// Mekanism: Generators
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")// Mekanism: Tools
-}
-```
-
-Add the following to your `gradle.properties` file (see [Maven](https://modmaven.dev/mekanism/Mekanism/) for the list of available versions):
-
-```properties
-mekanism_version=1.20.1-10.4.0.14
-```
+The upstream Forge artifacts are available on [ModMaven](https://modmaven.dev/).
+This Fabric branch builds its own artifacts. Build this branch and use the jars in
+`build/libs/` for Fabric development; see [Development](docs/Development.md).
 
 # Credits #
 
