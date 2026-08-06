@@ -10,7 +10,7 @@ import mekanism.common.recipe.lookup.cache.TripleInputRecipeCache;
 import mekanism.common.util.ChemicalUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.TriPredicate;
+import mekanism.api.functions.TriPredicate;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 

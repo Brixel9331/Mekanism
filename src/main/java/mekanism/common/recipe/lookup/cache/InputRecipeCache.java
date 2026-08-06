@@ -16,7 +16,7 @@ import mekanism.common.recipe.lookup.cache.type.ChemicalInputCache;
 import mekanism.common.recipe.lookup.cache.type.FluidInputCache;
 import mekanism.common.recipe.lookup.cache.type.ItemInputCache;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.TriPredicate;
+import mekanism.api.functions.TriPredicate;
 import net.minecraftforge.fluids.FluidStack;
 
 public class InputRecipeCache {
