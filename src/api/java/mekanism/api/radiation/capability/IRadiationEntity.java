@@ -3,7 +3,7 @@ package mekanism.api.radiation.capability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.util.INBTSerializable;
+import mekanism.api.INBTSerializable;
 import org.jetbrains.annotations.NotNull;
 
 /**
