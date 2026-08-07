@@ -2,12 +2,12 @@ package mekanism.common.integration.lookingat.jade;
 
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.integration.lookingat.LookingAtHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fluids.FluidStack;
 
 public class JadeLookingAtHelper implements LookingAtHelper {
 

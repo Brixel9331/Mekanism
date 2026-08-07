@@ -1,6 +1,7 @@
 package mekanism.client.render.item.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.client.render.item.MekanismISTER;
@@ -14,7 +15,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class RenderFluidTankItem extends MekanismISTER {

@@ -2,6 +2,7 @@ package mekanism.common.integration.projecte.mappers;
 
 import java.util.List;
 import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.PressurizedReactionRecipe;
 import mekanism.api.recipes.PressurizedReactionRecipe.PressurizedReactionRecipeOutput;
 import mekanism.common.integration.projecte.IngredientHelper;
@@ -18,7 +19,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 @RecipeTypeMapper

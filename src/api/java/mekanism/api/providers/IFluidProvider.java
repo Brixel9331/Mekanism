@@ -1,11 +1,11 @@
 package mekanism.api.providers;
 
+import mekanism.api.fluid.FluidStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 @MethodsReturnNonnullByDefault
 public interface IFluidProvider extends IBaseProvider {
@@ -26,16 +26,16 @@ public interface IFluidProvider extends IBaseProvider {
 
     @Override
     default ResourceLocation getRegistryName() {
-        return ForgeRegistries.FLUIDS.getKey(getFluid());
+        return BuiltInRegistries.FLUID.getKey(getFluid());
     }
 
     @Override
     default Component getTextComponent() {
-        return getFluid().getFluidType().getDescription(getFluidStack(1));
+        return getFluidStack(1).getDisplayName();
     }
 
     @Override
     default String getTranslationKey() {
-        return getFluid().getFluidType().getDescriptionId();
+        return getFluidStack(1).getTranslationKey();
     }
 }

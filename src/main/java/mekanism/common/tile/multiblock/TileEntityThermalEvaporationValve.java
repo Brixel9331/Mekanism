@@ -2,6 +2,7 @@ package mekanism.common.tile.multiblock;
 
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.capabilities.heat.CachedAmbientTemperature;
 import mekanism.common.capabilities.holder.fluid.IFluidTankHolder;
 import mekanism.common.capabilities.holder.heat.IHeatCapacitorHolder;
@@ -11,7 +12,6 @@ import mekanism.common.tile.base.SubstanceType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class TileEntityThermalEvaporationValve extends TileEntityThermalEvaporationBlock {

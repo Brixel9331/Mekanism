@@ -8,6 +8,7 @@ import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
+import mekanism.api.fluid.FluidStack;
 import mekanism.client.render.data.ChemicalRenderData.GasRenderData;
 import mekanism.client.render.data.ChemicalRenderData.InfusionRenderData;
 import mekanism.client.render.data.ChemicalRenderData.PigmentRenderData;
@@ -15,7 +16,6 @@ import mekanism.client.render.data.ChemicalRenderData.SlurryRenderData;
 import mekanism.common.lib.multiblock.MultiblockData;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault

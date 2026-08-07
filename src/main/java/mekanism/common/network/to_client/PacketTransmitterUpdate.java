@@ -3,6 +3,7 @@ package mekanism.common.network.to_client;
 import java.util.UUID;
 import java.util.function.Predicate;
 import mekanism.api.chemical.merged.BoxedChemical;
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.content.network.BoxedChemicalNetwork;
 import mekanism.common.content.network.EnergyNetwork;
 import mekanism.common.content.network.FluidNetwork;
@@ -12,7 +13,6 @@ import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.network.IMekanismPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.NotNull;
 

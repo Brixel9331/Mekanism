@@ -1,6 +1,7 @@
 package mekanism.common.integration.projecte.mappers;
 
 import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.ElectrolysisRecipe;
 import mekanism.api.recipes.ElectrolysisRecipe.ElectrolysisRecipeOutput;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
@@ -16,7 +17,6 @@ import moze_intel.projecte.api.nss.NormalizedSimpleStack;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.fluids.FluidStack;
 
 @RecipeTypeMapper
 public class ElectrolysisRecipeMapper implements IRecipeTypeMapper {
