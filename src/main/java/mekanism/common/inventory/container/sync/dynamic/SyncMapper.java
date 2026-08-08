@@ -43,7 +43,6 @@ import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.network.to_client.container.property.PropertyType;
 import mekanism.common.util.LambdaMetaFactoryUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
 import org.objectweb.asm.Type;
@@ -62,7 +61,7 @@ public class SyncMapper extends BaseAnnotationScanner {
         // longer is valid, we want to ensure that the client is able to properly render it instead of printing an error due
         // to the client thinking that it is invalid
         specialProperties.add(new SpecialPropertyHandler<>(IExtendedFluidTank.class,
-              SpecialPropertyData.create(FluidStack.class, IFluidTank::getFluid, IExtendedFluidTank::setStackUnchecked)
+              SpecialPropertyData.create(FluidStack.class, IExtendedFluidTank::getFluid, IExtendedFluidTank::setStackUnchecked)
         ));
         specialProperties.add(new SpecialPropertyHandler<>(IGasTank.class,
               SpecialPropertyData.create(GasStack.class, IChemicalTank::getStack, IChemicalTank::setStackUnchecked)

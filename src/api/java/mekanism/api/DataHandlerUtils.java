@@ -1,15 +1,15 @@
 package mekanism.api;
 
 import java.util.List;
+import mekanism.api.INBTSerializable;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.inventory.IInventorySlot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import mekanism.api.INBTSerializable;
-import net.minecraftforge.fluids.IFluidTank;
 
 @NothingNullByDefault
 public class DataHandlerUtils {
@@ -66,7 +66,7 @@ public class DataHandlerUtils {
             return NBTConstants.CONTAINER;
         }
         INBTSerializable<CompoundTag> obj = containers.get(0);
-        if (obj instanceof IChemicalTank || obj instanceof IFluidTank) {
+        if (obj instanceof IChemicalTank || obj instanceof IExtendedFluidTank) {
             return NBTConstants.TANK;
         } else if (obj instanceof IHeatCapacitor || obj instanceof IEnergyContainer) {
             return NBTConstants.CONTAINER;
