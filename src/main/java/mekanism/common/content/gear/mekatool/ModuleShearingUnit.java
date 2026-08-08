@@ -8,6 +8,7 @@ import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.IModule;
+import mekanism.api.gear.ToolAction;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.gear.ItemMekaTool;
@@ -38,8 +39,6 @@ import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.IForgeShearable;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +49,7 @@ public class ModuleShearingUnit implements ICustomModule<ModuleShearingUnit> {
 
     @Override
     public boolean canPerformAction(IModule<ModuleShearingUnit> module, ToolAction action) {
-        if (action == ToolActions.SHEARS_DISARM) {
+        if (action == ToolAction.SHEARS_DISARM) {
             ItemStack container = module.getContainer();
             if (container.getItem() instanceof ItemMekaTool mekaTool) {
                 //Only require energy if we are installed on a Meka-Tool and can thus calculate the energy required to break the block "safely"
@@ -61,13 +60,13 @@ public class ModuleShearingUnit implements ICustomModule<ModuleShearingUnit> {
             //Note: If for some reason we are installed on something that is not the Meka-Tool don't stop the action from being enabled
             // as it may not actually require energy
             return true;
-        } else if (action == ToolActions.SHEARS_DIG) {
+        } else if (action == ToolAction.SHEARS_DIG) {
             ItemStack container = module.getContainer();
             //Note: If for some reason we are installed on something that is not the Meka-Tool don't stop the action from being enabled
             // as it may not actually require energy
             return !(container.getItem() instanceof ItemMekaTool mekaTool) || mekaTool.hasEnergyForDigAction(container);
         }
-        return ToolActions.DEFAULT_SHEARS_ACTIONS.contains(action);
+        return ToolAction.DEFAULT_SHEARS_ACTIONS.contains(action);
     }
 
     @NotNull

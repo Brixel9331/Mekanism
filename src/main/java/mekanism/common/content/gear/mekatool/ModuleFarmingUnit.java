@@ -8,6 +8,7 @@ import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.IModule;
+import mekanism.api.gear.ToolAction;
 import mekanism.api.gear.config.IModuleConfigItem;
 import mekanism.api.gear.config.ModuleConfigItemCreator;
 import mekanism.api.gear.config.ModuleEnumData;
@@ -17,14 +18,14 @@ import mekanism.api.text.TextComponentUtil;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.network.to_client.PacketLightningRender;
 import mekanism.common.network.to_client.PacketLightningRender.LightningPreset;
+import mekanism.common.network.to_client.PacketLightningRender;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -44,8 +45,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,9 +83,9 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
         Lazy<BlockState> lazyClickedState = Lazy.of(() -> context.getLevel().getBlockState(context.getClickedPos()));
         return MekanismUtils.performActions(
               //First try to use the disassembler as an axe
-              useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolActions.AXE_STRIP, SoundEvents.AXE_STRIP, -1),
-              () -> useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolActions.AXE_SCRAPE, SoundEvents.AXE_SCRAPE, LevelEvent.PARTICLES_SCRAPE),
-              () -> useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolActions.AXE_WAX_OFF, SoundEvents.AXE_WAX_OFF, LevelEvent.PARTICLES_WAX_OFF),
+              useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolAction.AXE_STRIP, SoundEvents.AXE_STRIP, -1),
+              () -> useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolAction.AXE_SCRAPE, SoundEvents.AXE_SCRAPE, LevelEvent.PARTICLES_SCRAPE),
+              () -> useAxeAOE(context, lazyClickedState, energyContainer, diameter, ToolAction.AXE_WAX_OFF, SoundEvents.AXE_WAX_OFF, LevelEvent.PARTICLES_WAX_OFF),
               //Then as a shovel
               () -> flattenAOE(context, lazyClickedState, energyContainer, diameter),
               () -> dowseCampfire(context, lazyClickedState, energyContainer),
@@ -97,17 +96,17 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
 
     @Override
     public boolean canPerformAction(IModule<ModuleFarmingUnit> module, ToolAction action) {
-        if (action == ToolActions.AXE_STRIP || action == ToolActions.AXE_SCRAPE || action == ToolActions.AXE_WAX_OFF) {
+        if (action == ToolAction.AXE_STRIP || action == ToolAction.AXE_SCRAPE || action == ToolAction.AXE_WAX_OFF) {
             return module.hasEnoughEnergy(MekanismConfig.gear.mekaToolEnergyUsageAxe);
-        } else if (action == ToolActions.SHOVEL_FLATTEN) {
+        } else if (action == ToolAction.SHOVEL_FLATTEN) {
             return module.hasEnoughEnergy(MekanismConfig.gear.mekaToolEnergyUsageShovel);
-        } else if (action == ToolActions.HOE_TILL) {
+        } else if (action == ToolAction.HOE_TILL) {
             return module.hasEnoughEnergy(MekanismConfig.gear.mekaToolEnergyUsageHoe);
         }
         //Note: In general when we get here there will be no tool actions known unless mods add more default tool actions
         // This is because we special case the known vanilla types above and the dig variants are already handled by the Meka-Tool itself before
         // it even checks the installed modules
-        return ToolActions.DEFAULT_AXE_ACTIONS.contains(action) || ToolActions.DEFAULT_SHOVEL_ACTIONS.contains(action) || ToolActions.DEFAULT_HOE_ACTIONS.contains(action);
+        return ToolAction.DEFAULT_AXE_ACTIONS.contains(action) || ToolAction.DEFAULT_SHOVEL_ACTIONS.contains(action) || ToolAction.DEFAULT_HOE_ACTIONS.contains(action);
     }
 
     @NothingNullByDefault
@@ -161,7 +160,7 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
     }
 
     private InteractionResult tillAOE(UseOnContext context, Lazy<BlockState> lazyClickedState, IEnergyContainer energyContainer, int diameter) {
-        return useAOE(context, lazyClickedState, energyContainer, diameter, ToolActions.HOE_TILL, SoundEvents.HOE_TILL, -1,
+        return useAOE(context, lazyClickedState, energyContainer, diameter, ToolAction.HOE_TILL, SoundEvents.HOE_TILL, -1,
               MekanismConfig.gear.mekaToolEnergyUsageHoe.get(), new HoeToolAOEData());
     }
 
@@ -171,7 +170,7 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
             //Don't allow flattening a block from underneath
             return InteractionResult.PASS;
         }
-        return useAOE(context, lazyClickedState, energyContainer, diameter, ToolActions.SHOVEL_FLATTEN, SoundEvents.SHOVEL_FLATTEN, -1,
+        return useAOE(context, lazyClickedState, energyContainer, diameter, ToolAction.SHOVEL_FLATTEN, SoundEvents.SHOVEL_FLATTEN, -1,
               MekanismConfig.gear.mekaToolEnergyUsageShovel.get(), new ShovelToolAOEData());
     }
 

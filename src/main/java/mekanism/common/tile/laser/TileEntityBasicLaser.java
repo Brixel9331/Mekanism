@@ -7,6 +7,7 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
+import mekanism.api.gear.ToolAction;
 import mekanism.api.lasers.ILaserDissipation;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.math.FloatingLong;
@@ -58,7 +59,6 @@ import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -140,7 +140,7 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
                         //If the entity is a living entity check if they are blocking with a shield and then allow
                         // the shield to cause some damage to be dissipated in exchange for durability
                         boolean updateDamage = false;
-                        if (livingEntity.isBlocking() && livingEntity.getUseItem().canPerformAction(ToolActions.SHIELD_BLOCK)) {
+                        if (livingEntity.isBlocking() && livingEntity.getUseItem().canPerformAction(ToolAction.SHIELD_BLOCK)) {
                             Vec3 viewVector = livingEntity.getViewVector(1);
                             Vec3 vectorTo = from.vectorTo(livingEntity.position()).normalize();
                             vectorTo = new Vec3(vectorTo.x, 0, vectorTo.z);
