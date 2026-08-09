@@ -8,9 +8,9 @@ import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IGasProvider;
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -60,8 +60,8 @@ public class Gas extends Chemical<Gas> implements IGasProvider {
     @SuppressWarnings("ConstantConditions")
     public final ResourceLocation getRegistryName() {
         //May be null if called before the object is registered
-        IForgeRegistry<Gas> registry = MekanismAPI.gasRegistry();
-        return registry == null ? null : registry.getKey(this);
+        Registry<Gas> registry = MekanismAPI.gasRegistry();
+        return registry.getResourceKey(this).map(net.minecraft.resources.ResourceKey::location).orElse(null);
     }
 
     @Override

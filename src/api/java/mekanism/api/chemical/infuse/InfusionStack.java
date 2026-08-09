@@ -4,10 +4,11 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IInfuseTypeProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -33,7 +34,7 @@ public final class InfusionStack extends ChemicalStack<InfuseType> {
     }
 
     @Override
-    protected IForgeRegistry<InfuseType> getRegistry() {
+    protected Registry<InfuseType> getRegistry() {
         return MekanismAPI.infuseTypeRegistry();
     }
 
@@ -65,7 +66,7 @@ public final class InfusionStack extends ChemicalStack<InfuseType> {
     }
 
     public static InfusionStack readFromPacket(FriendlyByteBuf buf) {
-        InfuseType infuseType = buf.readRegistryIdSafe(InfuseType.class);
+        InfuseType infuseType = ChemicalUtils.readChemicalFromPacket(buf, MekanismAPI.infuseTypeRegistry());
         if (infuseType.isEmptyType()) {
             return EMPTY;
         }

@@ -1,7 +1,7 @@
 package mekanism.api.chemical.slurry;
 
 import java.util.Optional;
-import net.minecraftforge.registries.tags.IReverseTag;
+import net.minecraft.core.Holder;
 import org.jetbrains.annotations.NotNull;
 
 public final class EmptySlurry extends Slurry {
@@ -12,7 +12,7 @@ public final class EmptySlurry extends Slurry {
 
     @NotNull
     @Override
-    protected Optional<IReverseTag<Slurry>> getReverseTag() {
+    protected Optional<Holder.Reference<Slurry>> getReverseTag() {
         //Empty slurry is in no tags
         return Optional.empty();
     }

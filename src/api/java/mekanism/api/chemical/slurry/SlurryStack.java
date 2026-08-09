@@ -4,10 +4,11 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.ISlurryProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -33,7 +34,7 @@ public final class SlurryStack extends ChemicalStack<Slurry> {
     }
 
     @Override
-    protected IForgeRegistry<Slurry> getRegistry() {
+    protected Registry<Slurry> getRegistry() {
         return MekanismAPI.slurryRegistry();
     }
 
@@ -65,7 +66,7 @@ public final class SlurryStack extends ChemicalStack<Slurry> {
     }
 
     public static SlurryStack readFromPacket(FriendlyByteBuf buf) {
-        Slurry slurry = buf.readRegistryIdSafe(Slurry.class);
+        Slurry slurry = ChemicalUtils.readChemicalFromPacket(buf, MekanismAPI.slurryRegistry());
         if (slurry.isEmptyType()) {
             return EMPTY;
         }

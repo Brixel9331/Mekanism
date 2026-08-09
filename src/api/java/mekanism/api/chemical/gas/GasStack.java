@@ -4,10 +4,11 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IGasProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -38,7 +39,7 @@ public final class GasStack extends ChemicalStack<Gas> {
     }
 
     @Override
-    protected IForgeRegistry<Gas> getRegistry() {
+    protected Registry<Gas> getRegistry() {
         return MekanismAPI.gasRegistry();
     }
 
@@ -70,7 +71,7 @@ public final class GasStack extends ChemicalStack<Gas> {
     }
 
     public static GasStack readFromPacket(FriendlyByteBuf buf) {
-        Gas gas = buf.readRegistryIdSafe(Gas.class);
+        Gas gas = ChemicalUtils.readChemicalFromPacket(buf, MekanismAPI.gasRegistry());
         if (gas.isEmptyType()) {
             return EMPTY;
         }
