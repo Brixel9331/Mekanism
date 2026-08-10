@@ -44,6 +44,7 @@ import mekanism.api.recipes.ingredients.ChemicalStackIngredient.SlurryStackIngre
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
+import mekanism.api.recipes.ingredients.StrictNBTIngredient;
 import mekanism.common.integration.crafttweaker.CrTConstants;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents.ChemicalRecipeComponent;
@@ -69,8 +70,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.StrictNBTIngredient;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -178,7 +177,7 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
     public static String basicImplicitIngredient(Ingredient vanillaIngredient, int amount, JsonElement serialized, boolean handleTags) {
         if (serialized.isJsonObject()) {
             JsonObject serializedIngredient = serialized.getAsJsonObject();
-            if (vanillaIngredient.isVanilla()) {
+            if (vanillaIngredient.getCustomIngredient() == null) {
                 if (serializedIngredient.has(JsonConstants.ITEM)) {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(serializedIngredient.get(JsonConstants.ITEM).getAsString()));
                     return ItemStackUtil.getCommandString(new ItemStack(item, amount));
@@ -186,8 +185,8 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
                     KnownTag<Item> tag = CrTUtils.itemTags().tag(serializedIngredient.get(JsonConstants.TAG).getAsString());
                     return amount == 1 ? tag.getCommandString() : tag.withAmount(amount).getCommandString();
                 }
-            } else if (vanillaIngredient instanceof StrictNBTIngredient) {
-                ItemStack stack = CraftingHelper.getItemStack(serializedIngredient, true);
+            } else if (vanillaIngredient.getCustomIngredient() instanceof StrictNBTIngredient) {
+                ItemStack stack = vanillaIngredient.getItems()[0].copy();
                 stack.setCount(amount);
                 return ItemStackUtil.getCommandString(stack);
             }

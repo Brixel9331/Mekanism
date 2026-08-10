@@ -12,12 +12,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import mekanism.api.JsonConstants;
+import mekanism.api.MekanismAPI;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
+import mekanism.api.recipes.ingredients.StrictNBTIngredient;
 import mekanism.api.recipes.ingredients.creator.IItemStackIngredientCreator;
-import mekanism.common.Mekanism;
-import mekanism.common.network.BasePacketHandler;
 import mekanism.common.recipe.ingredient.IMultiIngredient;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.contents.LiteralContents;
@@ -34,6 +34,7 @@ public class ItemStackIngredientCreator implements IItemStackIngredientCreator {
     public static final ItemStackIngredientCreator INSTANCE = new ItemStackIngredientCreator();
 
     private ItemStackIngredientCreator() {
+        StrictNBTIngredient.register();
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ItemStackIngredientCreator implements IItemStackIngredientCreator {
         Objects.requireNonNull(buffer, "ItemStackIngredients cannot be read from a null packet buffer.");
         return switch (buffer.readEnum(IngredientType.class)) {
             case SINGLE -> from(Ingredient.fromNetwork(buffer), buffer.readVarInt());
-            case MULTI -> createMulti(BasePacketHandler.readArray(buffer, ItemStackIngredient[]::new, this::read));
+            case MULTI -> createMulti(buffer.readList(this::read).toArray(ItemStackIngredient[]::new));
         };
     }
 
@@ -179,7 +180,7 @@ public class ItemStackIngredientCreator implements IItemStackIngredientCreator {
         @Override
         public void logMissingTags() {
             if (hasNoMatchingInstances()) {
-                Mekanism.logger.error("Empty item ingredient: {}", ingredient.toJson());
+                MekanismAPI.logger.error("Empty item ingredient: {}", ingredient.toJson());
             }
         }
 
@@ -307,7 +308,7 @@ public class ItemStackIngredientCreator implements IItemStackIngredientCreator {
         @Override
         public void write(FriendlyByteBuf buffer) {
             buffer.writeEnum(IngredientType.MULTI);
-            BasePacketHandler.writeArray(buffer, ingredients, InputIngredient::write);
+            buffer.writeCollection(List.of(ingredients), (output, ingredient) -> ingredient.write(output));
         }
 
         @Override
