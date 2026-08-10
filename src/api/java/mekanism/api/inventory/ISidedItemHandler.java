@@ -4,15 +4,13 @@ import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A sided variant of {@link IItemHandlerModifiable}
  */
 @NothingNullByDefault
-public interface ISidedItemHandler extends IItemHandlerModifiable {
+public interface ISidedItemHandler extends IExtendedItemHandler {
 
     /**
      * The side this {@link ISidedItemHandler} is for. This defaults to null, which is for internal use.
