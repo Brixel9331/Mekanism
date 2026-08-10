@@ -5,6 +5,7 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalType;
+import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
@@ -50,10 +51,10 @@ public class BoxedChemical implements IHasTextComponent {
     public static BoxedChemical read(FriendlyByteBuf buffer) {
         ChemicalType chemicalType = buffer.readEnum(ChemicalType.class);
         return new BoxedChemical(chemicalType, switch (chemicalType) {
-            case GAS -> buffer.readRegistryIdSafe(Gas.class);
-            case INFUSION -> buffer.readRegistryIdSafe(InfuseType.class);
-            case PIGMENT -> buffer.readRegistryIdSafe(Pigment.class);
-            case SLURRY -> buffer.readRegistryIdSafe(Slurry.class);
+            case GAS -> ChemicalUtils.readChemicalFromPacket(buffer, MekanismAPI.gasRegistry());
+            case INFUSION -> ChemicalUtils.readChemicalFromPacket(buffer, MekanismAPI.infuseTypeRegistry());
+            case PIGMENT -> ChemicalUtils.readChemicalFromPacket(buffer, MekanismAPI.pigmentRegistry());
+            case SLURRY -> ChemicalUtils.readChemicalFromPacket(buffer, MekanismAPI.slurryRegistry());
         });
     }
 
@@ -122,10 +123,10 @@ public class BoxedChemical implements IHasTextComponent {
     public void write(FriendlyByteBuf buffer) {
         buffer.writeEnum(chemicalType);
         switch (chemicalType) {
-            case GAS -> buffer.writeRegistryId(MekanismAPI.gasRegistry(), (Gas) chemical);
-            case INFUSION -> buffer.writeRegistryId(MekanismAPI.infuseTypeRegistry(), (InfuseType) chemical);
-            case PIGMENT -> buffer.writeRegistryId(MekanismAPI.pigmentRegistry(), (Pigment) chemical);
-            case SLURRY -> buffer.writeRegistryId(MekanismAPI.slurryRegistry(), (Slurry) chemical);
+            case GAS -> buffer.writeId(MekanismAPI.gasRegistry(), (Gas) chemical);
+            case INFUSION -> buffer.writeId(MekanismAPI.infuseTypeRegistry(), (InfuseType) chemical);
+            case PIGMENT -> buffer.writeId(MekanismAPI.pigmentRegistry(), (Pigment) chemical);
+            case SLURRY -> buffer.writeId(MekanismAPI.slurryRegistry(), (Slurry) chemical);
         }
     }
 

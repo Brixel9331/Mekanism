@@ -3,12 +3,14 @@ package mekanism.api.chemical;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -52,5 +54,9 @@ public class ChemicalTags<CHEMICAL extends Chemical<CHEMICAL>> {
     public Optional<Holder.Reference<CHEMICAL>> getHolder(CHEMICAL chemical) {
         Registry<CHEMICAL> registry = getRegistry();
         return registry.getResourceKey(chemical).flatMap(registry::getHolder);
+    }
+
+    public Stream<CHEMICAL> getTagContents(TagKey<CHEMICAL> tag) {
+        return getRegistry().getTag(tag).stream().flatMap(HolderSet::stream).map(Holder::value).filter(chemical -> !chemical.isEmptyType());
     }
 }

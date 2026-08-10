@@ -8,7 +8,6 @@ import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import mekanism.api.JsonConstants;
@@ -25,23 +24,24 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
-import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.InfusionStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.PigmentStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.SlurryStackIngredient;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.creator.IChemicalStackIngredientCreator;
-import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
-import mekanism.common.network.BasePacketHandler;
 import mekanism.common.recipe.ingredient.chemical.MultiChemicalStackIngredient.MultiGasStackIngredient;
 import mekanism.common.recipe.ingredient.chemical.MultiChemicalStackIngredient.MultiInfusionStackIngredient;
 import mekanism.common.recipe.ingredient.chemical.MultiChemicalStackIngredient.MultiPigmentStackIngredient;
 import mekanism.common.recipe.ingredient.chemical.MultiChemicalStackIngredient.MultiSlurryStackIngredient;
+import mekanism.common.recipe.ingredient.creator.GasStackIngredientCreator;
+import mekanism.common.recipe.ingredient.creator.InfusionStackIngredientCreator;
+import mekanism.common.recipe.ingredient.creator.PigmentStackIngredientCreator;
+import mekanism.common.recipe.ingredient.creator.SlurryStackIngredientCreator;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,19 +51,19 @@ public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>,
       INGREDIENT extends ChemicalStackIngredient<CHEMICAL, STACK>> {
 
     public static final ChemicalIngredientDeserializer<Gas, GasStack, GasStackIngredient> GAS = new ChemicalIngredientDeserializer<Gas, GasStack, GasStackIngredient>(
-          "gas", ChemicalIngredientInfo.GAS, ChemicalTags.GAS, GasStack::readFromPacket, SerializerHelper::deserializeGas, IngredientCreatorAccess.gas(),
+          "gas", ChemicalIngredientInfo.GAS, ChemicalTags.GAS, GasStack::readFromPacket, SerializerHelper::deserializeGas, GasStackIngredientCreator.INSTANCE,
           MultiGasStackIngredient::new, GasStackIngredient[]::new);
     public static final ChemicalIngredientDeserializer<InfuseType, InfusionStack, InfusionStackIngredient> INFUSION =
           new ChemicalIngredientDeserializer<InfuseType, InfusionStack, InfusionStackIngredient>("infuse type", ChemicalIngredientInfo.INFUSION,
-                ChemicalTags.INFUSE_TYPE, InfusionStack::readFromPacket, SerializerHelper::deserializeInfuseType, IngredientCreatorAccess.infusion(),
+                ChemicalTags.INFUSE_TYPE, InfusionStack::readFromPacket, SerializerHelper::deserializeInfuseType, InfusionStackIngredientCreator.INSTANCE,
                 MultiInfusionStackIngredient::new, InfusionStackIngredient[]::new);
     public static final ChemicalIngredientDeserializer<Pigment, PigmentStack, PigmentStackIngredient> PIGMENT =
           new ChemicalIngredientDeserializer<Pigment, PigmentStack, PigmentStackIngredient>("pigment", ChemicalIngredientInfo.PIGMENT, ChemicalTags.PIGMENT,
-                PigmentStack::readFromPacket, SerializerHelper::deserializePigment, IngredientCreatorAccess.pigment(), MultiPigmentStackIngredient::new,
+                PigmentStack::readFromPacket, SerializerHelper::deserializePigment, PigmentStackIngredientCreator.INSTANCE, MultiPigmentStackIngredient::new,
                 PigmentStackIngredient[]::new);
     public static final ChemicalIngredientDeserializer<Slurry, SlurryStack, SlurryStackIngredient> SLURRY =
           new ChemicalIngredientDeserializer<Slurry, SlurryStack, SlurryStackIngredient>("slurry", ChemicalIngredientInfo.SLURRY, ChemicalTags.SLURRY,
-                SlurryStack::readFromPacket, SerializerHelper::deserializeSlurry, IngredientCreatorAccess.slurry(), MultiSlurryStackIngredient::new,
+                SlurryStack::readFromPacket, SerializerHelper::deserializeSlurry, SlurryStackIngredientCreator.INSTANCE, MultiSlurryStackIngredient::new,
                 SlurryStackIngredient[]::new);
 
     private final ChemicalTags<CHEMICAL> tags;
@@ -109,7 +109,7 @@ public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>,
         return switch (buffer.readEnum(IngredientType.class)) {
             case SINGLE -> ingredientCreator.from(fromPacket.apply(buffer));
             case TAGGED -> ingredientCreator.from(tags.tag(buffer.readResourceLocation()), buffer.readVarLong());
-            case MULTI -> createMulti(BasePacketHandler.readArray(buffer, arrayCreator, this::read));
+            case MULTI -> createMulti(buffer.readList(this::read).toArray(arrayCreator));
         };
     }
 
@@ -166,12 +166,7 @@ public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>,
                 throw new JsonSyntaxException("Expected amount to be greater than zero.");
             }
             ResourceLocation resourceLocation = new ResourceLocation(GsonHelper.getAsString(jsonObject, JsonConstants.TAG));
-            Optional<ITagManager<CHEMICAL>> manager = tags.getManager();
-            if (manager.isEmpty()) {
-                throw new JsonSyntaxException("Unexpected error trying to retrieve the chemical tag manager.");
-            }
-            ITagManager<CHEMICAL> tagManager = manager.get();
-            TagKey<CHEMICAL> key = tagManager.createTagKey(resourceLocation);
+            TagKey<CHEMICAL> key = tags.tag(resourceLocation);
             return ingredientCreator.from(key, amount);
         }
         throw new JsonSyntaxException("Expected to receive a resource location representing either a tag or " + getNameWithPrefix() + ".");

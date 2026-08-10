@@ -16,6 +16,7 @@ import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
 import mekanism.common.resource.ore.OreType;
 import mekanism.common.util.EnumUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -229,7 +230,7 @@ public class MekanismTags {
         public static final TagKey<Block> RELOCATION_NOT_SUPPORTED = forgeTag("relocation_not_supported");
         public static final TagKey<Block> CARDBOARD_BLACKLIST = tag("cardboard_blacklist");
         public static final TagKey<Block> MINER_BLACKLIST = tag("miner_blacklist");
-        public static final LazyTagLookup<Block> MINER_BLACKLIST_LOOKUP = LazyTagLookup.create(ForgeRegistries.BLOCKS, MINER_BLACKLIST);
+        public static final LazyTagLookup<Block> MINER_BLACKLIST_LOOKUP = LazyTagLookup.create(BuiltInRegistries.BLOCK, MINER_BLACKLIST);
         public static final TagKey<Block> ATOMIC_DISASSEMBLER_ORE = tag("atomic_disassembler_ore");
         /**
          * For use in the farming module to target blocks that should be effectively ignored when checking if the block below should be targeted.
@@ -314,8 +315,8 @@ public class MekanismTags {
         public static final TagKey<Fluid> SULFURIC_ACID = forgeTag("sulfuric_acid");
         public static final TagKey<Fluid> HYDROFLUORIC_ACID = forgeTag("hydrofluoric_acid");
 
-        public static final LazyTagLookup<Fluid> WATER_LOOKUP = LazyTagLookup.create(ForgeRegistries.FLUIDS, FluidTags.WATER);
-        public static final LazyTagLookup<Fluid> LAVA_LOOKUP = LazyTagLookup.create(ForgeRegistries.FLUIDS, FluidTags.LAVA);
+        public static final LazyTagLookup<Fluid> WATER_LOOKUP = LazyTagLookup.create(BuiltInRegistries.FLUID, FluidTags.WATER);
+        public static final LazyTagLookup<Fluid> LAVA_LOOKUP = LazyTagLookup.create(BuiltInRegistries.FLUID, FluidTags.LAVA);
 
         private static TagKey<Fluid> forgeTag(String name) {
             return FluidTags.create(new ResourceLocation("forge", name));
@@ -387,7 +388,7 @@ public class MekanismTags {
         }
 
         public static final TagKey<MobEffect> SPEED_UP_BLACKLIST = tag("speed_up_blacklist");
-        public static final LazyTagLookup<MobEffect> SPEED_UP_BLACKLIST_LOOKUP = LazyTagLookup.create(ForgeRegistries.MOB_EFFECTS, SPEED_UP_BLACKLIST);
+        public static final LazyTagLookup<MobEffect> SPEED_UP_BLACKLIST_LOOKUP = LazyTagLookup.create(BuiltInRegistries.MOB_EFFECT, SPEED_UP_BLACKLIST);
 
         private static TagKey<MobEffect> tag(String name) {
             return TagUtils.createKey(ForgeRegistries.MOB_EFFECTS, Mekanism.rl(name));
@@ -403,7 +404,7 @@ public class MekanismTags {
         }
 
         public static final TagKey<BlockEntityType<?>> CARDBOARD_BLACKLIST = tag("cardboard_blacklist");
-        public static final LazyTagLookup<BlockEntityType<?>> CARDBOARD_BLACKLIST_LOOKUP = LazyTagLookup.create(ForgeRegistries.BLOCK_ENTITY_TYPES, CARDBOARD_BLACKLIST);
+        public static final LazyTagLookup<BlockEntityType<?>> CARDBOARD_BLACKLIST_LOOKUP = LazyTagLookup.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, CARDBOARD_BLACKLIST);
         public static final TagKey<BlockEntityType<?>> RELOCATION_NOT_SUPPORTED = forgeTag("relocation_not_supported");
         public static final TagKey<BlockEntityType<?>> IMMOVABLE = forgeTag("immovable");
 
