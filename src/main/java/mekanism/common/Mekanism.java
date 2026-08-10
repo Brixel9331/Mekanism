@@ -218,10 +218,10 @@ public class Mekanism {
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         MekanismDataSerializers.DATA_SERIALIZERS.register(modEventBus);
         MekanismLootFunctions.REGISTER.register(modEventBus);
-        MekanismGases.GASES.createAndRegisterChemical(modEventBus);
-        MekanismInfuseTypes.INFUSE_TYPES.createAndRegisterChemical(modEventBus);
-        MekanismPigments.PIGMENTS.createAndRegisterChemical(modEventBus);
-        MekanismSlurries.SLURRIES.createAndRegisterChemical(modEventBus);
+        MekanismGases.GASES.register();
+        MekanismInfuseTypes.INFUSE_TYPES.register();
+        MekanismPigments.PIGMENTS.register();
+        MekanismSlurries.SLURRIES.register();
         MekanismRobitSkins.createAndRegisterDatapack(modEventBus);
         MekanismModules.MODULES.createAndRegister(modEventBus);
         modEventBus.addListener(this::registerEventListener);
@@ -241,12 +241,6 @@ public class Mekanism {
     }
 
     private void registerEventListener(RegisterEvent event) {
-        //Register the empty chemicals
-        ResourceLocation emptyName = rl("empty");
-        event.register(MekanismAPI.GAS_REGISTRY_NAME, emptyName, () -> MekanismAPI.EMPTY_GAS);
-        event.register(MekanismAPI.INFUSE_TYPE_REGISTRY_NAME, emptyName, () -> MekanismAPI.EMPTY_INFUSE_TYPE);
-        event.register(MekanismAPI.PIGMENT_REGISTRY_NAME, emptyName, () -> MekanismAPI.EMPTY_PIGMENT);
-        event.register(MekanismAPI.SLURRY_REGISTRY_NAME, emptyName, () -> MekanismAPI.EMPTY_SLURRY);
         //Register our custom serializer condition
         if (event.getRegistryKey().equals(ForgeRegistries.Keys.RECIPE_SERIALIZERS)) {
             CraftingHelper.register(ConditionExistsCondition.Serializer.INSTANCE);

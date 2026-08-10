@@ -20,7 +20,7 @@ public class MekanismSlurries {
 
     static {
         for (PrimaryResource resource : EnumUtils.PRIMARY_RESOURCES) {
-            PROCESSED_RESOURCES.put(resource, SLURRIES.register(resource));
+            PROCESSED_RESOURCES.put(resource, SLURRIES.register(resource.getRegistrySuffix(), builder -> builder.tint(resource.getTint()).ore(resource.getOreTag())));
         }
     }
 }
