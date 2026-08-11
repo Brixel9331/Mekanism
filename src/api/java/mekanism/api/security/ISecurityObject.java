@@ -1,8 +1,6 @@
 package mekanism.api.security;
 
 import mekanism.api.annotations.NothingNullByDefault;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 /**
  * Expose this as a capability on items, entities, or block entities to represent it is an object that have "security". It is <strong>IMPORTANT</strong> to make sure that
@@ -16,7 +14,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
  * @since 10.2.1
  */
 @NothingNullByDefault
-@AutoRegisterCapability
 public interface ISecurityObject extends IOwnerObject {
 
     /**

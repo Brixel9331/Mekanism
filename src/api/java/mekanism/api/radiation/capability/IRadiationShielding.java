@@ -1,11 +1,9 @@
 package mekanism.api.radiation.capability;
 
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
 /**
  * Simple capability that can be added to things like armor to provide shielding against radiation.
  */
-@AutoRegisterCapability
 public interface IRadiationShielding {
 
     /**
