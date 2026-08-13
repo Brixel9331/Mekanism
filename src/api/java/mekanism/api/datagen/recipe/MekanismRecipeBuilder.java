@@ -1,6 +1,5 @@
 package mekanism.api.datagen.recipe;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.function.Consumer;
 import mekanism.api.JsonConstants;
 import mekanism.api.MekanismAPI;
 import mekanism.api.annotations.NothingNullByDefault;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -18,8 +18,6 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +31,7 @@ public abstract class MekanismRecipeBuilder<BUILDER extends MekanismRecipeBuilde
         return new ResourceLocation(MekanismAPI.MEKANISM_MODID, name);
     }
 
-    protected final List<ICondition> conditions = new ArrayList<>();
+    protected final List<ConditionJsonProvider> conditions = new ArrayList<>();
     protected final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
     protected final ResourceLocation serializerName;
 
@@ -67,7 +65,7 @@ public abstract class MekanismRecipeBuilder<BUILDER extends MekanismRecipeBuilde
      *
      * @param condition Condition to add.
      */
-    public BUILDER addCondition(ICondition condition) {
+    public BUILDER addCondition(ConditionJsonProvider condition) {
         conditions.add(condition);
         return (BUILDER) this;
     }
@@ -142,11 +140,7 @@ public abstract class MekanismRecipeBuilder<BUILDER extends MekanismRecipeBuilde
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty(JsonConstants.TYPE, serializerName.toString());
             if (!conditions.isEmpty()) {
-                JsonArray conditionsArray = new JsonArray();
-                for (ICondition condition : conditions) {
-                    conditionsArray.add(CraftingHelper.serialize(condition));
-                }
-                jsonObject.add(JsonConstants.CONDITIONS, conditionsArray);
+                ConditionJsonProvider.write(jsonObject, conditions.toArray(ConditionJsonProvider[]::new));
             }
             this.serializeRecipeData(jsonObject);
             return jsonObject;
