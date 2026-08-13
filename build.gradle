@@ -88,6 +88,7 @@ configurations {
 }
 
 loom {
+    accessWidenerPath = file('src/main/resources/mekanism.accesswidener')
     mods {
         mekanism {
             sourceSet sourceSets.api
