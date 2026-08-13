@@ -86,7 +86,7 @@ public class MekanismGenerators implements IModModule {
         GeneratorsContainerTypes.CONTAINER_TYPES.register(modEventBus);
         GeneratorsTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         GeneratorsGases.GASES.register();
-        GeneratorsModules.MODULES.register(modEventBus);
+        GeneratorsModules.MODULES.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
         packetHandler = new GeneratorsPacketHandler();

@@ -223,7 +223,7 @@ public class Mekanism {
         MekanismPigments.PIGMENTS.register();
         MekanismSlurries.SLURRIES.register();
         MekanismRobitSkins.createAndRegisterDatapack(modEventBus);
-        MekanismModules.MODULES.createAndRegister(modEventBus);
+        MekanismModules.MODULES.register();
         modEventBus.addListener(this::registerEventListener);
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
@@ -320,7 +320,7 @@ public class Mekanism {
     }
 
     private void imcHandle(InterModProcessEvent event) {
-        ModuleHelper.get().processIMC(event);
+        ModuleHelper.get().processIMC();
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
