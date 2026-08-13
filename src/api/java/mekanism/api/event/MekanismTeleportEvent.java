@@ -1,21 +1,32 @@
 package mekanism.api.event;
 
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Base Mekanism extension of the {@link EntityTeleportEvent}.
  *
  * @since 10.3.9
  */
-@Cancelable
-public class MekanismTeleportEvent extends EntityTeleportEvent {
+public class MekanismTeleportEvent {
+
+    public static final Event<Callback> BEFORE_TELEPORT = EventFactory.createArrayBacked(Callback.class, callbacks -> event -> {
+        for (Callback callback : callbacks) {
+            if (event.isCanceled()) {
+                break;
+            }
+            callback.onTeleport(event);
+        }
+    });
+
+    private final Entity entity;
+    private final Vec3 target;
+    private boolean canceled;
 
     /**
      * @param entity  Entity teleporting.
@@ -24,7 +35,63 @@ public class MekanismTeleportEvent extends EntityTeleportEvent {
      * @param targetZ Destination z position.
      */
     protected MekanismTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
-        super(entity, targetX, targetY, targetZ);
+        this.entity = entity;
+        this.target = new Vec3(targetX, targetY, targetZ);
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public Vec3 getTarget() {
+        return target;
+    }
+
+    public double getTargetX() {
+        return target.x;
+    }
+
+    public double getTargetY() {
+        return target.y;
+    }
+
+    public double getTargetZ() {
+        return target.z;
+    }
+
+    public Vec3 getPrev() {
+        return entity.position();
+    }
+
+    public double getPrevX() {
+        return entity.getX();
+    }
+
+    public double getPrevY() {
+        return entity.getY();
+    }
+
+    public double getPrevZ() {
+        return entity.getZ();
+    }
+
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public boolean post() {
+        BEFORE_TELEPORT.invoker().onTeleport(this);
+        return canceled;
+    }
+
+    @FunctionalInterface
+    public interface Callback {
+
+        void onTeleport(MekanismTeleportEvent event);
     }
 
     /**
@@ -40,7 +107,6 @@ public class MekanismTeleportEvent extends EntityTeleportEvent {
      * <br>
      * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
-    @Cancelable
     public static class MekaTool extends MekanismTeleportEvent {
 
         private final BlockHitResult targetBlock;
