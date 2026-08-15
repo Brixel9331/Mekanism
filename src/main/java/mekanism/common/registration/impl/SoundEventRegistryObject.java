@@ -2,19 +2,18 @@ package mekanism.common.registration.impl;
 
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.text.ILangEntry;
-import mekanism.common.registration.WrappedRegistryObject;
+import mekanism.common.registration.RegistryObject;
 import net.minecraft.Util;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraftforge.registries.RegistryObject;
 
 @NothingNullByDefault
-public class SoundEventRegistryObject<SOUND extends SoundEvent> extends WrappedRegistryObject<SOUND> implements ILangEntry {
+public class SoundEventRegistryObject<SOUND extends SoundEvent> extends RegistryObject<SOUND> implements ILangEntry {
 
     private final String translationKey;
 
     public SoundEventRegistryObject(RegistryObject<SOUND> registryObject) {
         super(registryObject);
-        translationKey = Util.makeDescriptionId("sound_event", this.registryObject.getId());
+        translationKey = Util.makeDescriptionId("sound_event", getId());
     }
 
     @Override

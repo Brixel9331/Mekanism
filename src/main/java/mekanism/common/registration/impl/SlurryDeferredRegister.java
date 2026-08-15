@@ -13,7 +13,7 @@ public class SlurryDeferredRegister extends DeferredRegister<Slurry> {
     }
 
     public SlurryRegistryObject<Slurry, Slurry> register(String baseName, UnaryOperator<SlurryBuilder> builderModifier) {
-        return new SlurryRegistryObject<>(register("dirty_" + baseName, () -> new Slurry(builderModifier.apply(SlurryBuilder.dirty()))),
-              register("clean_" + baseName, () -> new Slurry(builderModifier.apply(SlurryBuilder.clean()))));
+        return new SlurryRegistryObject<>(registerEntry("dirty_" + baseName, () -> new Slurry(builderModifier.apply(SlurryBuilder.dirty()))),
+              registerEntry("clean_" + baseName, () -> new Slurry(builderModifier.apply(SlurryBuilder.clean()))));
     }
 }

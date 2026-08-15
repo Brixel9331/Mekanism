@@ -2,15 +2,16 @@ package mekanism.common.registration.impl;
 
 import com.mojang.serialization.Codec;
 import java.util.function.Supplier;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProviderType;
 
-public class HeightProviderTypeDeferredRegister extends WrappedDeferredRegister<HeightProviderType<?>> {
+public class HeightProviderTypeDeferredRegister extends DeferredRegister<HeightProviderType<?>> {
 
     public HeightProviderTypeDeferredRegister(String modid) {
-        super(modid, Registries.HEIGHT_PROVIDER_TYPE);
+        super(modid, Registries.HEIGHT_PROVIDER_TYPE, () -> BuiltInRegistries.HEIGHT_PROVIDER_TYPE);
     }
 
     public <PROVIDER extends HeightProvider> HeightProviderTypeRegistryObject<PROVIDER> register(String name, Codec<PROVIDER> codec) {
