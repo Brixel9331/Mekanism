@@ -25,7 +25,7 @@ public class RobitSkinSerializationHelper {
     /**
      * Codec for (de)serializing robit skins inline.
      */
-    public static final Codec<RobitSkin> DIRECT_CODEC = ExtraCodecs.lazyInitializedCodec(IMekanismAccess.INSTANCE::robitSkinCodec);
+    public static final Codec<RobitSkin> DIRECT_CODEC = ExtraCodecs.lazyInitializedCodec(() -> IMekanismAccess.INSTANCE.robitSkinCodec());
 
     /**
      * Codec for referring to robit skins by id in other datapack registry files. Can only be used with {@link net.minecraft.resources.RegistryOps}.

@@ -17,7 +17,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
 
 public class MekanismRobitSkins {
 
@@ -29,8 +28,8 @@ public class MekanismRobitSkins {
     @SuppressWarnings("FieldCanBeLocal")//Cannot be local as we reflect and grab it from the API
     private static Codec<RobitSkin> DIRECT_CODEC;
 
-    public static void createAndRegisterDatapack(IEventBus modEventBus) {
-        DIRECT_CODEC = MekanismRobitSkins.ROBIT_SKINS.createAndRegisterDatapack(modEventBus, RobitSkin::codec, RobitSkinSerializationHelper.NETWORK_CODEC);
+    public static void createAndRegisterDatapack() {
+        DIRECT_CODEC = MekanismRobitSkins.ROBIT_SKINS.createAndRegisterDatapack(RobitSkinSerializationHelper.NETWORK_CODEC);
     }
 
     public static Codec<RobitSkin> getDirectCodec() {

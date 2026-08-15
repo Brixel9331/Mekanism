@@ -222,7 +222,7 @@ public class Mekanism {
         MekanismInfuseTypes.INFUSE_TYPES.register();
         MekanismPigments.PIGMENTS.register();
         MekanismSlurries.SLURRIES.register();
-        MekanismRobitSkins.createAndRegisterDatapack(modEventBus);
+        MekanismRobitSkins.createAndRegisterDatapack();
         MekanismModules.MODULES.register();
         modEventBus.addListener(this::registerEventListener);
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
