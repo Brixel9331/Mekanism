@@ -31,7 +31,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.server.permission.PermissionAPI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +54,7 @@ public final class SecurityUtils implements ISecurityUtils {
     private boolean isOp(Player p) {
         Objects.requireNonNull(p, "Player may not be null.");
         return MekanismConfig.general.opsBypassRestrictions.get() && p instanceof ServerPlayer player &&
-               PermissionAPI.getPermission(player, MekanismPermissions.BYPASS_SECURITY);
+               MekanismPermissions.canBypassSecurity(player);
     }
 
     @Nullable

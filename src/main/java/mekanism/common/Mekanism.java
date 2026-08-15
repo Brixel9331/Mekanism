@@ -18,7 +18,6 @@ import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.base.IModModule;
 import mekanism.common.base.KeySync;
 import mekanism.common.base.MekFakePlayer;
-import mekanism.common.base.MekanismPermissions;
 import mekanism.common.base.PlayerState;
 import mekanism.common.base.TagCache;
 import mekanism.common.command.CommandMek;
@@ -195,7 +194,6 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::addReloadListenersLowest);
         MinecraftForge.EVENT_BUS.addListener(this::onTagsReload);
-        MinecraftForge.EVENT_BUS.addListener(MekanismPermissions::registerPermissionNodes);
         MinecraftForge.EVENT_BUS.register(IncompleteRecipeScanner.class);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
