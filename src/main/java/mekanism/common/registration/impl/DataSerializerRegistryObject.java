@@ -1,12 +1,48 @@
 package mekanism.common.registration.impl;
 
-import mekanism.common.registration.WrappedRegistryObject;
+import java.util.Objects;
+import java.util.function.Supplier;
+import mekanism.common.registration.INamedEntry;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
 
-public class DataSerializerRegistryObject<T> extends WrappedRegistryObject<EntityDataSerializer<T>> {
+public final class DataSerializerRegistryObject<T> implements Supplier<EntityDataSerializer<T>>, INamedEntry {
 
-    public DataSerializerRegistryObject(RegistryObject<EntityDataSerializer<T>> registryObject) {
-        super(registryObject);
+    private final ResourceLocation id;
+    private final Supplier<EntityDataSerializer<T>> supplier;
+    private EntityDataSerializer<T> serializer;
+
+    DataSerializerRegistryObject(ResourceLocation id, Supplier<EntityDataSerializer<T>> supplier) {
+        this.id = id;
+        this.supplier = Objects.requireNonNull(supplier);
+    }
+
+    void register() {
+        if (serializer == null) {
+            EntityDataSerializer<T> value = Objects.requireNonNull(supplier.get(), "Entity data serializer supplier returned null");
+            if (EntityDataSerializers.getSerializedId(value) >= 0) {
+                throw new IllegalArgumentException("Entity data serializer is already registered: " + id);
+            }
+            EntityDataSerializers.registerSerializer(value);
+            serializer = value;
+        }
+    }
+
+    @Override
+    public EntityDataSerializer<T> get() {
+        if (serializer == null) {
+            throw new IllegalStateException("Entity data serializer has not been registered: " + id);
+        }
+        return serializer;
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    @Override
+    public String getInternalRegistryName() {
+        return id.getPath();
     }
 }

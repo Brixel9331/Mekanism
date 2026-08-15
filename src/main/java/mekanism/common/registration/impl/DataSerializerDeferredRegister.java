@@ -1,17 +1,24 @@
 package mekanism.common.registration.impl;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import mekanism.common.registration.WrappedDeferredRegister;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class DataSerializerDeferredRegister extends WrappedDeferredRegister<EntityDataSerializer<?>> {
+public class DataSerializerDeferredRegister {
+
+    private final String modid;
+    private final Map<ResourceLocation, DataSerializerRegistryObject<?>> entries = new LinkedHashMap<>();
+    private boolean started;
+    private boolean registered;
 
     public DataSerializerDeferredRegister(String modid) {
-        super(modid, ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS);
+        this.modid = Objects.requireNonNull(modid);
     }
 
     public <T extends Enum<T>> DataSerializerRegistryObject<T> registerEnum(String name, Class<T> enumClass) {
@@ -44,6 +51,28 @@ public class DataSerializerDeferredRegister extends WrappedDeferredRegister<Enti
     }
 
     public <T> DataSerializerRegistryObject<T> register(String name, Supplier<EntityDataSerializer<T>> sup) {
-        return register(name, sup, DataSerializerRegistryObject::new);
+        if (started) {
+            throw new IllegalStateException("Entity data serializer registration has already started");
+        }
+        ResourceLocation id = new ResourceLocation(modid, name);
+        if (entries.containsKey(id)) {
+            throw new IllegalArgumentException("Duplicate entity data serializer: " + id);
+        }
+        DataSerializerRegistryObject<T> entry = new DataSerializerRegistryObject<>(id, sup);
+        entries.put(id, entry);
+        return entry;
+    }
+
+    public void register() {
+        if (registered) {
+            return;
+        } else if (started) {
+            throw new IllegalStateException("Entity data serializer registration did not complete");
+        }
+        started = true;
+        for (DataSerializerRegistryObject<?> entry : entries.values()) {
+            entry.register();
+        }
+        registered = true;
     }
 }
