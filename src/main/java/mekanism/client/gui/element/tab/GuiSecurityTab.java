@@ -2,6 +2,7 @@ package mekanism.client.gui.element.tab;
 
 import java.util.function.Supplier;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.api.text.EnumColor;
 import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
@@ -9,14 +10,13 @@ import mekanism.client.gui.element.GuiInsetElement;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.security.SecurityData;
-import mekanism.common.network.to_server.PacketGuiInteract;
 import mekanism.common.network.to_server.PacketGuiInteract.GuiInteraction;
 import mekanism.common.network.to_server.PacketGuiInteract.GuiInteractionEntity;
+import mekanism.common.network.to_server.PacketGuiInteract;
 import mekanism.common.network.to_server.PacketSecurityMode;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.SecurityUtils;
 import mekanism.common.util.text.OwnerDisplay;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,12 +25,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabilityProvider>> {
+public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable Object>> {
 
     private static final ResourceLocation PUBLIC = MekanismUtils.getResource(ResourceType.GUI, "public.png");
     private static final ResourceLocation PRIVATE = MekanismUtils.getResource(ResourceType.GUI, "private.png");
@@ -39,11 +38,11 @@ public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabili
     @Nullable
     private final InteractionHand currentHand;
 
-    public GuiSecurityTab(IGuiWrapper gui, ICapabilityProvider provider) {
+    public GuiSecurityTab(IGuiWrapper gui, Object provider) {
         this(gui, provider, 34);
     }
 
-    public GuiSecurityTab(IGuiWrapper gui, ICapabilityProvider provider, int y) {
+    public GuiSecurityTab(IGuiWrapper gui, Object provider, int y) {
         this(gui, () -> provider, y, null);
     }
 
@@ -51,7 +50,7 @@ public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabili
         this(gui, () -> minecraft.player.getItemInHand(hand), 34, hand);
     }
 
-    private GuiSecurityTab(IGuiWrapper gui, Supplier<ICapabilityProvider> provider, int y, @Nullable InteractionHand hand) {
+    private GuiSecurityTab(IGuiWrapper gui, Supplier<Object> provider, int y, @Nullable InteractionHand hand) {
         super(PUBLIC, gui, provider, gui.getWidth(), y, 26, 18, false);
         this.currentHand = hand;
     }
@@ -73,9 +72,9 @@ public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabili
     @Override
     public void renderToolTip(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderToolTip(guiGraphics, mouseX, mouseY);
-        ICapabilityProvider provider = dataSource.get();
+        Object provider = dataSource.get();
         if (provider != null) {
-            provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+            SecurityLookup.SECURITY.find(provider).ifPresent(security -> {
                 SecurityData data = SecurityUtils.get().getFinalData(security, true);
                 Component securityComponent = MekanismLang.SECURITY.translateColored(EnumColor.GRAY, data.mode());
                 Component ownerComponent = OwnerDisplay.of(minecraft.player, security.getOwnerUUID(), security.getOwnerName()).getTextComponent();
@@ -90,9 +89,9 @@ public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabili
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
-        ICapabilityProvider provider = dataSource.get();
+        Object provider = dataSource.get();
         if (provider != null) {
-            provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+            SecurityLookup.SECURITY.find(provider).ifPresent(security -> {
                 if (security.ownerMatches(minecraft.player)) {
                     if (currentHand != null) {
                         Mekanism.packetHandler().sendToServer(new PacketSecurityMode(currentHand, button == GLFW.GLFW_MOUSE_BUTTON_LEFT));

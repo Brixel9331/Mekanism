@@ -25,8 +25,8 @@ import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.inventory.IMekanismInventory;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
-import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
+import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.OneInputCachedRecipe;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
@@ -35,6 +35,7 @@ import mekanism.api.recipes.outputs.OutputHelper;
 import mekanism.api.robit.IRobit;
 import mekanism.api.robit.RobitSkin;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.api.security.SecurityMode;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
@@ -42,7 +43,6 @@ import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.CapabilityCache;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
-import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.entity.ai.RobitAIFollow;
@@ -67,8 +67,8 @@ import mekanism.common.registries.MekanismDamageTypes;
 import mekanism.common.registries.MekanismDataSerializers;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.registries.MekanismItems;
-import mekanism.common.registries.MekanismRobitSkins;
 import mekanism.common.registries.MekanismRobitSkins.SkinLookup;
+import mekanism.common.registries.MekanismRobitSkins;
 import mekanism.common.tile.TileEntityChargepad;
 import mekanism.common.tile.interfaces.ISustainedInventory;
 import mekanism.common.tile.prefab.TileEntityRecipeMachine;
@@ -200,7 +200,6 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
         super(type, world);
         getNavigation().setCanFloat(false);
         setCustomNameVisible(true);
-        addCapabilityResolver(BasicCapabilityResolver.security(this));
         recipeCacheLookupMonitor = new RecipeCacheLookupMonitor<>(this);
         // Choose a random offset to check for all errors. We do this to ensure that not every tile tries to recheck errors for every
         // recipe the same tick and thus create uneven spikes of CPU usage
@@ -439,7 +438,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
         ItemRobit item = (ItemRobit) stack.getItem();
         item.setSustainedInventory(getSustainedInventory(), stack);
         item.setName(stack, getName());
-        stack.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+        SecurityLookup.SECURITY.find(stack).ifPresent(security -> {
             security.setOwnerUUID(getOwnerUUID());
             security.setSecurityMode(getSecurityMode());
         });

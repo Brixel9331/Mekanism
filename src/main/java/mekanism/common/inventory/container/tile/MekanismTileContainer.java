@@ -11,7 +11,6 @@ import mekanism.common.util.WorldUtils;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +38,7 @@ public class MekanismTileContainer<TILE extends TileEntityMekanism> extends Meka
 
     @Nullable
     @Override
-    public ICapabilityProvider getSecurityObject() {
+    public Object getSecurityObject() {
         return tile;
     }
 

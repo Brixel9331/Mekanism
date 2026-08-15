@@ -2,8 +2,6 @@ package mekanism.common.capabilities.resolver;
 
 import java.util.List;
 import mekanism.api.annotations.NothingNullByDefault;
-import mekanism.api.security.ISecurityObject;
-import mekanism.common.capabilities.Capabilities;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -30,10 +28,6 @@ public class BasicCapabilityResolver implements ICapabilityResolver {
      */
     public static <T> BasicCapabilityResolver constant(Capability<T> supportedCapability, T value) {
         return create(supportedCapability, () -> value);
-    }
-
-    public static BasicCapabilityResolver security(ISecurityObject value) {
-        return new BasicCapabilityResolver(() -> value, Capabilities.OWNER_OBJECT, Capabilities.SECURITY_OBJECT);
     }
 
     private final List<Capability<?>> supportedCapability;

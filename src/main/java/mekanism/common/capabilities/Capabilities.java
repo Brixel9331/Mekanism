@@ -14,8 +14,6 @@ import mekanism.api.lasers.ILaserDissipation;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.radiation.capability.IRadiationEntity;
 import mekanism.api.radiation.capability.IRadiationShielding;
-import mekanism.api.security.IOwnerObject;
-import mekanism.api.security.ISecurityObject;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -50,6 +48,4 @@ public class Capabilities {
 
     public static final Capability<IRadiationEntity> RADIATION_ENTITY = CapabilityManager.get(new CapabilityToken<>() {});
 
-    public static final Capability<IOwnerObject> OWNER_OBJECT = CapabilityManager.get(new CapabilityToken<>() {});
-    public static final Capability<ISecurityObject> SECURITY_OBJECT = CapabilityManager.get(new CapabilityToken<>() {});
 }

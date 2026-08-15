@@ -1,14 +1,10 @@
 package mekanism.common.capabilities.security.item;
 
+import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.security.IOwnerObject;
-import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
-import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
-import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.lib.frequency.IFrequencyItem;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
@@ -20,7 +16,17 @@ import org.jetbrains.annotations.Nullable;
  * Helper class for implementing owners on items
  */
 @NothingNullByDefault
-public class ItemStackOwnerObject extends ItemCapability implements IOwnerObject {
+public class ItemStackOwnerObject implements IOwnerObject {
+
+    private final ItemStack stack;
+
+    public ItemStackOwnerObject(ItemStack stack) {
+        this.stack = Objects.requireNonNull(stack);
+    }
+
+    public ItemStack getStack() {
+        return stack;
+    }
 
     @Nullable
     @Override
@@ -50,10 +56,5 @@ public class ItemStackOwnerObject extends ItemCapability implements IOwnerObject
             }
             ItemDataUtils.setUUID(stack, NBTConstants.OWNER_UUID, owner);
         }
-    }
-
-    @Override
-    protected void gatherCapabilityResolvers(Consumer<ICapabilityResolver> consumer) {
-        consumer.accept(BasicCapabilityResolver.constant(Capabilities.OWNER_OBJECT, this));
     }
 }

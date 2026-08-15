@@ -13,6 +13,7 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.MekanismIMC;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.IncompleteRecipeScanner;
+import mekanism.common.capabilities.security.MekanismSecurity;
 import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.base.IModModule;
 import mekanism.common.base.KeySync;
@@ -182,6 +183,7 @@ public class Mekanism {
 
     public Mekanism() {
         instance = this;
+        MekanismSecurity.register();
         MekanismConfig.registerConfigs(ModLoadingContext.get());
 
         MinecraftForge.EVENT_BUS.addListener(this::onEnergyTransferred);
