@@ -1,13 +1,12 @@
 package mekanism.common.registration.impl;
 
-import mekanism.common.registration.WrappedRegistryObject;
+import mekanism.common.registration.RegistryObject;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityTypeRegistryObject<BE extends BlockEntity> extends WrappedRegistryObject<BlockEntityType<BE>> {
+public class TileEntityTypeRegistryObject<BE extends BlockEntity> extends RegistryObject<BlockEntityType<BE>> {
 
     @Nullable
     private BlockEntityTicker<BE> clientTicker;
@@ -16,12 +15,6 @@ public class TileEntityTypeRegistryObject<BE extends BlockEntity> extends Wrappe
 
     public TileEntityTypeRegistryObject(RegistryObject<BlockEntityType<BE>> registryObject) {
         super(registryObject);
-    }
-
-    //Internal use only, overwrite the registry object
-    TileEntityTypeRegistryObject<BE> setRegistryObject(RegistryObject<BlockEntityType<BE>> registryObject) {
-        this.registryObject = registryObject;
-        return this;
     }
 
     //Internal use only

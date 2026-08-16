@@ -200,14 +200,14 @@ public class Mekanism {
         modEventBus.addListener(this::onConfigLoad);
         modEventBus.addListener(this::imcQueue);
         modEventBus.addListener(this::imcHandle);
-        MekanismItems.ITEMS.register(modEventBus);
-        MekanismBlocks.BLOCKS.register(modEventBus);
+        MekanismItems.ITEMS.register();
+        MekanismBlocks.BLOCKS.register();
         MekanismFluids.FLUIDS.register(modEventBus);
         MekanismContainerTypes.CONTAINER_TYPES.register(modEventBus);
         MekanismCreativeTabs.CREATIVE_TABS.register(modEventBus);
         MekanismDataSerializers.DATA_SERIALIZERS.register();
         MekanismEntityTypes.ENTITY_TYPES.register();
-        MekanismTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
+        MekanismTileEntityTypes.TILE_ENTITY_TYPES.register();
         MekanismGameEvents.GAME_EVENTS.register();
         MekanismSounds.SOUND_EVENTS.register();
         MekanismParticleTypes.PARTICLE_TYPES.register();
