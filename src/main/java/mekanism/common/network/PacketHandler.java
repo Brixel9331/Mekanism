@@ -1,6 +1,7 @@
 package mekanism.common.network;
 
 import mekanism.common.Mekanism;
+import mekanism.common.network.FabricPacketChannel;
 import mekanism.common.network.to_client.PacketLaserHitBlock;
 import mekanism.common.network.to_client.PacketLightningRender;
 import mekanism.common.network.to_client.PacketPlayerData;
@@ -40,14 +41,13 @@ import mekanism.common.network.to_server.PacketRobit;
 import mekanism.common.network.to_server.PacketSecurityMode;
 import mekanism.common.network.to_server.PacketUpdateModuleSettings;
 import mekanism.common.network.to_server.PacketWindowSelect;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 public class PacketHandler extends BasePacketHandler {
 
-    private final SimpleChannel netHandler = createChannel(Mekanism.rl(Mekanism.MODID), Mekanism.instance.versionNumber);
+    private final FabricPacketChannel netHandler = createChannel(Mekanism.rl(Mekanism.MODID), Mekanism.instance.versionNumber);
 
     @Override
-    protected SimpleChannel getChannel() {
+    protected FabricPacketChannel getChannel() {
         return netHandler;
     }
 
@@ -95,5 +95,6 @@ public class PacketHandler extends BasePacketHandler {
         registerServerToClient(PacketTransporterUpdate.class, PacketTransporterUpdate::decode);
         registerServerToClient(PacketUpdateContainer.class, PacketUpdateContainer::decode);
         registerServerToClient(PacketUpdateTile.class, PacketUpdateTile::decode);
+        getChannel().registerReceivers();
     }
 }

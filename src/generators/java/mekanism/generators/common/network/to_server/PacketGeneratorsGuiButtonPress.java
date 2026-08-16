@@ -3,6 +3,7 @@ package mekanism.generators.common.network.to_server;
 import java.util.function.BiFunction;
 import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.WorldUtils;
 import mekanism.generators.common.GeneratorsLang;
@@ -14,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
-import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Used for informing the server that a click happened in a GUI and the gui window needs to change
@@ -36,7 +36,7 @@ public class PacketGeneratorsGuiButtonPress implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null) {//If we are on the server (the only time we should be receiving this packet), let forge handle switching the Gui
             TileEntityMekanism tile = WorldUtils.getTileEntity(TileEntityMekanism.class, player.level(), tilePosition);

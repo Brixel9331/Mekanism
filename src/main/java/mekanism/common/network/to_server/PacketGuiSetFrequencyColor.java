@@ -1,13 +1,13 @@
 package mekanism.common.network.to_server;
 
-import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
+import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.frequency.IColorableFrequency;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketGuiSetFrequencyColor<FREQ extends Frequency & IColorableFrequency> implements IMekanismPacket {
 
@@ -26,7 +26,7 @@ public class PacketGuiSetFrequencyColor<FREQ extends Frequency & IColorableFrequ
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null) {
             FREQ freq = frequencyType.getFrequency(identity, player.getUUID());

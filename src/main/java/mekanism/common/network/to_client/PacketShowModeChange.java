@@ -2,8 +2,8 @@ package mekanism.common.network.to_client;
 
 import mekanism.client.render.hud.MekanismStatusOverlay;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketShowModeChange implements IMekanismPacket {
 
@@ -13,7 +13,7 @@ public class PacketShowModeChange implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         //TODO - 1.20: Test on server
         MekanismStatusOverlay.INSTANCE.setTimer();
     }

@@ -8,6 +8,7 @@ import mekanism.common.block.attribute.AttributeGui;
 import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.item.interfaces.IGuiItem;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.registries.MekanismContainerTypes;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.multiblock.TileEntityBoilerCasing;
@@ -21,7 +22,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Used for informing the server that a click happened in a GUI and the gui window needs to change
@@ -73,7 +73,7 @@ public class PacketGuiButtonPress implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player == null) {
             return;

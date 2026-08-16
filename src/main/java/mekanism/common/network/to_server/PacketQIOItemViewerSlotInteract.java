@@ -7,12 +7,12 @@ import mekanism.common.content.qio.QIOGlobalItemLookup;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.util.InventoryUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketQIOItemViewerSlotInteract implements IMekanismPacket {
 
@@ -39,7 +39,7 @@ public class PacketQIOItemViewerSlotInteract implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null && player.containerMenu instanceof QIOItemViewerContainer container) {
             QIOFrequency freq = container.getFrequency();

@@ -3,10 +3,10 @@ package mekanism.common.network.to_server;
 import java.util.UUID;
 import mekanism.common.Mekanism;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.network.to_client.PacketPlayerData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketGearStateUpdate implements IMekanismPacket {
 
@@ -22,7 +22,7 @@ public class PacketGearStateUpdate implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         if (gearType == GearType.FLAMETHROWER) {
             Mekanism.playerState.setFlamethrowerState(uuid, state, false);
         } else if (gearType == GearType.JETPACK) {

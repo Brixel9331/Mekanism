@@ -11,13 +11,13 @@ import mekanism.common.content.qio.QIOCraftingTransferHelper.SingularHashedItemS
 import mekanism.common.content.qio.QIOServerCraftingTransferHandler;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.recipe.MekanismRecipeType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketQIOFillCraftingWindow implements IMekanismPacket {
 
@@ -34,7 +34,7 @@ public class PacketQIOFillCraftingWindow implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null && player.containerMenu instanceof QIOItemViewerContainer container) {
             byte selectedCraftingGrid = container.getSelectedCraftingGrid(player.getUUID());

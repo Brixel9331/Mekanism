@@ -1,12 +1,12 @@
 package mekanism.common.network.to_server;
 
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.util.SecurityUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketSecurityMode implements IMekanismPacket {
 
@@ -19,7 +19,7 @@ public class PacketSecurityMode implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player != null) {
             ItemStack stack = player.getItemInHand(currentHand);

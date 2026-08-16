@@ -1,13 +1,13 @@
 package mekanism.common.network.to_server;
 
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.tile.TileEntitySecurityDesk;
 import mekanism.common.util.WorldUtils;
 import mekanism.common.util.text.InputValidator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketAddTrusted implements IMekanismPacket {
 
@@ -27,7 +27,7 @@ public class PacketAddTrusted implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         if (!name.isEmpty() && InputValidator.test(name, InputValidator.USERNAME)) {
             Player player = context.getSender();
             if (player != null) {

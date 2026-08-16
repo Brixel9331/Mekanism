@@ -2,6 +2,7 @@ package mekanism.common.network.to_client;
 
 import mekanism.common.Mekanism;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.tile.base.TileEntityUpdateable;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.client.Minecraft;
@@ -9,7 +10,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketUpdateTile implements IMekanismPacket {
 
@@ -26,7 +26,7 @@ public class PacketUpdateTile implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ClientLevel world = Minecraft.getInstance().level;
         //Only handle the update packet if the block is currently loaded
         if (WorldUtils.isBlockLoaded(world, pos)) {

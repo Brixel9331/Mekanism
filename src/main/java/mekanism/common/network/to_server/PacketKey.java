@@ -2,9 +2,9 @@ package mekanism.common.network.to_server;
 
 import mekanism.common.Mekanism;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketKey implements IMekanismPacket {
 
@@ -17,7 +17,7 @@ public class PacketKey implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player != null) {
             if (add) {

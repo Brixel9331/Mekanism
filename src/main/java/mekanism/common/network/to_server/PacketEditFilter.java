@@ -4,13 +4,13 @@ import javax.annotation.Nullable;
 import mekanism.common.content.filter.BaseFilter;
 import mekanism.common.content.filter.IFilter;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.tile.interfaces.ITileFilterHolder;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketEditFilter<FILTER extends IFilter<FILTER>> implements IMekanismPacket {
 
@@ -28,7 +28,7 @@ public class PacketEditFilter<FILTER extends IFilter<FILTER>> implements IMekani
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player == null || filter == null) {
             return;

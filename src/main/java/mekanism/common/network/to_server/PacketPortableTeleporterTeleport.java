@@ -11,6 +11,7 @@ import mekanism.common.item.ItemPortableTeleporter;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import mekanism.common.network.to_client.PacketPortalFX;
 import mekanism.common.tile.TileEntityTeleporter;
 import mekanism.common.util.StorageUtils;
@@ -23,8 +24,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class PacketPortableTeleporterTeleport implements IMekanismPacket {
 
@@ -37,7 +36,7 @@ public class PacketPortableTeleporterTeleport implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player == null) {
             return;
@@ -51,7 +50,7 @@ public class PacketPortableTeleporterTeleport implements IMekanismPacket {
             }
             Coord4D coords = found.getClosestCoords(new Coord4D(player));
             if (coords != null) {
-                Level teleWorld = ServerLifecycleHooks.getCurrentServer().getLevel(coords.dimension);
+                Level teleWorld = player.server.getLevel(coords.dimension);
                 TileEntityTeleporter teleporter = WorldUtils.getTileEntity(TileEntityTeleporter.class, teleWorld, coords.getPos());
                 if (teleporter != null) {
                     if (!player.isCreative()) {

@@ -1,12 +1,12 @@
 package mekanism.common.network.to_server;
 
 import mekanism.common.inventory.container.MekanismContainer;
-import mekanism.common.inventory.container.SelectedWindowData;
 import mekanism.common.inventory.container.SelectedWindowData.WindowType;
+import mekanism.common.inventory.container.SelectedWindowData;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class PacketWindowSelect implements IMekanismPacket {
@@ -19,7 +19,7 @@ public class PacketWindowSelect implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null && player.containerMenu instanceof MekanismContainer container) {
             container.setSelectedWindow(player.getUUID(), selectedWindow);

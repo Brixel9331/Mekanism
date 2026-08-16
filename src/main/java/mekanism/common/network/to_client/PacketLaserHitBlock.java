@@ -1,10 +1,10 @@
 package mekanism.common.network.to_client;
 
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketLaserHitBlock implements IMekanismPacket {
 
@@ -15,7 +15,7 @@ public class PacketLaserHitBlock implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         if (Minecraft.getInstance().level != null) {
             Minecraft.getInstance().particleEngine.addBlockHitEffects(result.getBlockPos(), result);
         }

@@ -2,14 +2,14 @@ package mekanism.common.network.to_server;
 
 import mekanism.common.Mekanism;
 import mekanism.common.integration.curios.CuriosIntegration;
-import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.item.interfaces.IModeItem.DisplayChange;
+import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketModeChangeCurios implements IMekanismPacket {
 
@@ -34,7 +34,7 @@ public class PacketModeChangeCurios implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player != null && Mekanism.hooks.CuriosLoaded) {
             ItemStack stack = CuriosIntegration.getCurioStack(player, slotType, slot);

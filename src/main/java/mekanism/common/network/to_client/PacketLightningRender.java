@@ -3,14 +3,14 @@ package mekanism.common.network.to_client;
 import java.util.function.BooleanSupplier;
 import mekanism.client.render.RenderTickHandler;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.lib.effect.BoltEffect;
 import mekanism.common.lib.effect.BoltEffect.BoltRenderInfo;
 import mekanism.common.lib.effect.BoltEffect.SpawnFunction;
+import mekanism.common.lib.effect.BoltEffect;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketLightningRender implements IMekanismPacket {
 
@@ -29,7 +29,7 @@ public class PacketLightningRender implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         if (preset.shouldAdd.getAsBoolean()) {
             RenderTickHandler.renderBolt(renderer, preset.boltCreator.create(start, end, segments));
         }

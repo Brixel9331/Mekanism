@@ -3,9 +3,9 @@ package mekanism.common.network.to_server;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketGuiItemDataRequest implements IMekanismPacket {
 
@@ -20,7 +20,7 @@ public class PacketGuiItemDataRequest implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         ServerPlayer player = context.getSender();
         if (player != null) {
             if (type == Type.QIO_ITEM_VIEWER) {

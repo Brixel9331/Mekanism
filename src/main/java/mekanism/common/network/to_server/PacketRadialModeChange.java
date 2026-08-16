@@ -7,12 +7,12 @@ import mekanism.api.radial.mode.IRadialMode;
 import mekanism.common.Mekanism;
 import mekanism.common.lib.radial.IGenericRadialModeItem;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketRadialModeChange implements IMekanismPacket {
 
@@ -28,7 +28,7 @@ public class PacketRadialModeChange implements IMekanismPacket {
 
     @Override
     @SuppressWarnings("ConstantConditions")//not null, validated by hasNestedData
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player != null) {
             ItemStack stack = player.getItemBySlot(slot);

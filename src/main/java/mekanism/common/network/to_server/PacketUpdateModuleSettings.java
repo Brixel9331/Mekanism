@@ -15,10 +15,10 @@ import mekanism.common.content.gear.Module;
 import mekanism.common.content.gear.ModuleConfigItem;
 import mekanism.common.content.gear.ModuleHelper;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 //TODO: Eventually it would be nice to make this more generic in terms of how it can sync module data so that we can support custom types
 // though given the module tweaker screen doesn't currently have a way to support custom types it isn't that big a deal to make this support it yet either
@@ -51,7 +51,7 @@ public class PacketUpdateModuleSettings implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Player player = context.getSender();
         if (player != null && dataIndex >= 0 && value != null) {
             ItemStack stack = player.getInventory().getItem(slotId);

@@ -3,8 +3,8 @@ package mekanism.common.network.to_client;
 import java.util.UUID;
 import mekanism.common.Mekanism;
 import mekanism.common.network.IMekanismPacket;
+import mekanism.common.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketResetPlayerClient implements IMekanismPacket {
 
@@ -15,7 +15,7 @@ public class PacketResetPlayerClient implements IMekanismPacket {
     }
 
     @Override
-    public void handle(NetworkEvent.Context context) {
+    public void handle(PacketContext context) {
         Mekanism.playerState.clearPlayer(uuid, true);
     }
 
