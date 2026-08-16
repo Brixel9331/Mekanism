@@ -7,13 +7,11 @@ import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.ModuleTweakerContainer;
 import mekanism.common.network.IMekanismPacket;
-import mekanism.common.registries.MekanismContainerTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
 
 public class PacketOpenGui implements IMekanismPacket {
 
@@ -27,7 +25,7 @@ public class PacketOpenGui implements IMekanismPacket {
     public void handle(NetworkEvent.Context context) {
         ServerPlayer player = context.getSender();
         if (player != null && type.shouldOpenForPlayer.test(player)) {
-            NetworkHooks.openScreen(player, type.containerSupplier.get());
+            ContainerProvider.open(player, type.containerSupplier.get());
         }
     }
 
@@ -41,7 +39,7 @@ public class PacketOpenGui implements IMekanismPacket {
     }
 
     public enum GuiType {
-        MODULE_TWEAKER(() -> new ContainerProvider(MekanismLang.MODULE_TWEAKER, (id, inv, player) -> MekanismContainerTypes.MODULE_TWEAKER.get().create(id, inv)),
+        MODULE_TWEAKER(() -> new ContainerProvider(MekanismLang.MODULE_TWEAKER, (id, inv, player) -> new ModuleTweakerContainer(id, inv)),
               ModuleTweakerContainer::hasTweakableItem);
 
         private final Supplier<MenuProvider> containerSupplier;

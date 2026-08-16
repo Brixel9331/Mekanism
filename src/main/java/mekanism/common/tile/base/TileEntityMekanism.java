@@ -68,6 +68,7 @@ import mekanism.common.capabilities.resolver.manager.ItemHandlerManager;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.integration.computer.*;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
+import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.ITrackableContainer;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableDouble;
@@ -135,7 +136,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -525,7 +525,7 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
                 }
             }
 
-            NetworkHooks.openScreen((ServerPlayer) player, Attribute.get(getBlockType(), AttributeGui.class).getProvider(this), worldPosition);
+            ContainerProvider.open((ServerPlayer) player, Attribute.get(getBlockType(), AttributeGui.class).getProvider(this), worldPosition);
             return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;

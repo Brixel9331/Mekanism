@@ -203,7 +203,7 @@ public class Mekanism {
         MekanismItems.ITEMS.register();
         MekanismBlocks.BLOCKS.register();
         MekanismFluids.FLUIDS.register(modEventBus);
-        MekanismContainerTypes.CONTAINER_TYPES.register(modEventBus);
+        MekanismContainerTypes.CONTAINER_TYPES.register();
         MekanismCreativeTabs.CREATIVE_TABS.register(modEventBus);
         MekanismDataSerializers.DATA_SERIALIZERS.register();
         MekanismEntityTypes.ENTITY_TYPES.register();

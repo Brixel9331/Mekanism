@@ -2,9 +2,7 @@ package mekanism.common.inventory.container.type;
 
 import mekanism.common.inventory.container.entity.IEntityContainer;
 import mekanism.common.inventory.container.type.MekanismContainerType.IMekanismContainerFactory;
-import mekanism.common.tile.base.TileEntityMekanism;
-import mekanism.common.util.WorldUtils;
-import net.minecraft.client.Minecraft;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType.ExtendedFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
@@ -12,34 +10,32 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.network.IContainerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MekanismContainerType<T, CONTAINER extends AbstractContainerMenu> extends BaseMekanismContainerType<T, CONTAINER, IMekanismContainerFactory<T, CONTAINER>> {
 
-    public static <TILE extends TileEntityMekanism, CONTAINER extends AbstractContainerMenu> MekanismContainerType<TILE, CONTAINER> tile(Class<TILE> type,
+    public static <TILE extends BlockEntity, CONTAINER extends AbstractContainerMenu> MekanismContainerType<TILE, CONTAINER> tile(Class<TILE> type,
           IMekanismContainerFactory<TILE, CONTAINER> constructor) {
-        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getTileFromBuf(buf, type)));
+        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getTileFromBuf(buf, inv, type)));
     }
 
-    public static <TILE extends TileEntityMekanism, CONTAINER extends AbstractContainerMenu> MekanismContainerType<TILE, CONTAINER> tile(Class<TILE> type,
+    public static <TILE extends BlockEntity, CONTAINER extends AbstractContainerMenu> MekanismContainerType<TILE, CONTAINER> tile(Class<TILE> type,
           IMekanismSidedContainerFactory<TILE, CONTAINER> constructor) {
-        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getTileFromBuf(buf, type), true));
+        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getTileFromBuf(buf, inv, type), true));
     }
 
     public static <ENTITY extends Entity, CONTAINER extends AbstractContainerMenu & IEntityContainer<ENTITY>> MekanismContainerType<ENTITY, CONTAINER> entity(Class<ENTITY> type,
           IMekanismContainerFactory<ENTITY, CONTAINER> constructor) {
-        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getEntityFromBuf(buf, type)));
+        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getEntityFromBuf(buf, inv, type)));
     }
 
     public static <ENTITY extends Entity, CONTAINER extends AbstractContainerMenu & IEntityContainer<ENTITY>> MekanismContainerType<ENTITY, CONTAINER> entity(Class<ENTITY> type,
           IMekanismSidedContainerFactory<ENTITY, CONTAINER> constructor) {
-        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getEntityFromBuf(buf, type), true));
+        return new MekanismContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, getEntityFromBuf(buf, inv, type), true));
     }
 
-    protected MekanismContainerType(Class<T> type, IMekanismContainerFactory<T, CONTAINER> mekanismConstructor, IContainerFactory<CONTAINER> constructor) {
+    protected MekanismContainerType(Class<T> type, IMekanismContainerFactory<T, CONTAINER> mekanismConstructor, ExtendedFactory<CONTAINER> constructor) {
         super(type, mekanismConstructor, constructor);
     }
 
@@ -61,33 +57,30 @@ public class MekanismContainerType<T, CONTAINER extends AbstractContainerMenu> e
     }
 
     @NotNull
-    private static <TILE extends BlockEntity> TILE getTileFromBuf(FriendlyByteBuf buf, Class<TILE> type) {
+    private static <TILE extends BlockEntity> TILE getTileFromBuf(FriendlyByteBuf buf, Inventory inventory, Class<TILE> type) {
         if (buf == null) {
             throw new IllegalArgumentException("Null packet buffer");
-        } else if (!FMLEnvironment.dist.isClient()) {
+        } else if (!inventory.player.level().isClientSide) {
             throw new UnsupportedOperationException("This method is only supported on the client.");
         }
         BlockPos pos = buf.readBlockPos();
-        TILE tile = WorldUtils.getTileEntity(type, Minecraft.getInstance().level, pos);
-        if (tile == null) {
+        BlockEntity tile = inventory.player.level().getBlockEntity(pos);
+        if (!type.isInstance(tile)) {
             throw new IllegalStateException("Client could not locate tile at " + pos + " for tile container. "
                                             + "This is likely caused by a mod breaking client side tile lookup");
         }
-        return tile;
+        return type.cast(tile);
     }
 
     @NotNull
-    private static <ENTITY extends Entity> ENTITY getEntityFromBuf(FriendlyByteBuf buf, Class<ENTITY> type) {
+    private static <ENTITY extends Entity> ENTITY getEntityFromBuf(FriendlyByteBuf buf, Inventory inventory, Class<ENTITY> type) {
         if (buf == null) {
             throw new IllegalArgumentException("Null packet buffer");
-        } else if (!FMLEnvironment.dist.isClient()) {
+        } else if (!inventory.player.level().isClientSide) {
             throw new UnsupportedOperationException("This method is only supported on the client.");
         }
-        if (Minecraft.getInstance().level == null) {
-            throw new IllegalStateException("Client world is null.");
-        }
         int entityId = buf.readVarInt();
-        Entity e = Minecraft.getInstance().level.getEntity(entityId);
+        Entity e = inventory.player.level().getEntity(entityId);
         if (type.isInstance(e)) {
             //noinspection unchecked
             return (ENTITY) e;

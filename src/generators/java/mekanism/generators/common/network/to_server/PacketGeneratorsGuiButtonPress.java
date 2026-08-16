@@ -1,6 +1,7 @@
 package mekanism.generators.common.network.to_server;
 
 import java.util.function.BiFunction;
+import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.network.IMekanismPacket;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.WorldUtils;
@@ -14,7 +15,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
 
 /**
  * Used for informing the server that a click happened in a GUI and the gui window needs to change
@@ -44,7 +44,7 @@ public class PacketGeneratorsGuiButtonPress implements IMekanismPacket {
                 MenuProvider provider = tileButton.getProvider(tile, extra);
                 if (provider != null) {
                     //Ensure valid data
-                    NetworkHooks.openScreen(player, provider, buf -> {
+                    ContainerProvider.open(player, provider, buf -> {
                         buf.writeBlockPos(tilePosition);
                         buf.writeVarInt(extra);
                     });

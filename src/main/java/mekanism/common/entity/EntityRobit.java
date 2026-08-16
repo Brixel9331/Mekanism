@@ -47,6 +47,7 @@ import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.entity.ai.RobitAIFollow;
 import mekanism.common.entity.ai.RobitAIPickup;
+import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableFloatingLong;
 import mekanism.common.inventory.container.sync.SyncableInt;
@@ -124,7 +125,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -420,7 +420,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
             if (provider != null) {
                 gameEvent(GameEvent.ENTITY_INTERACT, player);
                 //Validate the provider isn't null, it shouldn't be but just in case
-                NetworkHooks.openScreen((ServerPlayer) player, provider, buf -> buf.writeVarInt(getId()));
+                ContainerProvider.open((ServerPlayer) player, provider, buf -> buf.writeVarInt(getId()));
             }
         }
         return InteractionResult.sidedSuccess(level().isClientSide);

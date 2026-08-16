@@ -5,6 +5,7 @@ import java.util.function.Function;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
+import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.item.interfaces.IGuiItem;
 import mekanism.common.network.IMekanismPacket;
 import mekanism.common.registries.MekanismContainerTypes;
@@ -21,7 +22,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
 
 /**
  * Used for informing the server that a click happened in a GUI and the gui window needs to change
@@ -84,7 +84,7 @@ public class PacketGuiButtonPress implements IMekanismPacket {
                 MenuProvider provider = entityButton.getProvider(entity);
                 if (provider != null) {
                     //Ensure valid data
-                    NetworkHooks.openScreen(player, provider, buf -> buf.writeVarInt(entityID));
+                    ContainerProvider.open(player, provider, buf -> buf.writeVarInt(entityID));
                 }
             }
         } else if (type == Type.TILE) {
@@ -93,7 +93,7 @@ public class PacketGuiButtonPress implements IMekanismPacket {
                 MenuProvider provider = tileButton.getProvider(tile, extra);
                 if (provider != null) {
                     //Ensure valid data
-                    NetworkHooks.openScreen(player, provider, buf -> {
+                    ContainerProvider.open(player, provider, buf -> {
                         buf.writeBlockPos(tilePosition);
                         buf.writeVarInt(extra);
                     });
@@ -104,7 +104,7 @@ public class PacketGuiButtonPress implements IMekanismPacket {
             if (stack.getItem() instanceof IGuiItem) {
                 MenuProvider provider = itemButton.getProvider(stack, hand);
                 if (provider != null) {
-                    NetworkHooks.openScreen(player, provider, buf -> {
+                    ContainerProvider.open(player, provider, buf -> {
                         buf.writeEnum(hand);
                         buf.writeItem(stack);
                     });

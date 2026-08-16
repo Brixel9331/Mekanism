@@ -2,6 +2,7 @@ package mekanism.common.inventory.container.type;
 
 import mekanism.common.inventory.container.type.MekanismItemContainerType.IMekanismItemContainerFactory;
 import mekanism.common.util.RegistryUtils;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType.ExtendedFactory;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,7 +10,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.IContainerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +26,7 @@ public class MekanismItemContainerType<ITEM extends Item, CONTAINER extends Abst
         return new MekanismItemContainerType<>(type, constructor, (id, inv, buf) -> constructor.create(id, inv, buf.readEnum(InteractionHand.class), getStackFromBuffer(buf, type), true));
     }
 
-    protected MekanismItemContainerType(Class<ITEM> type, IMekanismItemContainerFactory<ITEM, CONTAINER> mekanismConstructor, IContainerFactory<CONTAINER> constructor) {
+    protected MekanismItemContainerType(Class<ITEM> type, IMekanismItemContainerFactory<ITEM, CONTAINER> mekanismConstructor, ExtendedFactory<CONTAINER> constructor) {
         super(type, mekanismConstructor, constructor);
     }
 
@@ -52,7 +52,7 @@ public class MekanismItemContainerType<ITEM extends Item, CONTAINER extends Abst
             throw new IllegalArgumentException("Null packet buffer");
         }
         ItemStack stack = buf.readItem();
-        if (type.isInstance(stack.getItem())) {
+        if (!stack.isEmpty() && type.isInstance(stack.getItem())) {
             return stack;
         }
         throw new IllegalStateException("Client received invalid stack (" + RegistryUtils.getName(stack.getItem()) + ") for item container.");
