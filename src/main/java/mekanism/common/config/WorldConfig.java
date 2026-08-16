@@ -59,11 +59,6 @@ public class WorldConfig extends BaseMekanismConfig {
         return Type.SERVER;
     }
 
-    @Override
-    public boolean addToContainer() {
-        return false;
-    }
-
     public OreVeinConfig getVeinConfig(OreVeinType oreVeinType) {
         return ores.get(oreVeinType.type()).veinConfigs.get(oreVeinType.index());
     }

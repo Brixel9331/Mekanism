@@ -28,7 +28,6 @@ import mekanism.common.command.builders.Builders.MatrixBuilder;
 import mekanism.common.command.builders.Builders.SPSBuilder;
 import mekanism.common.command.builders.Builders.TankBuilder;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.config.MekanismModConfig;
 import mekanism.common.content.boiler.BoilerMultiblockData;
 import mekanism.common.content.boiler.BoilerValidator;
 import mekanism.common.content.evaporation.EvaporationMultiblockData;
@@ -117,8 +116,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
@@ -183,7 +180,7 @@ public class Mekanism {
     public Mekanism() {
         instance = this;
         MekanismSecurity.register();
-        MekanismConfig.registerConfigs(ModLoadingContext.get());
+        MekanismConfig.registerConfigs();
 
         MinecraftForge.EVENT_BUS.addListener(this::onEnergyTransferred);
         MinecraftForge.EVENT_BUS.addListener(this::onChemicalTransferred);
@@ -197,7 +194,6 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.register(IncompleteRecipeScanner.class);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::onConfigLoad);
         modEventBus.addListener(this::imcQueue);
         modEventBus.addListener(this::imcHandle);
         MekanismItems.ITEMS.register();
@@ -396,16 +392,6 @@ public class Mekanism {
 
     private void onLiquidTransferred(FluidTransferEvent event) {
         packetHandler.sendToReceivers(new PacketTransmitterUpdate(event.network, event.fluidType), event.network);
-    }
-
-    private void onConfigLoad(ModConfigEvent configEvent) {
-        //Note: We listen to both the initial load and the reload, to make sure that we fix any accidentally
-        // cached values from calls before the initial loading
-        ModConfig config = configEvent.getConfig();
-        //Make sure it is for the same modid as us
-        if (config.getModId().equals(MODID) && config instanceof MekanismModConfig mekConfig) {
-            mekConfig.clearCache(configEvent);
-        }
     }
 
     private void onWorldLoad(LevelEvent.Load event) {

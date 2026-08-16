@@ -1,7 +1,5 @@
 package mekanism.common.config;
 
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModLoadingContext;
 
 public class MekanismConfig {
 
@@ -17,15 +15,14 @@ public class MekanismConfig {
     public static final UsageConfig usage = new UsageConfig();
     public static final WorldConfig world = new WorldConfig();
 
-    public static void registerConfigs(ModLoadingContext modLoadingContext) {
-        ModContainer modContainer = modLoadingContext.getActiveContainer();
-        MekanismConfigHelper.registerConfig(modContainer, client);
-        MekanismConfigHelper.registerConfig(modContainer, common);
-        MekanismConfigHelper.registerConfig(modContainer, general);
-        MekanismConfigHelper.registerConfig(modContainer, gear);
-        MekanismConfigHelper.registerConfig(modContainer, storage);
-        MekanismConfigHelper.registerConfig(modContainer, tiers);
-        MekanismConfigHelper.registerConfig(modContainer, usage);
-        MekanismConfigHelper.registerConfig(modContainer, world);
+    public static void registerConfigs() {
+        MekanismConfigHelper.registerConfig("mekanism", client);
+        MekanismConfigHelper.registerConfig("mekanism", common);
+        MekanismConfigHelper.registerConfig("mekanism", general);
+        MekanismConfigHelper.registerConfig("mekanism", gear);
+        MekanismConfigHelper.registerConfig("mekanism", storage);
+        MekanismConfigHelper.registerConfig("mekanism", tiers);
+        MekanismConfigHelper.registerConfig("mekanism", usage);
+        MekanismConfigHelper.registerConfig("mekanism", world);
     }
 }

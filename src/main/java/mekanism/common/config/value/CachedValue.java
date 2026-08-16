@@ -1,13 +1,16 @@
 package mekanism.common.config.value;
 
+import com.mojang.logging.LogUtils;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import mekanism.common.Mekanism;
 import mekanism.common.config.IMekanismConfig;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import org.slf4j.Logger;
 
 public abstract class CachedValue<T> {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private final IMekanismConfig config;
     protected final ConfigValue<T> internal;
@@ -28,15 +31,15 @@ public abstract class CachedValue<T> {
             invalidationListeners = new HashSet<>();
         }
         if (!invalidationListeners.add(listener)) {
-            Mekanism.logger.warn("Duplicate invalidation listener added");
+            LOGGER.warn("Duplicate invalidation listener added");
         }
     }
 
     public void removeInvalidationListener(IConfigValueInvalidationListener listener) {
         if (invalidationListeners == null) {
-            Mekanism.logger.warn("Unable to remove specified invalidation listener, no invalidation listeners have been added.");
+            LOGGER.warn("Unable to remove specified invalidation listener, no invalidation listeners have been added.");
         } else if (!invalidationListeners.remove(listener)) {
-            Mekanism.logger.warn("Unable to remove specified invalidation listener.");
+            LOGGER.warn("Unable to remove specified invalidation listener.");
         }
     }
 

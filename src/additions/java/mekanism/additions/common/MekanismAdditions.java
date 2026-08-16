@@ -14,7 +14,6 @@ import mekanism.additions.common.registries.AdditionsStructureModifierSerializer
 import mekanism.additions.common.voice.VoiceServerManager;
 import mekanism.common.Mekanism;
 import mekanism.common.base.IModModule;
-import mekanism.common.config.MekanismModConfig;
 import mekanism.common.lib.Version;
 import mekanism.common.registration.impl.EntityTypeRegistryObject;
 import net.minecraft.core.BlockPos;
@@ -35,8 +34,6 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.NotNull;
@@ -60,13 +57,12 @@ public class MekanismAdditions implements IModModule {
 
     public MekanismAdditions() {
         Mekanism.addModule(instance = this);
-        MekanismAdditionsConfig.registerConfigs(ModLoadingContext.get());
+        MekanismAdditionsConfig.registerConfigs();
         MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopping);
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::onConfigLoad);
         AdditionsEntityTypes.ENTITY_TYPES.register();
         AdditionsItems.ITEMS.register();
         AdditionsBlocks.BLOCKS.register();
@@ -160,14 +156,6 @@ public class MekanismAdditions implements IModModule {
         if (voiceManager != null) {
             voiceManager.stop();
             voiceManager = null;
-        }
-    }
-
-    private void onConfigLoad(ModConfigEvent configEvent) {
-        ModConfig config = configEvent.getConfig();
-        //Make sure it is for the same modid as us
-        if (config.getModId().equals(MODID) && config instanceof MekanismModConfig mekConfig) {
-            mekConfig.clearCache(configEvent);
         }
     }
 }

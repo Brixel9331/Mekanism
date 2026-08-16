@@ -1,24 +1,30 @@
 package mekanism.common.config;
 
+import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
 import java.nio.file.Path;
-import mekanism.common.Mekanism;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraftforge.fml.config.ModConfig;
 
 public class MekanismConfigHelper {
 
     private MekanismConfigHelper() {
     }
 
-    public static final Path CONFIG_DIR = FMLPaths.getOrCreateGameRelativePath(FMLPaths.CONFIGDIR.get().resolve(Mekanism.MOD_NAME));
+    public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("Mekanism");
 
     /**
      * Creates a mod config so that {@link net.minecraftforge.fml.config.ConfigTracker} will track it and sync server configs from server to client.
      */
-    public static void registerConfig(ModContainer modContainer, IMekanismConfig config) {
-        MekanismModConfig modConfig = new MekanismModConfig(modContainer, config);
-        if (config.addToContainer()) {
-            modContainer.addConfig(modConfig);
+    public static MekanismModConfig registerConfig(String modId, IMekanismConfig config) {
+        ModConfigEvents.loading(modId).register(loaded -> clearCache(loaded, config, false));
+        ModConfigEvents.reloading(modId).register(loaded -> clearCache(loaded, config, false));
+        ModConfigEvents.unloading(modId).register(loaded -> clearCache(loaded, config, true));
+        return new MekanismModConfig(modId, config);
+    }
+
+    private static void clearCache(ModConfig loaded, IMekanismConfig config, boolean unloading) {
+        if (loaded.getSpec() == config.getConfigSpec()) {
+            config.clearCache(unloading);
         }
     }
 }

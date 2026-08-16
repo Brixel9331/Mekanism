@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import mekanism.common.Mekanism;
 import mekanism.common.base.IModModule;
-import mekanism.common.config.MekanismModConfig;
 import mekanism.common.lib.Version;
 import mekanism.tools.common.config.MekanismToolsConfig;
 import mekanism.tools.common.material.BaseMekanismMaterial;
@@ -21,8 +20,6 @@ import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -40,13 +37,12 @@ public class MekanismTools implements IModModule {
 
     public MekanismTools() {
         Mekanism.addModule(instance = this);
-        MekanismToolsConfig.registerConfigs(ModLoadingContext.get());
+        MekanismToolsConfig.registerConfigs();
         //Register the listener for special mob spawning (mobs with Mekanism armor/tools)
         MinecraftForge.EVENT_BUS.addListener(MobEquipmentHelper::onLivingSpecialSpawn);
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::onConfigLoad);
         ToolsItems.ITEMS.register();
         ToolsCreativeTabs.CREATIVE_TABS.register(modEventBus);
         ToolsRecipeSerializers.RECIPE_SERIALIZERS.register();
@@ -56,16 +52,6 @@ public class MekanismTools implements IModModule {
 
     public static ResourceLocation rl(String path) {
         return new ResourceLocation(MekanismTools.MODID, path);
-    }
-
-    private void onConfigLoad(ModConfigEvent configEvent) {
-        //Note: We listen to both the initial load and the reload, to make sure that we fix any accidentally
-        // cached values from calls before the initial loading
-        ModConfig config = configEvent.getConfig();
-        //Make sure it is for the same modid as us
-        if (config.getModId().equals(MODID) && config instanceof MekanismModConfig mekConfig) {
-            mekConfig.clearCache(configEvent);
-        }
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
