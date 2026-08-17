@@ -68,8 +68,7 @@ import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.PacketHandler;
 import mekanism.common.network.to_client.PacketTransmitterUpdate;
 import mekanism.common.recipe.MekanismRecipeType;
-import mekanism.common.recipe.condition.ConditionExistsCondition;
-import mekanism.common.recipe.condition.ModVersionLoadedCondition;
+import mekanism.common.recipe.condition.MekanismResourceConditions;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismContainerTypes;
 import mekanism.common.registries.MekanismCreativeTabs;
@@ -105,7 +104,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -120,8 +118,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
 @Mod(Mekanism.MODID)
@@ -181,6 +177,8 @@ public class Mekanism {
         instance = this;
         MekanismSecurity.register();
         MekanismConfig.registerConfigs();
+        //Register our custom serializer condition
+        MekanismResourceConditions.register();
 
         MinecraftForge.EVENT_BUS.addListener(this::onEnergyTransferred);
         MinecraftForge.EVENT_BUS.addListener(this::onChemicalTransferred);
@@ -220,7 +218,6 @@ public class Mekanism {
         MekanismSlurries.SLURRIES.register();
         MekanismRobitSkins.createAndRegisterDatapack();
         MekanismModules.MODULES.register();
-        modEventBus.addListener(this::registerEventListener);
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
         packetHandler = new PacketHandler();
@@ -234,14 +231,6 @@ public class Mekanism {
 
     public static PacketHandler packetHandler() {
         return instance.packetHandler;
-    }
-
-    private void registerEventListener(RegisterEvent event) {
-        //Register our custom serializer condition
-        if (event.getRegistryKey().equals(ForgeRegistries.Keys.RECIPE_SERIALIZERS)) {
-            CraftingHelper.register(ConditionExistsCondition.Serializer.INSTANCE);
-            CraftingHelper.register(ModVersionLoadedCondition.Serializer.INSTANCE);
-        }
     }
 
     public static ResourceLocation rl(String path) {

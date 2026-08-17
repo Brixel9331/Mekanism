@@ -1,63 +1,58 @@
 package mekanism.common.recipe.condition;
 
 import com.google.gson.JsonObject;
-import mekanism.common.Mekanism;
+import com.google.gson.JsonParseException;
+import mekanism.api.MekanismAPI;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
-import net.minecraftforge.fml.ModList;
-import org.apache.maven.artifact.versioning.ComparableVersion;
 
-public class ModVersionLoadedCondition implements ICondition {
+public class ModVersionLoadedCondition implements ConditionJsonProvider {
 
-    private static final ResourceLocation NAME = Mekanism.rl("mod_version_loaded");
+    static final ResourceLocation NAME = new ResourceLocation(MekanismAPI.MEKANISM_MODID, "mod_version_loaded");
     private final String minVersion;
     private final String modid;
+    private final VersionPredicate predicate;
 
     public ModVersionLoadedCondition(String modid, String version) {
         this.modid = modid;
         this.minVersion = version;
+        try {
+            this.predicate = VersionPredicate.parse(">=" + version);
+        } catch (VersionParsingException e) {
+            throw new JsonParseException("Invalid minimum mod version: " + version, e);
+        }
     }
 
     @Override
-    public ResourceLocation getID() {
+    public ResourceLocation getConditionId() {
         return NAME;
     }
 
-    @Override
-    public boolean test(IContext context) {
+    boolean test(Version installedVersion) {
         //They match or we are ahead of the min version
-        return ModList.get().getModContainerById(modid).filter(modContainer -> new ComparableVersion(minVersion).compareTo(
-              new ComparableVersion(modContainer.getModInfo().getVersion().toString())) <= 0).isPresent();
+        return predicate.test(installedVersion);
+    }
+
+    static boolean test(JsonObject json) {
+        ModVersionLoadedCondition condition = new ModVersionLoadedCondition(GsonHelper.getAsString(json, "modid"),
+              GsonHelper.getAsString(json, "minVersion"));
+        return FabricLoader.getInstance().getModContainer(condition.modid)
+              .filter(container -> condition.test(container.getMetadata().getVersion())).isPresent();
+    }
+
+    @Override
+    public void writeParameters(JsonObject json) {
+        json.addProperty("modid", modid);
+        json.addProperty("minVersion", minVersion);
     }
 
     @Override
     public String toString() {
         return "mod_version_loaded(\"" + modid + "\", \"" + minVersion + "\")";
-    }
-
-    public static class Serializer implements IConditionSerializer<ModVersionLoadedCondition> {
-
-        public static final Serializer INSTANCE = new Serializer();
-
-        private Serializer() {
-        }
-
-        @Override
-        public void write(JsonObject json, ModVersionLoadedCondition value) {
-            json.addProperty("modid", value.modid);
-            json.addProperty("minVersion", value.minVersion);
-        }
-
-        @Override
-        public ModVersionLoadedCondition read(JsonObject json) {
-            return new ModVersionLoadedCondition(GsonHelper.getAsString(json, "modid"), GsonHelper.getAsString(json, "minVersion"));
-        }
-
-        @Override
-        public ResourceLocation getID() {
-            return ModVersionLoadedCondition.NAME;
-        }
     }
 }

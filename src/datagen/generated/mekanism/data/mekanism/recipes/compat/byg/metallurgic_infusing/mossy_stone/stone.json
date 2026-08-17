@@ -4,10 +4,12 @@
     "amount": 10,
     "tag": "mekanism:bio"
   },
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:mod_loaded",
-      "modid": "byg"
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "byg"
+      ]
     }
   ],
   "itemInput": {

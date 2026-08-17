@@ -1,17 +1,19 @@
 {
   "type": "mekanism:sawing",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:and",
+      "condition": "fabric:and",
       "values": [
         {
-          "type": "forge:mod_loaded",
-          "modid": "ilikewood"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "ilikewood"
+          ]
         },
         {
-          "type": "mekanism:condition_exists",
-          "condition": {
-            "type": "ilikewood:config",
+          "condition": "mekanism:condition_exists",
+          "value": {
+            "condition": "ilikewood:config",
             "config": "composters"
           }
         }

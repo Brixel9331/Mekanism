@@ -4,19 +4,19 @@
     "amount": 256,
     "pigment": "mekanism:white"
   },
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:and",
+      "condition": "fabric:and",
       "values": [
         {
-          "type": "mekanism:mod_version_loaded",
+          "condition": "mekanism:mod_version_loaded",
           "minVersion": "1.20.1-11.0.1.0",
           "modid": "ilikewood"
         },
         {
-          "type": "mekanism:condition_exists",
-          "condition": {
-            "type": "ilikewood:config",
+          "condition": "mekanism:condition_exists",
+          "value": {
+            "condition": "ilikewood:config",
             "config": "beds"
           }
         }

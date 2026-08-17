@@ -4,21 +4,27 @@
     "amount": 256,
     "pigment": "mekanism:purple"
   },
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:and",
+      "condition": "fabric:and",
       "values": [
         {
-          "type": "forge:mod_loaded",
-          "modid": "ilikewoodxbyg"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "ilikewoodxbyg"
+          ]
         },
         {
-          "type": "forge:mod_loaded",
-          "modid": "byg"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "byg"
+          ]
         },
         {
-          "type": "forge:mod_loaded",
-          "modid": "ilikewood_beds"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "ilikewood_beds"
+          ]
         }
       ]
     }

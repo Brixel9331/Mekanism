@@ -1,20 +1,26 @@
 {
   "type": "mekanism:sawing",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:and",
+      "condition": "fabric:and",
       "values": [
         {
-          "type": "forge:mod_loaded",
-          "modid": "ilikewoodxbiomesoplenty"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "ilikewoodxbiomesoplenty"
+          ]
         },
         {
-          "type": "forge:mod_loaded",
-          "modid": "biomesoplenty"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "biomesoplenty"
+          ]
         },
         {
-          "type": "forge:mod_loaded",
-          "modid": "ilikewood_barrels"
+          "condition": "fabric:all_mods_loaded",
+          "values": [
+            "ilikewood_barrels"
+          ]
         }
       ]
     }

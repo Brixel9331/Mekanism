@@ -1,5 +1,6 @@
 package mekanism.common.recipe.compat;
 
+import com.google.gson.JsonObject;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -10,7 +11,6 @@ import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
-import mekanism.common.lib.FieldReflectionHelper;
 import mekanism.common.recipe.RecipeProviderUtil;
 import mekanism.common.recipe.condition.ConditionExistsCondition;
 import mekanism.common.recipe.condition.ModVersionLoadedCondition;
@@ -18,7 +18,10 @@ import mekanism.common.recipe.impl.PigmentExtractingRecipeProvider;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.registries.MekanismPigments;
 import mekanism.common.util.EnumUtils;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,11 +30,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.crafting.conditions.AndCondition;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import yamahari.ilikewood.ILikeWood;
 import yamahari.ilikewood.config.ILikeWoodConfig;
-import yamahari.ilikewood.data.condition.ConfigCondition;
 import yamahari.ilikewood.plugin.vanilla.VanillaWoodTypes;
 import yamahari.ilikewood.registry.objecttype.WoodenBlockType;
 import yamahari.ilikewood.registry.objecttype.WoodenItemType;
@@ -40,10 +40,7 @@ import yamahari.ilikewood.registry.woodtype.IWoodType;
 @NothingNullByDefault
 public class ILikeWoodRecipeProvider extends CompatRecipeProvider {
 
-    private static final FieldReflectionHelper<AndCondition, ICondition[]> EXPLODER = new FieldReflectionHelper<>(AndCondition.class, "children",
-          () -> new ICondition[0]);
-
-    private final ICondition cherryVersion;
+    private final ConditionJsonProvider cherryVersion;
 
     public ILikeWoodRecipeProvider(String modid) {
         super(modid);
@@ -71,7 +68,7 @@ public class ILikeWoodRecipeProvider extends CompatRecipeProvider {
     }
 
     //TODO: Maybe move some of these into RecipeProviderUtil, so that we make sure the numbers stay consistent
-    public static void addWoodType(Consumer<FinishedRecipe> consumer, ICondition condition, String basePath, ItemLike planks, ItemLike log,
+    public static void addWoodType(Consumer<FinishedRecipe> consumer, ConditionJsonProvider condition, String basePath, ItemLike planks, ItemLike log,
           ItemLike fences, IWoodType woodType) {
         String name = woodType.getName();
         Item stick = ILikeWood.getItem(woodType, WoodenItemType.STICK);
@@ -177,7 +174,7 @@ public class ILikeWoodRecipeProvider extends CompatRecipeProvider {
         addBedRecipes(consumer, condition, planks, woodType, basePath + "bed/" + name + "/");
     }
 
-    private static void addBedRecipes(Consumer<FinishedRecipe> consumer, ICondition condition, ItemLike planks, IWoodType woodType, String basePath) {
+    private static void addBedRecipes(Consumer<FinishedRecipe> consumer, ConditionJsonProvider condition, ItemLike planks, IWoodType woodType, String basePath) {
         //All beds share the same config so just use the white bed for condition lookup
         condition = compoundCondition(condition, ILikeWoodConfig.BEDS_CONFIG);
         for (EnumColor color : EnumUtils.COLORS) {
@@ -185,7 +182,7 @@ public class ILikeWoodRecipeProvider extends CompatRecipeProvider {
         }
     }
 
-    private static void addBedRecipe(Consumer<FinishedRecipe> consumer, ICondition condition, ItemLike planks, IWoodType woodType, EnumColor color, String basePath) {
+    private static void addBedRecipe(Consumer<FinishedRecipe> consumer, ConditionJsonProvider condition, ItemLike planks, IWoodType woodType, EnumColor color, String basePath) {
         DyeColor dye = color.getDyeColor();
         if (dye != null) {
             WoodenBlockType bedType = getBedType(dye);
@@ -221,17 +218,23 @@ public class ILikeWoodRecipeProvider extends CompatRecipeProvider {
         };
     }
 
-    private static ICondition compoundCondition(ICondition base, ILikeWoodConfig... configs) {
-        Stream<ICondition> baseConditions;
-        if (base instanceof AndCondition and) {
-            //Only support to a depth of one
-            baseConditions = Arrays.stream(EXPLODER.getValue(and));
-        } else {
-            baseConditions = Stream.of(base);
-        }
-        return new AndCondition(Stream.concat(
-              baseConditions,
+    private static ConditionJsonProvider compoundCondition(ConditionJsonProvider base, ILikeWoodConfig... configs) {
+        return DefaultResourceConditions.and(Stream.concat(
+              Stream.of(base),
               Arrays.stream(configs).map(config -> new ConditionExistsCondition(new ConfigCondition(config.name())))
-        ).toArray(ICondition[]::new));
+        ).toArray(ConditionJsonProvider[]::new));
+    }
+
+    private record ConfigCondition(String config) implements ConditionJsonProvider {
+
+        @Override
+        public ResourceLocation getConditionId() {
+            return new ResourceLocation("ilikewood", "config");
+        }
+
+        @Override
+        public void writeParameters(JsonObject object) {
+            object.addProperty("config", config);
+        }
     }
 }
