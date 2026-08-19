@@ -72,7 +72,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
-import net.minecraftforge.common.util.Lazy;
+import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

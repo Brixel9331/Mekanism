@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.common.util.Lazy;
+import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault

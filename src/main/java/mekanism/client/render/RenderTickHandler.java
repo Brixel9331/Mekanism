@@ -86,7 +86,7 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.common.util.Lazy;
+import mekanism.common.lib.Lazy;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

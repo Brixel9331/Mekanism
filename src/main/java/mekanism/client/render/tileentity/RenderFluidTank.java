@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.common.util.Lazy;
+import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 
 @NothingNullByDefault
