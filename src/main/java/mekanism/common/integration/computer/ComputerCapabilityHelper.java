@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.integration.computer.computercraft.CCCapabilityHelper;
-import mekanism.common.integration.computer.opencomputers2.OC2CapabilityHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ComputerCapabilityHelper {
@@ -14,10 +13,6 @@ public class ComputerCapabilityHelper {
             if (Mekanism.hooks.CCLoaded) {
                 //If ComputerCraft is loaded add the capability for it
                 capabilityAdder.accept(CCCapabilityHelper.getComputerCraftCapability(tile));
-            }
-            if (Mekanism.hooks.OC2Loaded) {
-                //If OpenComputers2 is loaded add the capability for it
-                capabilityAdder.accept(OC2CapabilityHelper.getOpenComputers2Capability(tile));
             }
         }
     }

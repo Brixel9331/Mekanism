@@ -7,9 +7,6 @@ import mekanism.common.integration.computer.computercraft.CCCapabilityHelper;
 import mekanism.common.integration.crafttweaker.content.CrTContentUtils;
 import mekanism.common.integration.curios.CuriosIntegration;
 import mekanism.common.integration.energy.EnergyCompatUtils;
-import mekanism.common.integration.jsonthings.JsonThingsIntegration;
-import mekanism.common.integration.lookingat.theoneprobe.TOPProvider;
-import mekanism.common.integration.projecte.NSSHelper;
 import mekanism.common.recipe.bin.BinInsertRecipe;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.loading.DatagenModLoader;
@@ -50,18 +47,12 @@ public final class MekanismHooks {
     public boolean FluxNetworksLoaded;
     public boolean IC2Loaded;
     public boolean JEILoaded;
-    public boolean JsonThingsLoaded;
-    public boolean OC2Loaded;
-    public boolean ProjectELoaded;
-    public boolean RecipeStagesLoaded;
-    public boolean TOPLoaded;
     public boolean WildfireGenderModLoaded;
 
     public void hookConstructor(final IEventBus bus) {
         ModList modList = ModList.get();
         CraftTweakerLoaded = modList.isLoaded(CRAFTTWEAKER_MOD_ID);
         CuriosLoaded = modList.isLoaded(CURIOS_MODID);
-        JsonThingsLoaded = modList.isLoaded(JSON_THINGS_MOD_ID);
         if (CuriosLoaded) {
             CuriosIntegration.addListeners(bus);
         }
@@ -81,9 +72,6 @@ public final class MekanismHooks {
             //Register our CrT listener at lowest priority to try and ensure they get later ids than our normal registries
             crtModEventBus.addListener(EventPriority.LOWEST, CrTContentUtils::registerCrTContent);
         }
-        if (JsonThingsLoaded) {
-            JsonThingsIntegration.hook(bus);
-        }
     }
 
     public void hookCommonSetup() {
@@ -92,10 +80,6 @@ public final class MekanismHooks {
         DMELoaded = modList.isLoaded(DARK_MODE_EVERYWHERE_MODID);
         IC2Loaded = modList.isLoaded(IC2_MOD_ID);
         JEILoaded = modList.isLoaded(JEI_MOD_ID);
-        OC2Loaded = modList.isLoaded(OC2_MOD_ID);
-        ProjectELoaded = modList.isLoaded(PROJECTE_MOD_ID);
-        RecipeStagesLoaded = modList.isLoaded(RECIPE_STAGES_MOD_ID);
-        TOPLoaded = modList.isLoaded(TOP_MOD_ID);
         FluxNetworksLoaded = modList.isLoaded(FLUX_NETWORKS_MOD_ID);
         WildfireGenderModLoaded = modList.isLoaded(WILDFIRE_GENDER_MOD_ID);
         if (computerCompatEnabled()) {
@@ -119,16 +103,10 @@ public final class MekanismHooks {
             // we add this check here, so we can skip iterating the list of things we want to blacklist when it is not present
             sendDarkModeEverywhereIMC();
         }
-        if (ProjectELoaded) {
-            NSSHelper.init();
-        }
-        if (TOPLoaded) {
-            InterModComms.sendTo(TOP_MOD_ID, "getTheOneProbe", TOPProvider::new);
-        }
     }
 
     public boolean computerCompatEnabled() {
-        return CCLoaded || OC2Loaded;
+        return CCLoaded;
     }
 
     /**

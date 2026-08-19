@@ -20,7 +20,6 @@ import mekanism.common.advancements.MekanismAdvancementProvider;
 import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.integration.computer.ComputerHelpProvider;
 import mekanism.common.integration.crafttweaker.MekanismCrTExampleProvider;
-import mekanism.common.integration.projecte.MekanismCustomConversions;
 import mekanism.common.loot.MekanismLootProvider;
 import mekanism.common.recipe.impl.MekanismRecipeProvider;
 import mekanism.common.registries.MekanismDatapackRegistryProvider;
@@ -71,7 +70,6 @@ public class MekanismDataGenerator {
         MekanismRecipeProvider recipeProvider = new MekanismRecipeProvider(output, existingFileHelper);
         gen.addProvider(event.includeServer(), recipeProvider);
         gen.addProvider(event.includeServer(), new MekanismAdvancementProvider(output, existingFileHelper));
-        gen.addProvider(event.includeServer(), new MekanismCustomConversions(output, lookupProvider));
         gen.addProvider(event.includeServer(), new MekanismCrTExampleProvider(output, existingFileHelper));
         gen.addProvider(event.includeServer(), new ComputerHelpProvider(output, Mekanism.MODID));
         //Data generator to help with persisting data when porting across MC versions when optional deps aren't updated yet
