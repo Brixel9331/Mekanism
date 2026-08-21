@@ -8,16 +8,17 @@ import mekanism.api.recipes.MekanismRecipe;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.cache.IInputRecipeCache;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public class RecipeTypeDeferredRegister extends WrappedDeferredRegister<RecipeType<?>> {
+public class RecipeTypeDeferredRegister extends DeferredRegister<RecipeType<?>> {
 
     private final List<IMekanismRecipeTypeProvider<?, ?>> recipeTypes = new ArrayList<>();
 
     public RecipeTypeDeferredRegister(String modid) {
-        super(modid, ForgeRegistries.RECIPE_TYPES);
+        super(modid, Registries.RECIPE_TYPE, () -> BuiltInRegistries.RECIPE_TYPE);
     }
 
     public <RECIPE extends MekanismRecipe, INPUT_CACHE extends IInputRecipeCache> RecipeTypeRegistryObject<RECIPE, INPUT_CACHE> register(String name,

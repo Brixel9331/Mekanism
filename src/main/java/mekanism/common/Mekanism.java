@@ -209,9 +209,9 @@ public class Mekanism {
         MekanismIntProviderTypes.INT_PROVIDER_TYPES.register();
         MekanismPlacementModifiers.PLACEMENT_MODIFIERS.register();
         MekanismFeatures.FEATURES.register();
-        MekanismRecipeType.RECIPE_TYPES.register(modEventBus);
+        MekanismRecipeType.RECIPE_TYPES.register();
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register();
-        MekanismLootFunctions.REGISTER.register(modEventBus);
+        MekanismLootFunctions.REGISTER.register();
         MekanismGases.GASES.register();
         MekanismInfuseTypes.INFUSE_TYPES.register();
         MekanismPigments.PIGMENTS.register();
