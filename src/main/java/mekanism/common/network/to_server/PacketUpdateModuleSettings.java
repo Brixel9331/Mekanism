@@ -16,6 +16,7 @@ import mekanism.common.content.gear.ModuleConfigItem;
 import mekanism.common.content.gear.ModuleHelper;
 import mekanism.common.network.IMekanismPacket;
 import mekanism.common.network.PacketContext;
+import mekanism.common.network.RegistryPacketCodec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -80,7 +81,7 @@ public class PacketUpdateModuleSettings implements IMekanismPacket {
     @Override
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarInt(slotId);
-        buffer.writeRegistryId(MekanismAPI.moduleRegistry(), moduleType);
+        RegistryPacketCodec.write(buffer, MekanismAPI.moduleRegistry(), moduleType);
         buffer.writeVarInt(dataIndex);
         buffer.writeEnum(dataType);
         switch (dataType) {
@@ -93,7 +94,7 @@ public class PacketUpdateModuleSettings implements IMekanismPacket {
 
     public static PacketUpdateModuleSettings decode(FriendlyByteBuf buffer) {
         int slotId = buffer.readVarInt();
-        ModuleData<?> moduleType = buffer.readRegistryIdSafe(ModuleData.class);
+        ModuleData<?> moduleType = RegistryPacketCodec.read(buffer, MekanismAPI.moduleRegistry());
         int dataIndex = buffer.readVarInt();
         ModuleDataType dataType = buffer.readEnum(ModuleDataType.class);
         Object data = switch (dataType) {

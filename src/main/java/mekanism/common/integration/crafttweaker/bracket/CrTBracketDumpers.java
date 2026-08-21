@@ -12,7 +12,6 @@ import mekanism.common.integration.crafttweaker.CrTUtils;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenRegister
@@ -68,16 +67,16 @@ public class CrTBracketDumpers {
     }
 
     private static <CHEMICAL extends Chemical<CHEMICAL>, CRT_STACK extends ICrTChemicalStack<CHEMICAL, ?, CRT_STACK>> Collection<String>
-    getChemicalStackDump(IForgeRegistry<CHEMICAL> registry, Function<CHEMICAL, CRT_STACK> getter) {
+    getChemicalStackDump(Registry<CHEMICAL> registry, Function<CHEMICAL, CRT_STACK> getter) {
         return getDump(registry, chemical -> getter.apply(chemical).getCommandString());
     }
 
-    private static <V> Collection<String> getDump(IForgeRegistry<V> registry, String bracket) {
+    private static <V> Collection<String> getDump(Registry<V> registry, String bracket) {
         return getDump(registry, v -> "<" + bracket + ":" + registry.getKey(v) + ">");
     }
 
-    private static <V> Collection<String> getDump(IForgeRegistry<V> registry, Function<V, String> getter) {
-        return registry.getValues().stream().map(getter).toList();
+    private static <V> Collection<String> getDump(Registry<V> registry, Function<V, String> getter) {
+        return registry.stream().map(getter).toList();
     }
 
     private static Collection<String> getDump(ResourceKey<? extends Registry<?>> registryKey, String bracket) {

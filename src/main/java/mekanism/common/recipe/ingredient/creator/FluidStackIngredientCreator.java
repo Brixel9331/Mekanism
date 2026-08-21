@@ -22,17 +22,17 @@ import mekanism.api.recipes.ingredients.creator.IFluidStackIngredientCreator;
 import mekanism.common.Mekanism;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.recipe.ingredient.IMultiIngredient;
+import mekanism.common.tags.LazyTagLookup;
 import mekanism.common.tags.TagUtils;
 import mekanism.common.util.RegistryUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,8 +119,8 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
                 throw new JsonSyntaxException("Expected amount to be greater than zero.");
             }
             ResourceLocation resourceLocation = new ResourceLocation(GsonHelper.getAsString(jsonObject, JsonConstants.TAG));
-            ITagManager<Fluid> tagManager = TagUtils.manager(ForgeRegistries.FLUIDS);
-            TagKey<Fluid> key = tagManager.createTagKey(resourceLocation);
+            Registry<Fluid> tagManager = BuiltInRegistries.FLUID;
+            TagKey<Fluid> key = TagUtils.createKey(tagManager, resourceLocation);
             return from(key, amount);
         }
         throw new JsonSyntaxException("Expected to receive a resource location representing either a tag or a fluid.");
@@ -250,14 +250,14 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
     @NothingNullByDefault
     public static class TaggedFluidStackIngredient extends FluidStackIngredient {
 
-        private final ITag<Fluid> tag;
+        private final LazyTagLookup<Fluid> tag;
         private final int amount;
 
         private TaggedFluidStackIngredient(TagKey<Fluid> tag, int amount) {
-            this(TagUtils.tag(ForgeRegistries.FLUIDS, tag), amount);
+            this(TagUtils.tag(BuiltInRegistries.FLUID, tag), amount);
         }
 
-        private TaggedFluidStackIngredient(ITag<Fluid> tag, int amount) {
+        private TaggedFluidStackIngredient(LazyTagLookup<Fluid> tag, int amount) {
             this.tag = tag;
             this.amount = amount;
         }
@@ -294,7 +294,7 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         @Override
         public void logMissingTags() {
             if (tag.isEmpty()) {
-                Mekanism.logger.error("Empty tag: {}", tag.getKey());
+                Mekanism.logger.error("Empty tag: {}", tag.key());
             }
         }
 
@@ -320,13 +320,13 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         }
 
         public TagKey<Fluid> getTag() {
-            return tag.getKey();
+            return tag.key();
         }
 
         @Override
         public void write(FriendlyByteBuf buffer) {
             buffer.writeEnum(IngredientType.TAGGED);
-            buffer.writeResourceLocation(tag.getKey().location());
+            buffer.writeResourceLocation(tag.key().location());
             buffer.writeVarInt(amount);
         }
 
@@ -334,7 +334,7 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         public JsonElement serialize() {
             JsonObject json = new JsonObject();
             json.addProperty(JsonConstants.AMOUNT, amount);
-            json.addProperty(JsonConstants.TAG, tag.getKey().location().toString());
+            json.addProperty(JsonConstants.TAG, tag.key().location().toString());
             return json;
         }
 

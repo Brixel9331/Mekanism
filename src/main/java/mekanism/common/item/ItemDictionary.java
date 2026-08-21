@@ -14,6 +14,7 @@ import mekanism.common.tags.TagUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,7 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +70,7 @@ public class ItemDictionary extends Item {
                     FluidState fluidState = blockState.getFluidState();
                     Set<ResourceLocation> blockTags = TagUtils.tagNames(blockState.getTags());
                     Set<ResourceLocation> fluidTags = fluidState.isEmpty() ? Collections.emptySet() : TagUtils.tagNames(fluidState.getTags());
-                    Set<ResourceLocation> tileTags = tile == null ? Collections.emptySet() : TagUtils.tagNames(ForgeRegistries.BLOCK_ENTITY_TYPES, tile.getType());
+                    Set<ResourceLocation> tileTags = tile == null ? Collections.emptySet() : TagUtils.tagNames(BuiltInRegistries.BLOCK_ENTITY_TYPE, tile.getType());
                     if (blockTags.isEmpty() && fluidTags.isEmpty() && tileTags.isEmpty()) {
                         player.sendSystemMessage(MekanismUtils.logFormat(MekanismLang.DICTIONARY_NO_KEY));
                     } else {

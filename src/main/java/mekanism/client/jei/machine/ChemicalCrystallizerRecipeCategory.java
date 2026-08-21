@@ -7,11 +7,11 @@ import mekanism.api.chemical.merged.BoxedChemicalStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.recipes.ChemicalCrystallizerRecipe;
-import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.InfusionStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.PigmentStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.SlurryStackIngredient;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.client.gui.element.GuiInnerScreen;
 import mekanism.client.gui.element.gauge.GaugeType;
 import mekanism.client.gui.element.gauge.GuiGasGauge;
@@ -19,13 +19,14 @@ import mekanism.client.gui.element.gauge.GuiGauge;
 import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.client.gui.element.slot.GuiSlot;
 import mekanism.client.gui.element.slot.SlotType;
-import mekanism.client.gui.machine.GuiChemicalCrystallizer;
 import mekanism.client.gui.machine.GuiChemicalCrystallizer.IOreInfo;
+import mekanism.client.gui.machine.GuiChemicalCrystallizer;
 import mekanism.client.jei.BaseRecipeCategory;
 import mekanism.client.jei.MekanismJEI;
 import mekanism.client.jei.MekanismJEIRecipeType;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.registries.MekanismBlocks;
+import mekanism.common.tags.LazyTagLookup;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tags.TagUtils;
 import mekanism.common.tile.component.config.DataType;
@@ -39,11 +40,10 @@ import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,13 +95,13 @@ public class ChemicalCrystallizerRecipeCategory extends BaseRecipeCategory<Chemi
             initChemical(builder, MekanismJEI.TYPE_PIGMENT, ingredient);
         } else if (input instanceof SlurryStackIngredient ingredient) {
             initChemical(builder, MekanismJEI.TYPE_SLURRY, ingredient);
-            Set<ITag<Item>> tags = new HashSet<>();
+            Set<LazyTagLookup<Item>> tags = new HashSet<>();
             for (SlurryStack slurryStack : ingredient.getRepresentations()) {
                 Slurry slurry = slurryStack.getType();
                 if (!MekanismTags.Slurries.DIRTY_LOOKUP.contains(slurry)) {
                     TagKey<Item> oreTag = slurry.getOreTag();
                     if (oreTag != null) {
-                        tags.add(TagUtils.tag(ForgeRegistries.ITEMS, oreTag));
+                        tags.add(TagUtils.tag(BuiltInRegistries.ITEM, oreTag));
                     }
                 }
             }

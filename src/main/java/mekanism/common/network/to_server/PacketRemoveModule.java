@@ -4,6 +4,7 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.gear.ModuleData;
 import mekanism.common.network.IMekanismPacket;
 import mekanism.common.network.PacketContext;
+import mekanism.common.network.RegistryPacketCodec;
 import mekanism.common.tile.TileEntityModificationStation;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
@@ -34,10 +35,10 @@ public class PacketRemoveModule implements IMekanismPacket {
     @Override
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(pos);
-        buffer.writeRegistryId(MekanismAPI.moduleRegistry(), moduleType);
+        RegistryPacketCodec.write(buffer, MekanismAPI.moduleRegistry(), moduleType);
     }
 
     public static PacketRemoveModule decode(FriendlyByteBuf buffer) {
-        return new PacketRemoveModule(buffer.readBlockPos(), buffer.readRegistryIdSafe(ModuleData.class));
+        return new PacketRemoveModule(buffer.readBlockPos(), RegistryPacketCodec.read(buffer, MekanismAPI.moduleRegistry()));
     }
 }

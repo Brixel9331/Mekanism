@@ -36,18 +36,18 @@ import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ElectrolysisRecipe.ElectrolysisRecipeOutput;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.PressurizedReactionRecipe.PressurizedReactionRecipeOutput;
-import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.InfusionStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.PigmentStackIngredient;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.SlurryStackIngredient;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.api.recipes.ingredients.StrictNBTIngredient;
 import mekanism.common.integration.crafttweaker.CrTConstants;
-import mekanism.common.integration.crafttweaker.CrTRecipeComponents;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents.ChemicalRecipeComponent;
+import mekanism.common.integration.crafttweaker.CrTRecipeComponents;
 import mekanism.common.integration.crafttweaker.CrTUtils;
 import mekanism.common.integration.crafttweaker.chemical.CrTChemicalStack.CrTGasStack;
 import mekanism.common.integration.crafttweaker.chemical.CrTChemicalStack.CrTInfusionStack;
@@ -64,13 +64,13 @@ import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.Sin
 import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.TaggedFluidStackIngredient;
 import mekanism.common.recipe.ingredient.creator.ItemStackIngredientCreator.MultiItemStackIngredient;
 import mekanism.common.recipe.ingredient.creator.ItemStackIngredientCreator.SingleItemStackIngredient;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -179,7 +179,7 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
             JsonObject serializedIngredient = serialized.getAsJsonObject();
             if (vanillaIngredient.getCustomIngredient() == null) {
                 if (serializedIngredient.has(JsonConstants.ITEM)) {
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(serializedIngredient.get(JsonConstants.ITEM).getAsString()));
+                    Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(serializedIngredient.get(JsonConstants.ITEM).getAsString()));
                     return ItemStackUtil.getCommandString(new ItemStack(item, amount));
                 } else if (handleTags && serializedIngredient.has(JsonConstants.TAG)) {
                     KnownTag<Item> tag = CrTUtils.itemTags().tag(serializedIngredient.get(JsonConstants.TAG).getAsString());

@@ -40,8 +40,8 @@ import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.filter.SortableFilterManager;
 import mekanism.common.content.miner.MinerFilter;
-import mekanism.common.content.miner.ThreadMinerSearch;
 import mekanism.common.content.miner.ThreadMinerSearch.State;
+import mekanism.common.content.miner.ThreadMinerSearch;
 import mekanism.common.integration.computer.ComputerException;
 import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerIInventorySlotWrapper;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
@@ -61,8 +61,8 @@ import mekanism.common.item.gear.ItemAtomicDisassembler;
 import mekanism.common.lib.chunkloading.IChunkLoader;
 import mekanism.common.lib.inventory.Finder;
 import mekanism.common.lib.inventory.HashedItem;
-import mekanism.common.lib.inventory.TransitRequest;
 import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
+import mekanism.common.lib.inventory.TransitRequest;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.base.TileEntityMekanism;
@@ -82,6 +82,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -108,7 +109,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -981,7 +981,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
         dataMap.putBoolean(NBTConstants.SILK_TOUCH, getSilkTouch());
         dataMap.putBoolean(NBTConstants.INVERSE, inverse);
         if (inverseReplaceTarget != Items.AIR) {
-            NBTUtils.writeRegistryEntry(dataMap, NBTConstants.REPLACE_STACK, ForgeRegistries.ITEMS, inverseReplaceTarget);
+            NBTUtils.writeRegistryEntry(dataMap, NBTConstants.REPLACE_STACK, BuiltInRegistries.ITEM, inverseReplaceTarget);
         }
         dataMap.putBoolean(NBTConstants.INVERSE_REQUIRES_REPLACE, inverseRequiresReplacement);
         filterManager.writeToNBT(dataMap);
@@ -1008,7 +1008,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
         NBTUtils.setBooleanIfPresent(dataMap, NBTConstants.PULL, pull -> doPull = pull);
         NBTUtils.setBooleanIfPresent(dataMap, NBTConstants.SILK_TOUCH, this::setSilkTouch);
         NBTUtils.setBooleanIfPresent(dataMap, NBTConstants.INVERSE, inverse -> this.inverse = inverse);
-        inverseReplaceTarget = NBTUtils.readRegistryEntry(dataMap, NBTConstants.REPLACE_STACK, ForgeRegistries.ITEMS, Items.AIR);
+        inverseReplaceTarget = NBTUtils.readRegistryEntry(dataMap, NBTConstants.REPLACE_STACK, BuiltInRegistries.ITEM, Items.AIR);
         NBTUtils.setBooleanIfPresent(dataMap, NBTConstants.INVERSE_REQUIRES_REPLACE, requiresReplace -> inverseRequiresReplacement = requiresReplace);
         filterManager.readFromNBT(dataMap);
         //Note: We read the overflow information if it is present in sustained data in order to grab the information from the digital miner item
@@ -1223,7 +1223,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
         container.track(SyncableInt.create(this::getMaxY, this::setMaxY));
         container.track(SyncableBoolean.create(this::getInverse, value -> inverse = value));
         container.track(SyncableBoolean.create(this::getInverseRequiresReplacement, value -> inverseRequiresReplacement = value));
-        container.track(SyncableRegistryEntry.create(ForgeRegistries.ITEMS, this::getInverseReplaceTarget, value -> inverseReplaceTarget = value));
+        container.track(SyncableRegistryEntry.create(BuiltInRegistries.ITEM, this::getInverseReplaceTarget, value -> inverseReplaceTarget = value));
         filterManager.addContainerTrackers(container);
     }
 

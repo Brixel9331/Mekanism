@@ -23,8 +23,8 @@ import mekanism.common.MekanismLang;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.tags.TagUtils;
 import mekanism.common.util.HeatUtils;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
 import mekanism.common.util.text.BooleanStateDisplay.ActiveDisabled;
 import mekanism.common.util.text.TextUtils;
@@ -35,9 +35,9 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public class FissionReactorRecipeCategory extends BaseRecipeCategory<FissionJEIRecipe> {
@@ -65,7 +65,7 @@ public class FissionReactorRecipeCategory extends BaseRecipeCategory<FissionJEIR
 
     private List<FluidStack> getWaterInput(FissionJEIRecipe recipe) {
         int amount = MathUtils.clampToInt(recipe.outputCoolant().getAmount());
-        return TagUtils.tag(ForgeRegistries.FLUIDS, FluidTags.WATER).stream().map(fluid -> new FluidStack(fluid, amount)).toList();
+        return TagUtils.tag(BuiltInRegistries.FLUID, FluidTags.WATER).stream().map(fluid -> new FluidStack(fluid, amount)).toList();
     }
 
     @Override

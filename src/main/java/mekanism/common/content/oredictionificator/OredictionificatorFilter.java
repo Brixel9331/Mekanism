@@ -10,15 +10,15 @@ import mekanism.common.content.filter.BaseFilter;
 import mekanism.common.integration.computer.ComputerException;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.network.BasePacketHandler;
+import mekanism.common.tags.LazyTagLookup;
+import mekanism.common.tags.TagUtils;
 import mekanism.common.tile.machine.TileEntityOredictionificator;
 import mekanism.common.util.NBTUtils;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITag;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
     @Nullable
     private TagKey<TYPE> filterLocation;
     @Nullable
-    private ITag<TYPE> filterTag;
+    private LazyTagLookup<TYPE> filterTag;
     @NotNull
     private TYPE selectedOutput = getFallbackElement();
     @Nullable
@@ -47,7 +47,7 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
 
     public void flushCachedTag() {
         //If the filter doesn't exist (because we loaded a tag that is no longer valid), then just set the filter to being empty
-        filterTag = filterLocation == null ? null : getTagManager().getTag(filterLocation);
+        filterTag = filterLocation == null ? null : TagUtils.tag(getTagManager(), filterLocation);
         if (filterTag == null || !filterTag.isBound()) {
             setSelectedOutput(getFallbackElement());
         } else if (!filterTag.contains(selectedOutput)) {
@@ -64,7 +64,7 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
     }
 
     public void checkValidity() {
-        if (filterLocation != null && getTagManager().isKnownTagName(filterLocation)) {
+        if (filterLocation != null && getTagManager().getTag(filterLocation).isPresent()) {
             for (String filter : getValidValuesConfig().get().getOrDefault(filterLocation.location().getNamespace(), Collections.emptyList())) {
                 if (filterLocation.location().getPath().startsWith(filter)) {
                     isValid = true;
@@ -84,7 +84,7 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
      * This method should only be called if the filter is valid or if it isn't the validity should be rechecked afterwards
      */
     public final void setFilter(@Nullable ResourceLocation location) {
-        filterLocation = location == null ? null : getTagManager().createTagKey(location);
+        filterLocation = location == null ? null : TagUtils.createKey(getTagManager(), location);
         flushCachedTag();
         isValid = true;
     }
@@ -148,7 +148,7 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
     }
 
     private void setSelectedOrFallback(@NotNull ResourceLocation resourceLocation) {
-        TYPE output = getRegistry().getValue(resourceLocation);
+        TYPE output = getRegistry().get(resourceLocation);
         setSelectedOutput(output == null ? getFallbackElement() : output);
     }
 
@@ -226,9 +226,9 @@ public abstract class OredictionificatorFilter<TYPE, STACK, FILTER extends Oredi
 
     public abstract TYPE getResultElement();
 
-    protected abstract IForgeRegistry<TYPE> getRegistry();
+    protected abstract Registry<TYPE> getRegistry();
 
-    protected abstract ITagManager<TYPE> getTagManager();
+    protected abstract Registry<TYPE> getTagManager();
 
     protected abstract TYPE getFallbackElement();
 

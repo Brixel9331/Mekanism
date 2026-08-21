@@ -1,6 +1,7 @@
 package mekanism.additions.common;
 
 import mekanism.common.tags.TagUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -10,7 +11,6 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class AdditionsTags {
 
@@ -128,7 +128,7 @@ public class AdditionsTags {
         public static final TagKey<EntityType<?>> ENDERMEN = forgeTag("endermen");
 
         private static TagKey<EntityType<?>> forgeTag(String name) {
-            return TagUtils.createKey(ForgeRegistries.ENTITY_TYPES, new ResourceLocation("forge", name));
+            return TagUtils.createKey(BuiltInRegistries.ENTITY_TYPE, new ResourceLocation("forge", name));
         }
     }
 }

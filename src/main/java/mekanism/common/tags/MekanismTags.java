@@ -15,6 +15,7 @@ import mekanism.common.resource.IResource;
 import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
 import mekanism.common.resource.ore.OreType;
+import mekanism.common.tags.TagUtils;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -30,7 +31,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class MekanismTags {
 
@@ -391,7 +391,7 @@ public class MekanismTags {
         public static final LazyTagLookup<MobEffect> SPEED_UP_BLACKLIST_LOOKUP = LazyTagLookup.create(BuiltInRegistries.MOB_EFFECT, SPEED_UP_BLACKLIST);
 
         private static TagKey<MobEffect> tag(String name) {
-            return TagUtils.createKey(ForgeRegistries.MOB_EFFECTS, Mekanism.rl(name));
+            return TagUtils.createKey(BuiltInRegistries.MOB_EFFECT, Mekanism.rl(name));
         }
     }
 
@@ -409,11 +409,11 @@ public class MekanismTags {
         public static final TagKey<BlockEntityType<?>> IMMOVABLE = forgeTag("immovable");
 
         private static TagKey<BlockEntityType<?>> tag(String name) {
-            return TagUtils.createKey(ForgeRegistries.BLOCK_ENTITY_TYPES, Mekanism.rl(name));
+            return TagUtils.createKey(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mekanism.rl(name));
         }
 
         private static TagKey<BlockEntityType<?>> forgeTag(String name) {
-            return TagUtils.createKey(ForgeRegistries.BLOCK_ENTITY_TYPES, new ResourceLocation("forge", name));
+            return TagUtils.createKey(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation("forge", name));
         }
     }
 }

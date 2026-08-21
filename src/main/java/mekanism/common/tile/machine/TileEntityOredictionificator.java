@@ -36,6 +36,8 @@ import mekanism.common.tile.interfaces.ITileFilterHolder;
 import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -43,8 +45,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 
 //TODO - V11: Make this support other tag types, such as fluids
@@ -147,8 +147,8 @@ public class TileEntityOredictionificator extends TileEntityConfigurableMachine 
     }
 
     public static boolean isValidTarget(ResourceLocation tag) {
-        ITagManager<Item> manager = TagUtils.manager(ForgeRegistries.ITEMS);
-        if (manager.isKnownTagName(manager.createTagKey(tag))) {
+        Registry<Item> manager = BuiltInRegistries.ITEM;
+        if (manager.getTag(TagUtils.createKey(manager, tag)).isPresent()) {
             for (String filter : MekanismConfig.general.validOredictionificatorFilters.get().getOrDefault(tag.getNamespace(), Collections.emptyList())) {
                 if (tag.getPath().startsWith(filter)) {
                     return true;

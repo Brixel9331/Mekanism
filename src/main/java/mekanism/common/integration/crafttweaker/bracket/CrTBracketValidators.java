@@ -10,8 +10,6 @@ import mekanism.common.integration.crafttweaker.CrTConstants;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenRegister
@@ -96,12 +94,8 @@ public class CrTBracketValidators {
         return validate(CrTConstants.BRACKET_MODULE_DATA, tokens, MekanismAPI.moduleRegistry());
     }
 
-    private static boolean validate(String bracket, String tokens, IForgeRegistry<?> registry) {
-        return validate(bracket, tokens, registryName -> isRegistryUnlocked(registry) || registry.containsKey(registryName));
-    }
-
-    private static boolean isRegistryUnlocked(IForgeRegistry<?> registry) {
-        return registry instanceof ForgeRegistry<?> forgeRegistry && !forgeRegistry.isLocked();
+    private static boolean validate(String bracket, String tokens, Registry<?> registry) {
+        return validate(bracket, tokens, registryName -> registry.containsKey(registryName));
     }
 
     private static boolean validate(String bracket, String tokens, ResourceKey<? extends Registry<?>> registryKey) {

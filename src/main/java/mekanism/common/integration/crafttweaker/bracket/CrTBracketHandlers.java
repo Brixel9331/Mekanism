@@ -11,15 +11,14 @@ import mekanism.api.gear.ModuleData;
 import mekanism.api.robit.RobitSkin;
 import mekanism.common.integration.crafttweaker.CrTConstants;
 import mekanism.common.integration.crafttweaker.CrTUtils;
-import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack.ICrTGasStack;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack.ICrTInfusionStack;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack.ICrTPigmentStack;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack.ICrTSlurryStack;
+import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenRegister
@@ -105,11 +104,11 @@ public class CrTBracketHandlers {
     }
 
     private static <CHEMICAL extends Chemical<CHEMICAL>, CRT_STACK extends ICrTChemicalStack<CHEMICAL, ?, CRT_STACK>> CRT_STACK getChemicalStack(String bracket,
-          String tokens, IForgeRegistry<CHEMICAL> registry, Function<CHEMICAL, CRT_STACK> getter) {
+          String tokens, Registry<CHEMICAL> registry, Function<CHEMICAL, CRT_STACK> getter) {
         return getter.apply(getValue(bracket, tokens, registry));
     }
 
-    private static <V> V getValue(String bracket, String tokens, IForgeRegistry<V> registry) {
+    private static <V> V getValue(String bracket, String tokens, Registry<V> registry) {
         return getValue(bracket, tokens, registry::containsKey, registry::getValue);
     }
 

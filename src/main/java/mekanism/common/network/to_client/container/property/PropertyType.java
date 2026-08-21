@@ -38,9 +38,9 @@ import mekanism.common.network.to_client.container.property.chemical.PigmentStac
 import mekanism.common.network.to_client.container.property.chemical.SlurryStackPropertyData;
 import mekanism.common.network.to_client.container.property.list.ListPropertyData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public enum PropertyType {
     BOOLEAN(Boolean.TYPE, false, (getter, setter) -> SyncableBoolean.create(() -> (boolean) getter.get(), setter::accept),
@@ -91,7 +91,7 @@ public enum PropertyType {
 
     //For use by any specific registry types we might at some point need the annotation for
     // potentially should have a better solution done than this
-    <V> PropertyType(Class<V> type, IForgeRegistry<V> registry, BiFunction<Short, FriendlyByteBuf, PropertyData> dataCreatorFunction) {
+    <V> PropertyType(Class<V> type, Registry<V> registry, BiFunction<Short, FriendlyByteBuf, PropertyData> dataCreatorFunction) {
         this(type, null, (supplier, consumer) -> SyncableRegistryEntry.create(registry, (Supplier<V>) supplier, (Consumer<V>) consumer), dataCreatorFunction);
     }
 

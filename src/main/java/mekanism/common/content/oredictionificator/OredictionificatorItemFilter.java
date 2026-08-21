@@ -5,12 +5,11 @@ import mekanism.common.config.value.CachedOredictionificatorConfigValue;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.tags.TagUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 
 //TODO - V11: Rewrite/refactor usages of this to better handle tags for fluids and chemicals by allowing them to make use of the super OredictionificatorFilter class
@@ -30,13 +29,13 @@ public class OredictionificatorItemFilter extends OredictionificatorFilter<Item,
     }
 
     @Override
-    protected IForgeRegistry<Item> getRegistry() {
-        return ForgeRegistries.ITEMS;
+    protected Registry<Item> getRegistry() {
+        return BuiltInRegistries.ITEM;
     }
 
     @Override
-    protected ITagManager<Item> getTagManager() {
-        return TagUtils.manager(ForgeRegistries.ITEMS);
+    protected Registry<Item> getTagManager() {
+        return BuiltInRegistries.ITEM;
     }
 
     @Override

@@ -4,11 +4,11 @@ import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.common.Mekanism;
 import mekanism.common.tags.LazyTagLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class GeneratorTags {
 
@@ -32,7 +32,7 @@ public class GeneratorTags {
         }
 
         public static final TagKey<Fluid> BIOETHANOL = forgeTag("bioethanol");
-        public static final LazyTagLookup<Fluid> BIOETHANOL_LOOKUP = LazyTagLookup.create(ForgeRegistries.FLUIDS, BIOETHANOL);
+        public static final LazyTagLookup<Fluid> BIOETHANOL_LOOKUP = LazyTagLookup.create(BuiltInRegistries.FLUID, BIOETHANOL);
         public static final TagKey<Fluid> DEUTERIUM = forgeTag("deuterium");
         public static final TagKey<Fluid> FUSION_FUEL = forgeTag("fusion_fuel");
         public static final TagKey<Fluid> TRITIUM = forgeTag("tritium");

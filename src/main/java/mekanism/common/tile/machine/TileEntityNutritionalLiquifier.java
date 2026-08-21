@@ -9,8 +9,8 @@ import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ItemStackToFluidRecipe;
-import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
+import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.OneInputCachedRecipe;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.api.recipes.inputs.IInputHandler;
@@ -49,6 +49,7 @@ import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -57,7 +58,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -227,7 +227,7 @@ public class TileEntityNutritionalLiquifier extends TileEntityProgressMachine<It
         updateTag.put(NBTConstants.FLUID_STORED, fluidTank.serializeNBT());
         CompoundTag item = new CompoundTag();
         if (lastPasteItem != null) {
-            NBTUtils.writeRegistryEntry(item, NBTConstants.ID, ForgeRegistries.ITEMS, lastPasteItem.getItem());
+            NBTUtils.writeRegistryEntry(item, NBTConstants.ID, BuiltInRegistries.ITEM, lastPasteItem.getItem());
             CompoundTag tag = lastPasteItem.getInternalTag();
             if (tag != null) {
                 item.put(NBTConstants.TAG, tag.copy());
@@ -247,7 +247,7 @@ public class TileEntityNutritionalLiquifier extends TileEntityProgressMachine<It
             } else if (nbt.contains(NBTConstants.ID, Tag.TAG_STRING)) {
                 ResourceLocation id = ResourceLocation.tryParse(nbt.getString(NBTConstants.ID));
                 if (id != null) {
-                    Item item = ForgeRegistries.ITEMS.getValue(id);
+                    Item item = BuiltInRegistries.ITEM.get(id);
                     if (item != null && item != Items.AIR) {
                         ItemStack stack = new ItemStack(item);
                         if (nbt.contains(NBTConstants.TAG, Tag.TAG_COMPOUND)) {

@@ -5,8 +5,8 @@ import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.mod.Mod;
 import com.blamejared.crafttweaker_annotations.annotations.TypedExpansion;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
@@ -15,8 +15,8 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.gear.ModuleData;
 import mekanism.api.robit.RobitSkin;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenRegister
@@ -92,8 +92,8 @@ public class CrTModExpansion {
               .entrySet());
     }
 
-    private static <TYPE> Collection<TYPE> getModSpecific(Mod mod, IForgeRegistry<TYPE> registry) {
-        return getModSpecific(mod, registry.getEntries());
+    private static <TYPE> Collection<TYPE> getModSpecific(Mod mod, Registry<TYPE> registry) {
+        return getModSpecific(mod, registry.entrySet());
     }
 
     private static <TYPE> Collection<TYPE> getModSpecific(Mod mod, Set<Entry<ResourceKey<TYPE>, TYPE>> allElements) {

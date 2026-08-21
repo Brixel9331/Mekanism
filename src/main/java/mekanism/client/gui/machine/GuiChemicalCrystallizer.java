@@ -29,12 +29,12 @@ import mekanism.common.tags.MekanismTags;
 import mekanism.common.tags.TagUtils;
 import mekanism.common.tile.machine.TileEntityChemicalCrystallizer;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,7 +92,7 @@ public class GuiChemicalCrystallizer extends GuiConfigurableTile<TileEntityChemi
                 if (!prevSlurry.isEmptyType() && !MekanismTags.Slurries.DIRTY_LOOKUP.contains(prevSlurry)) {
                     TagKey<Item> oreTag = prevSlurry.getOreTag();
                     if (oreTag != null) {
-                        for (Item ore : TagUtils.tag(ForgeRegistries.ITEMS, oreTag)) {
+                        for (Item ore : TagUtils.tag(BuiltInRegistries.ITEM, oreTag)) {
                             iterStacks.add(new ItemStack(ore));
                         }
                     }

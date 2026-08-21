@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import mekanism.api.Coord4D;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.fluid.FluidStack;
@@ -33,11 +35,13 @@ import mekanism.common.content.transporter.SorterItemStackFilter;
 import mekanism.common.content.transporter.SorterModIDFilter;
 import mekanism.common.content.transporter.SorterTagFilter;
 import mekanism.common.integration.computer.TableType.Builder;
+import mekanism.common.lib.Lazy;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.util.RegistryUtils;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -48,13 +52,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import mekanism.common.lib.Lazy;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Provides methods to get parameters from a computer integration and return converted values back.
@@ -162,7 +161,7 @@ public abstract class BaseComputerHelper {
         if (itemName == null) {
             return Items.AIR;
         }
-        Item item = ForgeRegistries.ITEMS.getValue(itemName);
+        Item item = BuiltInRegistries.ITEM.get(itemName);
         if (item != null) {
             return item;
         }
