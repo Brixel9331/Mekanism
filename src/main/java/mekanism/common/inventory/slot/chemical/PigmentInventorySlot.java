@@ -11,6 +11,7 @@ import mekanism.api.chemical.pigment.IPigmentTank;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.common.capabilities.Capabilities;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class PigmentInventorySlot extends ChemicalInventorySlot<Pigment, Pigment
     public static PigmentInventorySlot fill(IPigmentTank pigmentTank, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(pigmentTank, "Pigment tank cannot be null");
         return new PigmentInventorySlot(pigmentTank, getFillExtractPredicate(pigmentTank, PigmentInventorySlot::getCapability),
-              stack -> fillInsertCheck(pigmentTank, getCapability(stack)), stack -> stack.getCapability(Capabilities.PIGMENT_HANDLER).isPresent(),
+              stack -> fillInsertCheck(pigmentTank, getCapability(stack)), stack -> CapabilityUtils.getCapability(stack, Capabilities.PIGMENT_HANDLER).isPresent(),
               listener, x, y);
     }
 
@@ -43,7 +44,7 @@ public class PigmentInventorySlot extends ChemicalInventorySlot<Pigment, Pigment
         Objects.requireNonNull(pigmentTank, "Pigment tank cannot be null");
         Predicate<@NotNull ItemStack> insertPredicate = getDrainInsertPredicate(pigmentTank, PigmentInventorySlot::getCapability);
         return new PigmentInventorySlot(pigmentTank, insertPredicate.negate(), insertPredicate,
-              stack -> stack.getCapability(Capabilities.PIGMENT_HANDLER).isPresent(), listener, x, y);
+              stack -> CapabilityUtils.getCapability(stack, Capabilities.PIGMENT_HANDLER).isPresent(), listener, x, y);
     }
 
     private PigmentInventorySlot(IPigmentTank pigmentTank, Predicate<@NotNull ItemStack> canExtract, Predicate<@NotNull ItemStack> canInsert,

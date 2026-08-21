@@ -1,9 +1,9 @@
 package mekanism.common.capabilities;
 
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,8 +33,8 @@ public interface IOffsetCapability {//TODO: Eventually we may want to give offse
      * {@link #getOffsetCapabilityIfEnabled(Capability, Direction, Vec3i)}, calling this method is fine.
      */
     @NotNull
-    default <T> LazyOptional<T> getOffsetCapability(@NotNull Capability<T> capability, @Nullable Direction side, @NotNull Vec3i offset) {
-        return isOffsetCapabilityDisabled(capability, side, offset) ? LazyOptional.empty() : getOffsetCapabilityIfEnabled(capability, side, offset);
+    default <T> CapabilityReference<T> getOffsetCapability(@NotNull Capability<T> capability, @Nullable Direction side, @NotNull Vec3i offset) {
+        return isOffsetCapabilityDisabled(capability, side, offset) ? CapabilityReference.empty() : getOffsetCapabilityIfEnabled(capability, side, offset);
     }
 
     /**
@@ -69,5 +69,5 @@ public interface IOffsetCapability {//TODO: Eventually we may want to give offse
      *
      * @return The requested capability.
      */
-    @NotNull <T> LazyOptional<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, @Nullable Direction side, @NotNull Vec3i offset);
+    @NotNull <T> CapabilityReference<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, @Nullable Direction side, @NotNull Vec3i offset);
 }

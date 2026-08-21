@@ -26,6 +26,8 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.Upgrade;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.CommonWorldTickHandler;
@@ -40,8 +42,8 @@ import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.filter.SortableFilterManager;
 import mekanism.common.content.miner.MinerFilter;
-import mekanism.common.content.miner.ThreadMinerSearch.State;
 import mekanism.common.content.miner.ThreadMinerSearch;
+import mekanism.common.content.miner.ThreadMinerSearch.State;
 import mekanism.common.integration.computer.ComputerException;
 import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerIInventorySlotWrapper;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
@@ -61,8 +63,8 @@ import mekanism.common.item.gear.ItemAtomicDisassembler;
 import mekanism.common.lib.chunkloading.IChunkLoader;
 import mekanism.common.lib.inventory.Finder;
 import mekanism.common.lib.inventory.HashedItem;
-import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
 import mekanism.common.lib.inventory.TransitRequest;
+import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.base.TileEntityMekanism;
@@ -104,9 +106,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -1072,7 +1072,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
 
     @NotNull
     @Override
-    public <T> LazyOptional<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, Direction side, @NotNull Vec3i offset) {
+    public <T> CapabilityReference<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, Direction side, @NotNull Vec3i offset) {
         if (capability == ForgeCapabilities.ITEM_HANDLER) {
             //Get item handler cap directly from here as we disable it entirely for the main block as we only have it enabled from ports
             return itemHandlerManager.resolve(capability, side);
@@ -1083,7 +1083,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
 
     @Override
     public boolean isOffsetCapabilityDisabled(@NotNull Capability<?> capability, Direction side, @NotNull Vec3i offset) {
-        if (!capability.isRegistered()) {
+        if (!capability.isAvailable()) {
             //Short circuit if a capability that is not registered is being queried
             return true;
         } else if (capability == ForgeCapabilities.ITEM_HANDLER) {

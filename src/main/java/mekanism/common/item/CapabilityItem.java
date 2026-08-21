@@ -2,14 +2,15 @@ package mekanism.common.item;
 
 import java.util.ArrayList;
 import java.util.List;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class CapabilityItem extends Item {
+public class CapabilityItem extends Item implements ItemCapabilityProvider {
 
     protected CapabilityItem(Item.Properties properties) {
         super(properties);
@@ -23,15 +24,15 @@ public class CapabilityItem extends Item {
     }
 
     @Override
-    public final ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public final CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         if (!areCapabilityConfigsLoaded()) {
             //Only expose the capabilities if the required configs are loaded
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         List<ItemCapability> capabilities = new ArrayList<>();
         gatherCapabilities(capabilities, stack, nbt);
         if (capabilities.isEmpty()) {
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         return new ItemCapabilityWrapper(stack, capabilities.toArray(ItemCapability[]::new));
     }

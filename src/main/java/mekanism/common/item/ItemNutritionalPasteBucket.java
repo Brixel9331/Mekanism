@@ -1,6 +1,8 @@
 package mekanism.common.item;
 
 import java.util.function.Supplier;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -18,13 +20,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemNutritionalPasteBucket extends BucketItem {
+public class ItemNutritionalPasteBucket extends BucketItem implements ItemCapabilityProvider {
 
     public ItemNutritionalPasteBucket(Supplier<? extends Fluid> supplier, Properties builder) {
         super(supplier, builder);
@@ -74,7 +75,7 @@ public class ItemNutritionalPasteBucket extends BucketItem {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @Nullable CompoundTag nbt) {
+    public CapabilityProvider initCapabilities(@NotNull ItemStack stack, @Nullable CompoundTag nbt) {
         return new FluidBucketWrapper(stack);
     }
 }

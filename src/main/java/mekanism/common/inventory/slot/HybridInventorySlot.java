@@ -15,6 +15,7 @@ import mekanism.common.inventory.slot.chemical.InfusionInventorySlot;
 import mekanism.common.inventory.slot.chemical.MergedChemicalInventorySlot;
 import mekanism.common.inventory.slot.chemical.PigmentInventorySlot;
 import mekanism.common.inventory.slot.chemical.SlurryInventorySlot;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -24,9 +25,9 @@ import org.jetbrains.annotations.Nullable;
 public class HybridInventorySlot extends MergedChemicalInventorySlot<MergedTank> implements IFluidHandlerSlot {
 
     private static boolean hasCapability(@NotNull ItemStack stack) {
-        return FluidUtil.getFluidHandler(stack).isPresent() || stack.getCapability(Capabilities.GAS_HANDLER).isPresent() ||
-               stack.getCapability(Capabilities.INFUSION_HANDLER).isPresent() || stack.getCapability(Capabilities.PIGMENT_HANDLER).isPresent() ||
-               stack.getCapability(Capabilities.SLURRY_HANDLER).isPresent();
+        return FluidUtil.getFluidHandler(stack).isPresent() || CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent() ||
+               CapabilityUtils.getCapability(stack, Capabilities.INFUSION_HANDLER).isPresent() || CapabilityUtils.getCapability(stack, Capabilities.PIGMENT_HANDLER).isPresent() ||
+               CapabilityUtils.getCapability(stack, Capabilities.SLURRY_HANDLER).isPresent();
     }
 
     public static HybridInventorySlot inputOrDrain(MergedTank mergedTank, @Nullable IContentsListener listener, int x, int y) {

@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.FloatingLongSupplier;
 import mekanism.api.text.TextComponentUtil;
@@ -14,8 +16,8 @@ import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.attribute.Attributes.AttributeSecurity;
-import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
+import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.energy.item.RateLimitEnergyHandler;
 import mekanism.common.config.MekanismConfig;
@@ -29,11 +31,10 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem {
+public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem implements ItemCapabilityProvider {
 
     @NotNull
     private final BLOCK block;
@@ -118,15 +119,15 @@ public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem {
     }
 
     @Override
-    public final ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public final CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         if (!areCapabilityConfigsLoaded(stack)) {
             //Only expose the capabilities if the required configs are loaded
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         List<ItemCapability> capabilities = new ArrayList<>();
         gatherCapabilities(capabilities, stack, nbt);
         if (capabilities.isEmpty()) {
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         return new ItemCapabilityWrapper(stack, capabilities.toArray(ItemCapability[]::new));
     }

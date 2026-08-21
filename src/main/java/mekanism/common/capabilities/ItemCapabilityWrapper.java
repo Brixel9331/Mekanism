@@ -3,16 +3,16 @@ package mekanism.common.capabilities;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemCapabilityWrapper implements ICapabilityProvider {
+public class ItemCapabilityWrapper implements CapabilityProvider {
 
     private final Map<Capability<?>, ItemCapability> capabilities = new IdentityHashMap<>();
     private final CapabilityCache capabilityCache = new CapabilityCache();
@@ -21,6 +21,11 @@ public class ItemCapabilityWrapper implements ICapabilityProvider {
     public ItemCapabilityWrapper(ItemStack stack, ItemCapability... caps) {
         itemStack = stack;
         add(caps);
+    }
+
+    @Override
+    public void invalidateCapabilities() {
+        capabilityCache.invalidateAll();
     }
 
     public void add(ItemCapability... caps) {
@@ -39,8 +44,8 @@ public class ItemCapabilityWrapper implements ICapabilityProvider {
 
     @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
-        if (!itemStack.isEmpty() && capability.isRegistered()) {
+    public <T> CapabilityReference<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
+        if (!itemStack.isEmpty() && capability.isAvailable()) {
             //Only provide capabilities if we are not empty and the capability is registered
             // as if it isn't registered we can just short circuit and not look up the capability
             if (!capabilityCache.isCapabilityDisabled(capability, null) && capabilityCache.canResolve(capability)) {
@@ -58,7 +63,7 @@ public class ItemCapabilityWrapper implements ICapabilityProvider {
                 return capabilityCache.getCapabilityUnchecked(capability, null);
             }
         }
-        return LazyOptional.empty();
+        return CapabilityReference.empty();
     }
 
     public abstract static class ItemCapability {

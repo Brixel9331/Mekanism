@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -32,11 +33,11 @@ import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.config.value.CachedFloatingLongValue;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.text.EnergyDisplay;
 import mekanism.common.util.text.TextUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,7 @@ public class StorageUtils {
     }
 
     public static void addStoredEnergy(@NotNull ItemStack stack, @NotNull List<Component> tooltip, boolean showMissingCap, ILangEntry langEntry) {
-        Optional<IStrictEnergyHandler> capability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
+        Optional<IStrictEnergyHandler> capability = CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).resolve();
         if (capability.isPresent()) {
             IStrictEnergyHandler energyHandlerItem = capability.get();
             int energyContainerCount = energyHandlerItem.getEnergyContainerCount();
@@ -83,7 +84,7 @@ public class StorageUtils {
     public static <CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, HANDLER extends IChemicalHandler<CHEMICAL, STACK>>
     void addStoredChemical(@NotNull ItemStack stack, @NotNull List<Component> tooltip, boolean showMissingCap, boolean showAttributes, ILangEntry emptyLangEntry,
           Function<STACK, Component> storedFunction, Capability<HANDLER> capability) {
-        Optional<HANDLER> cap = stack.getCapability(capability).resolve();
+        Optional<HANDLER> cap = CapabilityUtils.getCapability(stack, capability).resolve();
         if (cap.isPresent()) {
             HANDLER handler = cap.get();
             for (int tank = 0, tanks = handler.getTanks(); tank < tanks; tank++) {
@@ -251,7 +252,7 @@ public class StorageUtils {
     @Nullable
     public static IEnergyContainer getEnergyContainer(ItemStack stack, int container) {
         if (!stack.isEmpty()) {
-            Optional<IStrictEnergyHandler> energyCapability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
+            Optional<IStrictEnergyHandler> energyCapability = CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).resolve();
             if (energyCapability.isPresent()) {
                 IStrictEnergyHandler energyHandlerItem = energyCapability.get();
                 if (energyHandlerItem instanceof IMekanismStrictEnergyHandler energyHandler) {
@@ -322,7 +323,7 @@ public class StorageUtils {
 
     private static double getEnergyDurabilityForDisplay(ItemStack stack) {
         double bestRatio = 0;
-        Optional<IStrictEnergyHandler> energyCapability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
+        Optional<IStrictEnergyHandler> energyCapability = CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).resolve();
         if (energyCapability.isPresent()) {
             IStrictEnergyHandler energyHandlerItem = energyCapability.get();
             int containers = energyHandlerItem.getEnergyContainerCount();
@@ -334,7 +335,7 @@ public class StorageUtils {
     }
 
     private static double calculateRatio(ItemStack stack, double bestRatio, Capability<? extends IChemicalHandler<?, ?>> capability) {
-        Optional<? extends IChemicalHandler<?, ?>> cap = stack.getCapability(capability).resolve();
+        Optional<? extends IChemicalHandler<?, ?>> cap = CapabilityUtils.getCapability(stack, capability).resolve();
         if (cap.isPresent()) {
             IChemicalHandler<?, ?> handler = cap.get();
             for (int tank = 0, tanks = handler.getTanks(); tank < tanks; tank++) {

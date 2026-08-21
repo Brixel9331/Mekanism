@@ -1,16 +1,16 @@
 package mekanism.common.lib.transmitter.acceptor;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.lib.transmitter.acceptor.AcceptorCache.AcceptorInfo;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.CapabilityUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -20,11 +20,11 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
         super(transmitter, transmitterTile);
     }
 
-    protected void updateCachedAcceptorAndListen(Direction side, BlockEntity acceptorTile, LazyOptional<ACCEPTOR> acceptor) {
+    protected void updateCachedAcceptorAndListen(Direction side, BlockEntity acceptorTile, CapabilityReference<ACCEPTOR> acceptor) {
         updateCachedAcceptorAndListen(side, acceptorTile, acceptor, acceptor, true);
     }
 
-    protected void updateCachedAcceptorAndListen(Direction side, BlockEntity acceptorTile, LazyOptional<ACCEPTOR> acceptor, LazyOptional<?> sourceAcceptor,
+    protected void updateCachedAcceptorAndListen(Direction side, BlockEntity acceptorTile, CapabilityReference<ACCEPTOR> acceptor, CapabilityReference<?> sourceAcceptor,
           boolean sourceIsSame) {
         boolean dirtyAcceptor = false;
         if (cachedAcceptors.containsKey(side)) {
@@ -48,7 +48,7 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
             transmitter.markDirtyAcceptor(side);
             //If the capability is present, and we want to add the listener, add a listener so that once it gets invalidated
             // we recheck that side assuming that the world and position is still loaded and our tile has not been removed
-            NonNullConsumer<LazyOptional<ACCEPTOR>> refreshListener = getRefreshListener(side);
+            Consumer<CapabilityReference<ACCEPTOR>> refreshListener = getRefreshListener(side);
             if (sourceIsSame) {
                 //Add it to the actual acceptor as it is the same as the source, and we can do so without any unchecked warnings
                 acceptor.addListener(refreshListener);
@@ -63,7 +63,7 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
      * @implNote Grabs the acceptors from cache
      */
     @Override
-    public LazyOptional<ACCEPTOR> getConnectedAcceptor(Direction side) {
+    public CapabilityReference<ACCEPTOR> getConnectedAcceptor(Direction side) {
         if (cachedAcceptors.containsKey(side)) {
             AcceptorInfo<ACCEPTOR> acceptorInfo = cachedAcceptors.get(side);
             if (!acceptorInfo.getTile().isRemoved()) {
@@ -71,7 +71,7 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
             }
             //TODO: If the tile has been removed should we force an invalidation/recheck?
         }
-        return LazyOptional.empty();
+        return CapabilityReference.empty();
     }
 
     @Nullable
@@ -89,7 +89,7 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
      * @apiNote Only call this from the server side
      */
     public boolean isAcceptorAndListen(@Nullable BlockEntity tile, Direction side, Capability<ACCEPTOR> capability) {
-        LazyOptional<ACCEPTOR> acceptor = CapabilityUtils.getCapability(tile, capability, side.getOpposite());
+        CapabilityReference<ACCEPTOR> acceptor = CapabilityUtils.getCapability(tile, capability, side.getOpposite());
         if (acceptor.isPresent()) {
             //Update the cached acceptor and if it changed, add a listener to it to listen for invalidation
             updateCachedAcceptorAndListen(side, tile, acceptor);
@@ -100,16 +100,16 @@ public class AcceptorCache<ACCEPTOR> extends AbstractAcceptorCache<ACCEPTOR, Acc
 
     public static class AcceptorInfo<ACCEPTOR> extends AbstractAcceptorInfo {
 
-        private LazyOptional<?> sourceAcceptor;
-        private LazyOptional<ACCEPTOR> acceptor;
+        private CapabilityReference<?> sourceAcceptor;
+        private CapabilityReference<ACCEPTOR> acceptor;
 
-        private AcceptorInfo(BlockEntity tile, LazyOptional<?> sourceAcceptor, LazyOptional<ACCEPTOR> acceptor) {
+        private AcceptorInfo(BlockEntity tile, CapabilityReference<?> sourceAcceptor, CapabilityReference<ACCEPTOR> acceptor) {
             super(tile);
             this.acceptor = acceptor;
             this.sourceAcceptor = sourceAcceptor;
         }
 
-        private void updateAcceptor(LazyOptional<?> sourceAcceptor, LazyOptional<ACCEPTOR> acceptor) {
+        private void updateAcceptor(CapabilityReference<?> sourceAcceptor, CapabilityReference<ACCEPTOR> acceptor) {
             this.sourceAcceptor = sourceAcceptor;
             this.acceptor = acceptor;
         }

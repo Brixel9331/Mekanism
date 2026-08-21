@@ -2,9 +2,9 @@ package mekanism.common.capabilities.resolver;
 
 import java.util.List;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -28,7 +28,7 @@ public interface ICapabilityResolver {
      * @apiNote This method should only be called with capabilities that are in {@link #getSupportedCapabilities()}
      * @implNote The result should be cached
      */
-    <T> LazyOptional<T> resolve(Capability<T> capability, @Nullable Direction side);
+    <T> CapabilityReference<T> resolve(Capability<T> capability, @Nullable Direction side);
 
     /**
      * Invalidates the given capability on the given side.

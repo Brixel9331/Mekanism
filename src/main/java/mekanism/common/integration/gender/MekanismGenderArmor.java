@@ -2,10 +2,10 @@ package mekanism.common.integration.gender;
 
 import com.wildfire.api.IGenderArmor;
 import java.util.function.Consumer;
+import mekanism.api.capabilities.Capability;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 

@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.capabilities.holder.IHolder;
 import mekanism.common.capabilities.resolver.BasicSidedCapabilityResolver;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -50,11 +50,11 @@ public class CapabilityHandlerManager<HOLDER extends IHolder, CONTAINER, HANDLER
      * @apiNote Assumes that {@link #canHandle} has been called before this and that it was {@code true}.
      */
     @Override
-    public <T> LazyOptional<T> resolve(Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> resolve(Capability<T> capability, @Nullable Direction side) {
         if (getContainers(side).isEmpty()) {
             //If we don't have any containers accessible from that side, don't return a handler
             //TODO: Evaluate moving this somehow into being done via the is disabled check
-            return LazyOptional.empty();
+            return CapabilityReference.empty();
         }
         return super.resolve(capability, side);
     }

@@ -19,6 +19,7 @@ import mekanism.common.config.value.CachedLongValue;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.registries.MekanismGases;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.text.BooleanStateDisplay.OnOff;
 import mekanism.common.util.text.BooleanStateDisplay.YesNo;
@@ -82,7 +83,7 @@ public class ItemScubaTank extends ItemGasArmor implements IItemHUDProvider, IMo
             ItemScubaTank scubaTank = (ItemScubaTank) stack.getItem();
             list.add(MekanismLang.SCUBA_TANK_MODE.translateColored(EnumColor.DARK_GRAY, OnOff.of(scubaTank.getFlowing(stack), true)));
             GasStack stored = GasStack.EMPTY;
-            Optional<IGasHandler> capability = stack.getCapability(Capabilities.GAS_HANDLER).resolve();
+            Optional<IGasHandler> capability = CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).resolve();
             if (capability.isPresent()) {
                 IGasHandler gasHandlerItem = capability.get();
                 if (gasHandlerItem.getTanks() > 0) {

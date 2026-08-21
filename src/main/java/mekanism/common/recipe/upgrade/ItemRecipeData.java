@@ -21,6 +21,7 @@ import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.lib.inventory.personalstorage.PersonalStorageManager;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.BlockItem;
@@ -67,7 +68,7 @@ public class ItemRecipeData implements RecipeUpgradeData<ItemRecipeData> {
             return applyToStack(slots, stackSlots, (ListTag toWrite) -> PersonalStorageManager.createInventoryFor(stack, stackSlots));
         }
         boolean isBin = item instanceof ItemBlockBin;
-        Optional<IItemHandler> capability = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
+        Optional<IItemHandler> capability = CapabilityUtils.getCapability(stack, ForgeCapabilities.ITEM_HANDLER).resolve();
         if (capability.isPresent()) {
             IItemHandler itemHandler = capability.get();
             for (int i = 0, slots = itemHandler.getSlots(); i < slots; i++) {

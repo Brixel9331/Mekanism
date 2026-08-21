@@ -2,6 +2,8 @@ package mekanism.common.item.gear;
 
 import java.util.ArrayList;
 import java.util.List;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.integration.gender.GenderCapabilityHelper;
@@ -12,10 +14,9 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class ItemSpecialArmor extends ArmorItem {
+public abstract class ItemSpecialArmor extends ArmorItem implements ItemCapabilityProvider {
 
     protected ItemSpecialArmor(ArmorMaterial material, ArmorItem.Type armorType, Properties properties) {
         super(material, armorType, properties);
@@ -50,15 +51,15 @@ public abstract class ItemSpecialArmor extends ArmorItem {
     }
 
     @Override
-    public final ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public final CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         if (!areCapabilityConfigsLoaded()) {
             //Only expose the capabilities if the required configs are loaded
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         List<ItemCapability> capabilities = new ArrayList<>();
         gatherCapabilities(capabilities, stack, nbt);
         if (capabilities.isEmpty()) {
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         return new ItemCapabilityWrapper(stack, capabilities.toArray(ItemCapability[]::new));
     }

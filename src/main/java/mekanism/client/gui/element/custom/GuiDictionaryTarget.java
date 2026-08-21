@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.chemical.gas.GasStack;
@@ -22,13 +23,14 @@ import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.item.GuiDictionary.DictionaryTagType;
 import mekanism.client.jei.interfaces.IJEIGhostTarget;
-import mekanism.client.render.MekanismRenderer.FluidTextureType;
 import mekanism.client.render.MekanismRenderer;
+import mekanism.client.render.MekanismRenderer.FluidTextureType;
 import mekanism.common.Mekanism;
 import mekanism.common.base.TagCache;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.tags.TagUtils;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -48,7 +50,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -218,7 +219,7 @@ public class GuiDictionaryTarget extends GuiElement implements IJEIGhostTarget {
 
     private <STACK extends ChemicalStack<?>, HANDLER extends IChemicalHandler<?, STACK>> void addChemicalTags(DictionaryTagType tagType, ItemStack stack,
           Capability<HANDLER> capability) {
-        stack.getCapability(capability).ifPresent(handler ->
+        CapabilityUtils.getCapability(stack, capability).ifPresent(handler ->
               tags.put(tagType, TagCache.getTagsAsStrings(IntStream.range(0, handler.getTanks())
                           .mapToObj(handler::getChemicalInTank)
                           .filter(chemicalInTank -> !chemicalInTank.isEmpty())

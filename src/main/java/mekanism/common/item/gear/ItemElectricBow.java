@@ -5,6 +5,8 @@ import java.util.Map;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.EnumColor;
@@ -38,11 +40,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvider, ICustomCreativeTabContents {
+public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvider, ICustomCreativeTabContents, ItemCapabilityProvider {
 
     public ItemElectricBow(Properties properties) {
         super(properties.rarity(Rarity.RARE).setNoRepair().stacksTo(1));
@@ -183,10 +184,10 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         if (!MekanismConfig.gear.isLoaded()) {
             //Only expose the capabilities if the required configs are loaded
-            return super.initCapabilities(stack, nbt);
+            return null;
         }
         //Note: We interact with this capability using "manual" as the automation type, to ensure we can properly bypass the energy limit for extracting
         // Internal is used by the "null" side, which is what will get used for most items

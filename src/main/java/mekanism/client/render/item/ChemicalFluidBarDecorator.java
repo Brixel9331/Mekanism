@@ -2,11 +2,13 @@ package mekanism.client.render.item;
 
 import java.util.Optional;
 import java.util.function.Predicate;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.MathUtils;
 import mekanism.client.gui.GuiUtils;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.Minecraft;
@@ -15,7 +17,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
@@ -44,7 +45,7 @@ public class ChemicalFluidBarDecorator implements IItemDecorator {
         }
         yOffset += 12;
         for (Capability<? extends IChemicalHandler<?, ?>> chemicalCap : chemicalCaps) {
-            Optional<? extends IChemicalHandler<?, ?>> capabilityInstance = stack.getCapability(chemicalCap).resolve();
+            Optional<? extends IChemicalHandler<?, ?>> capabilityInstance = CapabilityUtils.getCapability(stack, chemicalCap).resolve();
             if (capabilityInstance.isPresent()) {
                 IChemicalHandler<?, ?> chemicalHandler = capabilityInstance.get();
                 int tank = getDisplayTank(chemicalHandler.getTanks());

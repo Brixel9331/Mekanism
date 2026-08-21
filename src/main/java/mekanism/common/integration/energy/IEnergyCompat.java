@@ -3,13 +3,12 @@ package mekanism.common.integration.energy;
 import java.util.Collection;
 import java.util.Collections;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.config.value.CachedValue;
 import mekanism.common.util.CapabilityUtils;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -60,7 +59,7 @@ public interface IEnergyCompat {
      *
      * @implNote The capabilities should be kept lazy so that they are not resolved if they are not needed yet.
      */
-    default boolean isCapabilityPresent(ICapabilityProvider provider, @Nullable Direction side) {
+    default boolean isCapabilityPresent(Object provider, @Nullable Direction side) {
         return CapabilityUtils.getCapability(provider, getCapability(), side).isPresent();
     }
 
@@ -71,7 +70,7 @@ public interface IEnergyCompat {
      *
      * @return A lazy optional for this capability
      */
-    LazyOptional<?> getHandlerAs(IStrictEnergyHandler handler);
+    CapabilityReference<?> getHandlerAs(IStrictEnergyHandler handler);
 
     /**
      * Wraps the capability implemented in the provider into a lazy optional {@link IStrictEnergyHandler}, or returns {@code LazyOptional.empty()} if the capability is
@@ -82,5 +81,5 @@ public interface IEnergyCompat {
      *
      * @return The capability implemented in the provider into an {@link IStrictEnergyHandler}, or {@code null} if the capability is not implemented.
      */
-    LazyOptional<IStrictEnergyHandler> getLazyStrictEnergyHandler(ICapabilityProvider provider, @Nullable Direction side);
+    CapabilityReference<IStrictEnergyHandler> getLazyStrictEnergyHandler(Object provider, @Nullable Direction side);
 }

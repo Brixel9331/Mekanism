@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import mekanism.api.MekanismAPI;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalType;
@@ -64,6 +65,7 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismContainerTypes;
 import mekanism.common.registries.MekanismFluids;
 import mekanism.common.registries.MekanismItems;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.RegistryUtils;
 import mezz.jei.api.IModPlugin;
@@ -88,7 +90,6 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -136,7 +137,7 @@ public class MekanismJEI implements IModPlugin {
     }
 
     private static String getChemicalComponent(ItemStack stack, Capability<? extends IChemicalHandler<?, ?>> capability) {
-        Optional<? extends IChemicalHandler<?, ?>> cap = stack.getCapability(capability).resolve();
+        Optional<? extends IChemicalHandler<?, ?>> cap = CapabilityUtils.getCapability(stack, capability).resolve();
         if (cap.isPresent()) {
             IChemicalHandler<?, ?> handler = cap.get();
             String component = "";
@@ -172,7 +173,7 @@ public class MekanismJEI implements IModPlugin {
     }
 
     private static String getEnergyComponent(ItemStack stack) {
-        Optional<IStrictEnergyHandler> capability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
+        Optional<IStrictEnergyHandler> capability = CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).resolve();
         if (capability.isPresent()) {
             IStrictEnergyHandler energyHandlerItem = capability.get();
             String component = "";
@@ -209,9 +210,9 @@ public class MekanismJEI implements IModPlugin {
         for (IItemProvider itemProvider : itemProviders) {
             //Handle items
             ItemStack itemStack = itemProvider.getItemStack();
-            if (itemStack.getCapability(Capabilities.STRICT_ENERGY).isPresent() || itemStack.getCapability(Capabilities.GAS_HANDLER).isPresent() ||
-                itemStack.getCapability(Capabilities.INFUSION_HANDLER).isPresent() || itemStack.getCapability(Capabilities.PIGMENT_HANDLER).isPresent() ||
-                itemStack.getCapability(Capabilities.SLURRY_HANDLER).isPresent() || FluidUtil.getFluidHandler(itemStack).isPresent()) {
+            if (CapabilityUtils.getCapability(itemStack, Capabilities.STRICT_ENERGY).isPresent() || CapabilityUtils.getCapability(itemStack, Capabilities.GAS_HANDLER).isPresent() ||
+                CapabilityUtils.getCapability(itemStack, Capabilities.INFUSION_HANDLER).isPresent() || CapabilityUtils.getCapability(itemStack, Capabilities.PIGMENT_HANDLER).isPresent() ||
+                CapabilityUtils.getCapability(itemStack, Capabilities.SLURRY_HANDLER).isPresent() || FluidUtil.getFluidHandler(itemStack).isPresent()) {
                 registry.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, itemProvider.asItem(), MEKANISM_NBT_INTERPRETER);
             }
         }

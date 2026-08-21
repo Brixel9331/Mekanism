@@ -1,14 +1,14 @@
 package mekanism.common.tile.interfaces;
 
 import java.util.Set;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.IOffsetCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author AidanBrady
  */
-public interface IBoundingBlock extends ICapabilityProvider, IComparatorSupport, IOffsetCapability, IUpgradeTile {
+public interface IBoundingBlock extends CapabilityProvider, IComparatorSupport, IOffsetCapability, IUpgradeTile {
 
     Set<Capability<?>> ALWAYS_PROXY = Set.of(
           Capabilities.CONFIG_CARD
@@ -41,7 +41,7 @@ public interface IBoundingBlock extends ICapabilityProvider, IComparatorSupport,
 
     @NotNull
     @Override
-    default <T> LazyOptional<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, Direction side, @NotNull Vec3i offset) {
+    default <T> CapabilityReference<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, Direction side, @NotNull Vec3i offset) {
         //And have it get the capability as if it was not offset
         return getCapability(capability, side);
     }

@@ -5,21 +5,21 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
 public class BasicSidedCapabilityResolver<HANDLER, SIDED_HANDLER extends HANDLER> implements ICapabilityResolver {
 
     private final ProxyCreator<HANDLER, SIDED_HANDLER> proxyCreator;
-    private final Map<Direction, LazyOptional<HANDLER>> handlers;
+    private final Map<Direction, CapabilityReference<HANDLER>> handlers;
     private final List<Capability<?>> supportedCapability;
     private final SIDED_HANDLER baseHandler;
     @Nullable
-    private LazyOptional<HANDLER> readOnlyHandler;
+    private CapabilityReference<HANDLER> readOnlyHandler;
 
     public BasicSidedCapabilityResolver(SIDED_HANDLER baseHandler, Capability<HANDLER> supportedCapability, BasicProxyCreator<HANDLER, SIDED_HANDLER> proxyCreator) {
         this(baseHandler, supportedCapability, proxyCreator, true);
@@ -55,16 +55,16 @@ public class BasicSidedCapabilityResolver<HANDLER, SIDED_HANDLER extends HANDLER
      * Lazily get and cache a handler instance for the given side, and make it be read only if something else is trying to interact with us using the null side
      */
     @Override
-    public <T> LazyOptional<T> resolve(Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> resolve(Capability<T> capability, @Nullable Direction side) {
         if (side == null) {
             if (readOnlyHandler == null || !readOnlyHandler.isPresent()) {
-                readOnlyHandler = LazyOptional.of(() -> proxyCreator.create(baseHandler, null, getHolder()));
+                readOnlyHandler = CapabilityReference.of(() -> proxyCreator.create(baseHandler, null, getHolder()));
             }
             return readOnlyHandler.cast();
         }
-        LazyOptional<HANDLER> cachedCapability = handlers.get(side);
+        CapabilityReference<HANDLER> cachedCapability = handlers.get(side);
         if (cachedCapability == null || !cachedCapability.isPresent()) {
-            handlers.put(side, cachedCapability = LazyOptional.of(() -> proxyCreator.create(baseHandler, side, getHolder())));
+            handlers.put(side, cachedCapability = CapabilityReference.of(() -> proxyCreator.create(baseHandler, side, getHolder())));
         }
         return cachedCapability.cast();
     }
@@ -74,24 +74,25 @@ public class BasicSidedCapabilityResolver<HANDLER, SIDED_HANDLER extends HANDLER
         if (side == null) {
             invalidateReadOnly();
         } else {
-            invalidate(handlers.get(side));
+            invalidate(handlers.remove(side));
         }
     }
 
     @Override
     public void invalidateAll() {
+        List<CapabilityReference<HANDLER>> previous = List.copyOf(handlers.values());
+        handlers.clear();
         invalidateReadOnly();
-        handlers.values().forEach(this::invalidate);
+        previous.forEach(this::invalidate);
     }
 
     private void invalidateReadOnly() {
-        if (readOnlyHandler != null && readOnlyHandler.isPresent()) {
-            readOnlyHandler.invalidate();
-            readOnlyHandler = null;
-        }
+        CapabilityReference<HANDLER> previous = readOnlyHandler;
+        readOnlyHandler = null;
+        invalidate(previous);
     }
 
-    protected void invalidate(@Nullable LazyOptional<?> cachedCapability) {
+    protected void invalidate(@Nullable CapabilityReference<?> cachedCapability) {
         if (cachedCapability != null && cachedCapability.isPresent()) {
             cachedCapability.invalidate();
         }

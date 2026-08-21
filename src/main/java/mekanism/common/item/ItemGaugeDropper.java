@@ -13,6 +13,7 @@ import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.merged.GaugeDropperContentsHandler;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
@@ -76,7 +77,7 @@ public class ItemGaugeDropper extends CapabilityItem {
     }
 
     private static <CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>> void clearChemicalTanks(ItemStack stack, STACK empty) {
-        Optional<IChemicalHandler<CHEMICAL, STACK>> cap = stack.getCapability(ChemicalUtil.getCapabilityForChemical(empty)).resolve();
+        Optional<IChemicalHandler<CHEMICAL, STACK>> cap = CapabilityUtils.getCapability(stack, ChemicalUtil.getCapabilityForChemical(empty)).resolve();
         if (cap.isPresent()) {
             IChemicalHandler<CHEMICAL, STACK> handler = cap.get();
             for (int tank = 0; tank < handler.getTanks(); tank++) {

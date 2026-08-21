@@ -8,6 +8,7 @@ import java.util.UUID;
 import mekanism.api.Chunk3D;
 import mekanism.api.Coord4D;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
 import mekanism.common.lib.transmitter.CompatibleTransmitterValidator;
@@ -30,7 +31,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -241,7 +241,7 @@ public abstract class Transmitter<ACCEPTOR, NETWORK extends DynamicNetwork<ACCEP
     }
 
     @NotNull
-    public LazyOptional<ACCEPTOR> getAcceptor(Direction side) {
+    public CapabilityReference<ACCEPTOR> getAcceptor(Direction side) {
         return acceptorCache.getCachedAcceptor(side);
     }
 

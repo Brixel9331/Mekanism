@@ -18,6 +18,9 @@ import mekanism.api.Coord4D;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IMekanismStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -25,8 +28,8 @@ import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.inventory.IMekanismInventory;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
-import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.cache.CachedRecipe;
+import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.cache.OneInputCachedRecipe;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
@@ -68,11 +71,12 @@ import mekanism.common.registries.MekanismDamageTypes;
 import mekanism.common.registries.MekanismDataSerializers;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.registries.MekanismItems;
-import mekanism.common.registries.MekanismRobitSkins.SkinLookup;
 import mekanism.common.registries.MekanismRobitSkins;
+import mekanism.common.registries.MekanismRobitSkins.SkinLookup;
 import mekanism.common.tile.TileEntityChargepad;
 import mekanism.common.tile.interfaces.ISustainedInventory;
 import mekanism.common.tile.prefab.TileEntityRecipeMachine;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.SecurityUtils;
@@ -121,9 +125,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
@@ -131,7 +133,7 @@ import org.jetbrains.annotations.Nullable;
 
 //TODO: When Galacticraft gets ported make it so the robit can "breath" without a mask
 public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInventory, ISustainedInventory, IMekanismStrictEnergyHandler,
-      ItemRecipeLookupHandler<ItemStackToItemStackRecipe> {
+      ItemRecipeLookupHandler<ItemStackToItemStackRecipe>, CapabilityProvider {
 
     public static AttributeSupplier.Builder getDefaultAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 1.0D).add(Attributes.MOVEMENT_SPEED, 0.3F);
@@ -428,7 +430,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
 
     private ItemStack getItemVariant() {
         ItemStack stack = MekanismItems.ROBIT.getItemStack();
-        Optional<IStrictEnergyHandler> capability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
+        Optional<IStrictEnergyHandler> capability = CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).resolve();
         if (capability.isPresent()) {
             IStrictEnergyHandler energyHandlerItem = capability.get();
             if (energyHandlerItem.getEnergyContainerCount() > 0) {
@@ -810,25 +812,24 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
 
     @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
-        if (capabilityCache != null) {
+    public <T> CapabilityReference<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
+        if (!isRemoved() && capabilityCache != null) {
             //Validate the cache is not null. In theory this should never happen unless some mod is trying to access capabilities
             // before our entity is done constructing, but there are cases such as the size event where based on when they are
             // fired if it is based on the entity's caps then the first call will happen before the enitity has finished
             // constructing. See https://github.com/mekanism/Mekanism/issues/7490
             if (capabilityCache.isCapabilityDisabled(capability, side)) {
-                return LazyOptional.empty();
+                return CapabilityReference.empty();
             } else if (capabilityCache.canResolve(capability)) {
                 return capabilityCache.getCapabilityUnchecked(capability, side);
             }
         }
         //Call to LivingEntity's Implementation of getCapability if we could not find a capability ourselves
-        return super.getCapability(capability, side);
+        return CapabilityReference.empty();
     }
 
     @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
+    public void invalidateCapabilities() {
         //When the capabilities on our tile get invalidated, make sure to also invalidate all our cached ones
         capabilityCache.invalidateAll();
     }

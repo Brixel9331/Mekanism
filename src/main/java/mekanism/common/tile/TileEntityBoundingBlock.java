@@ -2,6 +2,9 @@ package mekanism.common.tile;
 
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.Mekanism;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismTileEntityTypes;
@@ -20,15 +23,13 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Multi-block used by wind turbines, solar panels, and other machines
  */
-public class TileEntityBoundingBlock extends TileEntityUpdateable implements IUpgradeTile, Nameable {
+public class TileEntityBoundingBlock extends TileEntityUpdateable implements IUpgradeTile, Nameable, CapabilityProvider {
 
     private BlockPos mainPos = BlockPos.ZERO;
 
@@ -78,10 +79,13 @@ public class TileEntityBoundingBlock extends TileEntityUpdateable implements IUp
 
     @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
+        if (isRemoved()) {
+            return CapabilityReference.empty();
+        }
         IBoundingBlock main = getMain();
         if (main == null) {
-            return super.getCapability(capability, side);
+            return CapabilityReference.empty();
         }
         return main.getOffsetCapability(capability, side, worldPosition.subtract(getMainPos()));
     }

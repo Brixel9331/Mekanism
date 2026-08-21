@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.math.MathUtils;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.QIOFrequency;
@@ -37,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
 public class TileEntityQIOExporter extends TileEntityQIOFilterHandler {
@@ -75,7 +75,7 @@ public class TileEntityQIOExporter extends TileEntityQIOFilterHandler {
         }
         Direction direction = getDirection();
         BlockEntity back = WorldUtils.getTileEntity(getLevel(), worldPosition.relative(direction.getOpposite()));
-        LazyOptional<IItemHandler> backHandler = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
+        CapabilityReference<IItemHandler> backHandler = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
         if (!backHandler.isPresent()) {
             return;
         }

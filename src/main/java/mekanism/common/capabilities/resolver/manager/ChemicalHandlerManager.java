@@ -1,6 +1,7 @@
 package mekanism.common.capabilities.resolver.manager;
 
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -31,7 +32,6 @@ import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxyGasHandler;
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxyInfusionHandler;
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxyPigmentHandler;
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxySlurryHandler;
-import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

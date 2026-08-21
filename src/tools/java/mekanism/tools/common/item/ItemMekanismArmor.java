@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.UUID;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.config.value.CachedIntValue;
 import mekanism.common.lib.attribute.AttributeCache;
@@ -25,11 +27,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAttributeRefresher, ItemCapabilityProvider {
 
     private final MaterialCreator material;
     private final AttributeCache attributeCache;
@@ -97,7 +98,7 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         ItemCapabilityWrapper wrapper = new ItemCapabilityWrapper(stack);
         ToolsGenderCapabilityHelper.addGenderCapability(this, wrapper);
         return wrapper;

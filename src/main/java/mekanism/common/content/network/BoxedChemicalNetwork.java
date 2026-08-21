@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import mekanism.api.Action;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalType;
@@ -40,7 +41,6 @@ import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -246,10 +246,10 @@ public class BoxedChemicalNetwork extends DynamicBufferedNetwork<BoxedChemicalHa
 
     private <CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>> long tickEmit(@NotNull STACK stack) {
         ChemicalType chemicalType = ChemicalType.getTypeFor(stack);
-        Collection<Map<Direction, LazyOptional<BoxedChemicalHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
+        Collection<Map<Direction, CapabilityReference<BoxedChemicalHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
         ChemicalHandlerTarget<CHEMICAL, STACK, IChemicalHandler<CHEMICAL, STACK>> target = new ChemicalHandlerTarget<>(stack, acceptorValues.size() * 2);
-        for (Map<Direction, LazyOptional<BoxedChemicalHandler>> acceptors : acceptorValues) {
-            for (LazyOptional<BoxedChemicalHandler> lazyAcceptor : acceptors.values()) {
+        for (Map<Direction, CapabilityReference<BoxedChemicalHandler>> acceptors : acceptorValues) {
+            for (CapabilityReference<BoxedChemicalHandler> lazyAcceptor : acceptors.values()) {
                 lazyAcceptor.ifPresent(acceptor -> {
                     IChemicalHandler<CHEMICAL, STACK> handler = acceptor.getHandlerFor(chemicalType);
                     if (handler != null && ChemicalUtil.canInsert(handler, stack)) {

@@ -19,6 +19,7 @@ import mekanism.common.config.MekanismConfig;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.registries.MekanismModules;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.FluidInDetails;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -67,7 +68,7 @@ public class ModuleElectrolyticBreathingUnit implements ICustomModule<ModuleElec
             GasStack hydrogenStack = MekanismGases.HYDROGEN.getStack(maxRate * 2L);
             ItemStack chestStack = player.getItemBySlot(EquipmentSlot.CHEST);
             if (checkChestPlate(chestStack)) {
-                Optional<IGasHandler> chestCapability = chestStack.getCapability(Capabilities.GAS_HANDLER).resolve();
+                Optional<IGasHandler> chestCapability = CapabilityUtils.getCapability(chestStack, Capabilities.GAS_HANDLER).resolve();
                 if (chestCapability.isPresent()) {
                     hydrogenUsed = maxRate * 2L - chestCapability.get().insertChemical(hydrogenStack, Action.EXECUTE).getAmount();
                     hydrogenStack.shrink(hydrogenUsed);
@@ -75,7 +76,7 @@ public class ModuleElectrolyticBreathingUnit implements ICustomModule<ModuleElec
             }
             if (fillHeld.get()) {
                 ItemStack handStack = player.getItemBySlot(EquipmentSlot.MAINHAND);
-                Optional<IGasHandler> handCapability = handStack.getCapability(Capabilities.GAS_HANDLER).resolve();
+                Optional<IGasHandler> handCapability = CapabilityUtils.getCapability(handStack, Capabilities.GAS_HANDLER).resolve();
                 if (handCapability.isPresent()) {
                     hydrogenUsed = maxRate * 2L - handCapability.get().insertChemical(hydrogenStack, Action.EXECUTE).getAmount();
                 }

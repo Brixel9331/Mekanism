@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.List;
 import java.util.Optional;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -13,13 +14,13 @@ import mekanism.common.capabilities.GenericTankSpec;
 import mekanism.common.capabilities.chemical.item.ChemicalTankSpec;
 import mekanism.common.capabilities.fluid.item.RateLimitMultiTankFluidHandler.FluidTankSpec;
 import mekanism.common.item.gear.ItemMekaSuitArmor;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.FluidUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
@@ -61,7 +62,7 @@ public class MekaSuitBarDecorator implements IItemDecorator {
     private <CHEMICAL extends Chemical<CHEMICAL>> boolean tryRender(GuiGraphics guiGraphics, ItemStack stack, Capability<? extends IChemicalHandler<CHEMICAL, ?>> capability,
           int xOffset, int yOffset, List<ChemicalTankSpec<CHEMICAL>> chemicalTankSpecs) {
         if (!chemicalTankSpecs.isEmpty() && chemicalTankSpecs.stream().anyMatch(spec -> spec.supportsStack(stack))) {
-            Optional<? extends IChemicalHandler<CHEMICAL, ?>> capabilityInstance = stack.getCapability(capability).resolve();
+            Optional<? extends IChemicalHandler<CHEMICAL, ?>> capabilityInstance = CapabilityUtils.getCapability(stack, capability).resolve();
             if (capabilityInstance.isPresent()) {
                 IChemicalHandler<CHEMICAL, ?> chemicalHandler = capabilityInstance.get();
                 int tank = getDisplayTank(chemicalTankSpecs, stack, chemicalHandler.getTanks());

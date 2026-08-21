@@ -20,6 +20,7 @@ import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.item.interfaces.IJetpackItem;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.registries.MekanismGases;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -97,7 +98,7 @@ public class ItemJetpack extends ItemGasArmor implements IItemHUDProvider, IMode
             ItemJetpack jetpack = (ItemJetpack) stack.getItem();
             list.add(MekanismLang.JETPACK_MODE.translateColored(EnumColor.DARK_GRAY, jetpack.getJetpackMode(stack)));
             GasStack stored = GasStack.EMPTY;
-            Optional<IGasHandler> capability = stack.getCapability(Capabilities.GAS_HANDLER).resolve();
+            Optional<IGasHandler> capability = CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).resolve();
             if (capability.isPresent()) {
                 IGasHandler gasHandlerItem = capability.get();
                 if (gasHandlerItem.getTanks() > 0) {

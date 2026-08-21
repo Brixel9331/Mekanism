@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.tile.component.TileComponentConfig;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -88,7 +88,7 @@ public class CapabilityCache {
      */
     public boolean isCapabilityDisabled(Capability<?> capability, @Nullable Direction side) {
         //Treat unregistered capabilities as being disabled to skip and further logic relating to them
-        if (!capability.isRegistered() || alwaysDisabled.contains(capability)) {
+        if (!capability.isAvailable() || alwaysDisabled.contains(capability)) {
             return true;
         }
         if (semiDisabled.containsKey(capability)) {
@@ -115,20 +115,20 @@ public class CapabilityCache {
     /**
      * Gets a capability on the given side, ensuring that it can be resolved and that it is not disabled.
      */
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> getCapability(Capability<T> capability, @Nullable Direction side) {
         if (!isCapabilityDisabled(capability, side) && canResolve(capability)) {
             return getCapabilityUnchecked(capability, side);
         }
-        return LazyOptional.empty();
+        return CapabilityReference.empty();
     }
 
     /**
      * Gets a capability on the given side not checking to ensure that it is not disabled.
      */
-    public <T> LazyOptional<T> getCapabilityUnchecked(Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> getCapabilityUnchecked(Capability<T> capability, @Nullable Direction side) {
         ICapabilityResolver capabilityResolver = capabilityResolvers.get(capability);
         if (capabilityResolver == null) {
-            return LazyOptional.empty();
+            return CapabilityReference.empty();
         }
         return capabilityResolver.resolve(capability, side);
     }

@@ -10,6 +10,7 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -44,12 +45,12 @@ import mekanism.common.content.network.distribution.ChemicalHandlerTarget;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tier.ChemicalTankTier;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -257,7 +258,7 @@ public class ChemicalUtil {
 
     public static <CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, HANDLER extends IChemicalHandler<CHEMICAL, STACK>> boolean hasChemical(
           ItemStack stack, Predicate<STACK> validityCheck, Capability<HANDLER> capability) {
-        Optional<HANDLER> cap = stack.getCapability(capability).resolve();
+        Optional<HANDLER> cap = CapabilityUtils.getCapability(stack, capability).resolve();
         if (cap.isPresent()) {
             HANDLER handler = cap.get();
             for (int tank = 0; tank < handler.getTanks(); tank++) {

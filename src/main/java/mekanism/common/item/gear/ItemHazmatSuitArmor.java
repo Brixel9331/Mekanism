@@ -1,6 +1,8 @@
 package mekanism.common.item.gear;
 
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.CapabilityProvider;
+import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.radiation.item.RadiationShieldingHandler;
@@ -11,10 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStack.TooltipPart;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemHazmatSuitArmor extends ArmorItem {
+public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProvider {
 
     private static final HazmatMaterial HAZMAT_MATERIAL = new HazmatMaterial();
 
@@ -37,7 +38,7 @@ public class ItemHazmatSuitArmor extends ArmorItem {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+    public CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
         ItemCapabilityWrapper wrapper = new ItemCapabilityWrapper(stack, RadiationShieldingHandler.create(item -> getShieldingByArmor(getType())));
         GenderCapabilityHelper.addGenderCapability(this, wrapper::add);
         return wrapper;

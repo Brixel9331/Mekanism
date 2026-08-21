@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import mekanism.api.NBTConstants;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.QIOFrequency;
@@ -27,7 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
 public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
@@ -60,7 +60,7 @@ public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
         }
         Direction direction = getDirection();
         BlockEntity back = WorldUtils.getTileEntity(getLevel(), worldPosition.relative(direction.getOpposite()));
-        LazyOptional<IItemHandler> lazyCapability = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
+        CapabilityReference<IItemHandler> lazyCapability = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
         if (!lazyCapability.isPresent()) {//Not an IItemHandler
             return;
         }

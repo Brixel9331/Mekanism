@@ -29,6 +29,7 @@ import mekanism.common.network.IMekanismPacket;
 import mekanism.common.network.PacketContext;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.WorldUtils;
@@ -124,7 +125,7 @@ public class PacketDropperUse implements IMekanismPacket {
                 MekanismCriteriaTriggers.USE_GAUGE_DROPPER.trigger(player, UseDropperAction.DUMP);
             }
         } else {
-            Optional<IChemicalHandler<CHEMICAL, STACK>> cap = stack.getCapability(ChemicalUtil.getCapabilityForChemical(tank)).resolve();
+            Optional<IChemicalHandler<CHEMICAL, STACK>> cap = CapabilityUtils.getCapability(stack, ChemicalUtil.getCapabilityForChemical(tank)).resolve();
             if (cap.isPresent()) {
                 IChemicalHandler<CHEMICAL, STACK> handler = cap.get();
                 if (handler instanceof IMekanismChemicalHandler<CHEMICAL, STACK, ?> chemicalHandler) {

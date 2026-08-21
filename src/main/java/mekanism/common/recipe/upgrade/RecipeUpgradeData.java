@@ -17,8 +17,8 @@ import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.content.qio.IQIODriveItem.DriveMetadata;
 import mekanism.common.content.qio.IQIODriveItem;
+import mekanism.common.content.qio.IQIODriveItem.DriveMetadata;
 import mekanism.common.inventory.BinMekanismInventory;
 import mekanism.common.item.block.ItemBlockBin;
 import mekanism.common.item.block.ItemBlockPersonalStorage;
@@ -32,6 +32,7 @@ import mekanism.common.tier.BinTier;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.factory.TileEntityFactory;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.BlockItem;
@@ -75,7 +76,7 @@ public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {
                 supportedTypes.add(RecipeUpgradeType.UPGRADE);
             }
         }
-        if (stack.getCapability(Capabilities.STRICT_ENERGY).isPresent() || tile != null && tile.handles(SubstanceType.ENERGY)) {
+        if (CapabilityUtils.getCapability(stack, Capabilities.STRICT_ENERGY).isPresent() || tile != null && tile.handles(SubstanceType.ENERGY)) {
             //If we are for a block that handles energy, or we have an energy handler capability
             supportedTypes.add(RecipeUpgradeType.ENERGY);
         }
@@ -83,19 +84,19 @@ public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {
             //If we are for a block that handles fluid, or we have a fluid handler capability
             supportedTypes.add(RecipeUpgradeType.FLUID);
         }
-        if (stack.getCapability(Capabilities.GAS_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.GAS)) {
+        if (CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.GAS)) {
             //If we are for a block that handles gas, or we have a gas handler capability
             supportedTypes.add(RecipeUpgradeType.GAS);
         }
-        if (stack.getCapability(Capabilities.INFUSION_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.INFUSION)) {
+        if (CapabilityUtils.getCapability(stack, Capabilities.INFUSION_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.INFUSION)) {
             //If we are for a block that handles infusion, or we have an infusion handler capability
             supportedTypes.add(RecipeUpgradeType.INFUSION);
         }
-        if (stack.getCapability(Capabilities.PIGMENT_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.PIGMENT)) {
+        if (CapabilityUtils.getCapability(stack, Capabilities.PIGMENT_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.PIGMENT)) {
             //If we are for a block that handles pigment, or we have a pigment handler capability
             supportedTypes.add(RecipeUpgradeType.PIGMENT);
         }
-        if (stack.getCapability(Capabilities.SLURRY_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.SLURRY)) {
+        if (CapabilityUtils.getCapability(stack, Capabilities.SLURRY_HANDLER).isPresent() || tile != null && tile.handles(SubstanceType.SLURRY)) {
             //If we are for a block that handles slurry, or we have a slurry handler capability
             supportedTypes.add(RecipeUpgradeType.SLURRY);
         }

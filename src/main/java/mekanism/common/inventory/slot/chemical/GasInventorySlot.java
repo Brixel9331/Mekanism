@@ -15,6 +15,7 @@ import mekanism.api.chemical.gas.IGasTank;
 import mekanism.api.recipes.ItemStackToGasRecipe;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.recipe.MekanismRecipeType;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class GasInventorySlot extends ChemicalInventorySlot<Gas, GasStack> {
         Objects.requireNonNull(gasTank, "Gas tank cannot be null");
         Objects.requireNonNull(modeSupplier, "Mode supplier cannot be null");
         Predicate<@NotNull ItemStack> insertPredicate = getDrainInsertPredicate(gasTank, GasInventorySlot::getCapability).and(stack -> modeSupplier.getAsBoolean());
-        return new GasInventorySlot(gasTank, insertPredicate.negate(), insertPredicate, stack -> stack.getCapability(Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
+        return new GasInventorySlot(gasTank, insertPredicate.negate(), insertPredicate, stack -> CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
     }
 
     /**
@@ -53,7 +54,7 @@ public class GasInventorySlot extends ChemicalInventorySlot<Gas, GasStack> {
         Objects.requireNonNull(modeSupplier, "Mode supplier cannot be null");
         return new GasInventorySlot(gasTank, getFillExtractPredicate(gasTank, GasInventorySlot::getCapability),
               stack -> !modeSupplier.getAsBoolean() && fillInsertCheck(gasTank, getCapability(stack)),
-              stack -> stack.getCapability(Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
+              stack -> CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
     }
 
     /**
@@ -65,7 +66,7 @@ public class GasInventorySlot extends ChemicalInventorySlot<Gas, GasStack> {
         Function<ItemStack, GasStack> potentialConversionSupplier = stack -> getPotentialConversion(worldSupplier.get(), stack);
         return new GasInventorySlot(gasTank, worldSupplier, getFillOrConvertExtractPredicate(gasTank, GasInventorySlot::getCapability, potentialConversionSupplier),
               getFillOrConvertInsertPredicate(gasTank, GasInventorySlot::getCapability, potentialConversionSupplier), stack -> {
-            if (stack.getCapability(Capabilities.GAS_HANDLER).isPresent()) {
+            if (CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent()) {
                 //Note: we mark all gas items as valid and have a more restrictive insert check so that we allow full tanks when they are done being filled
                 return true;
             }
@@ -81,7 +82,7 @@ public class GasInventorySlot extends ChemicalInventorySlot<Gas, GasStack> {
     public static GasInventorySlot fill(IGasTank gasTank, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(gasTank, "Gas tank cannot be null");
         return new GasInventorySlot(gasTank, getFillExtractPredicate(gasTank, GasInventorySlot::getCapability),
-              stack -> fillInsertCheck(gasTank, getCapability(stack)), stack -> stack.getCapability(Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
+              stack -> fillInsertCheck(gasTank, getCapability(stack)), stack -> CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent(), listener, x, y);
     }
 
     /**
@@ -92,7 +93,7 @@ public class GasInventorySlot extends ChemicalInventorySlot<Gas, GasStack> {
     public static GasInventorySlot drain(IGasTank gasTank, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(gasTank, "Gas tank cannot be null");
         Predicate<@NotNull ItemStack> insertPredicate = getDrainInsertPredicate(gasTank, GasInventorySlot::getCapability);
-        return new GasInventorySlot(gasTank, insertPredicate.negate(), insertPredicate, stack -> stack.getCapability(Capabilities.GAS_HANDLER).isPresent(),
+        return new GasInventorySlot(gasTank, insertPredicate.negate(), insertPredicate, stack -> CapabilityUtils.getCapability(stack, Capabilities.GAS_HANDLER).isPresent(),
               listener, x, y);
     }
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IMekanismStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -23,7 +24,6 @@ import mekanism.common.util.text.EnergyDisplay;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,10 +128,10 @@ public class EnergyNetwork extends DynamicBufferedNetwork<IStrictEnergyHandler, 
     }
 
     private FloatingLong tickEmit(FloatingLong energyToSend) {
-        Collection<Map<Direction, LazyOptional<IStrictEnergyHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
+        Collection<Map<Direction, CapabilityReference<IStrictEnergyHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
         EnergyAcceptorTarget target = new EnergyAcceptorTarget(acceptorValues.size() * 2);
-        for (Map<Direction, LazyOptional<IStrictEnergyHandler>> acceptors : acceptorValues) {
-            for (LazyOptional<IStrictEnergyHandler> lazyAcceptor : acceptors.values()) {
+        for (Map<Direction, CapabilityReference<IStrictEnergyHandler>> acceptors : acceptorValues) {
+            for (CapabilityReference<IStrictEnergyHandler> lazyAcceptor : acceptors.values()) {
                 lazyAcceptor.ifPresent(acceptor -> {
                     if (acceptor.insertEnergy(energyToSend, Action.SIMULATE).smallerThan(energyToSend)) {
                         target.addHandler(acceptor);

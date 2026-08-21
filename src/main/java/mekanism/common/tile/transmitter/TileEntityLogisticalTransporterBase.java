@@ -5,6 +5,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.capabilities.item.CursedTransporterItemHandler;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
@@ -17,9 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +86,7 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
         private static final List<Capability<?>> SUPPORTED_CAPABILITY = Collections.singletonList(ForgeCapabilities.ITEM_HANDLER);
 
         private final Map<Direction, CursedTransporterItemHandler> cursedHandlers = new EnumMap<>(Direction.class);
-        private final Map<Direction, LazyOptional<IItemHandler>> handlers = new EnumMap<>(Direction.class);
+        private final Map<Direction, CapabilityReference<IItemHandler>> handlers = new EnumMap<>(Direction.class);
 
         @Override
         public List<Capability<?>> getSupportedCapabilities() {
@@ -97,21 +97,21 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
          * Lazily get and cache a handler instance for the given side, and make it be read only if something else is trying to interact with us using the null side
          */
         @Override
-        public <T> LazyOptional<T> resolve(Capability<T> capability, @Nullable Direction side) {
+        public <T> CapabilityReference<T> resolve(Capability<T> capability, @Nullable Direction side) {
             if (side == null) {
                 //We provide no readonly item handler view
-                return LazyOptional.empty();
+                return CapabilityReference.empty();
             }
-            LazyOptional<IItemHandler> cachedCapability = handlers.get(side);
+            CapabilityReference<IItemHandler> cachedCapability = handlers.get(side);
             if (cachedCapability == null || !cachedCapability.isPresent()) {
                 LogisticalTransporterBase transporter = getTransmitter();
                 //Note: We check here whether it exposes the cap rather than in the cap itself as we invalidate the cached cap whenever this changes
                 if (transporter.exposesInsertCap(side)) {
-                    handlers.put(side, cachedCapability = LazyOptional.of(() ->
+                    handlers.put(side, cachedCapability = CapabilityReference.of(() ->
                           cursedHandlers.computeIfAbsent(side, s -> new CursedTransporterItemHandler(transporter, worldPosition.relative(s),
                           () -> level == null ? -1 : level.getGameTime()))));
                 } else {
-                    return LazyOptional.empty();
+                    return CapabilityReference.empty();
                 }
             }
             return cachedCapability.cast();
@@ -129,7 +129,7 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
             handlers.values().forEach(this::invalidate);
         }
 
-        protected void invalidate(@Nullable LazyOptional<?> cachedCapability) {
+        protected void invalidate(@Nullable CapabilityReference<?> cachedCapability) {
             if (cachedCapability != null && cachedCapability.isPresent()) {
                 cachedCapability.invalidate();
             }

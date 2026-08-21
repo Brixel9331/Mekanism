@@ -3,6 +3,8 @@ package mekanism.common.integration.energy.fluxnetworks;
 import java.util.Collection;
 import java.util.Set;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
@@ -11,11 +13,8 @@ import mekanism.common.integration.energy.IEnergyCompat;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.UnitDisplayUtils.EnergyUnit;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 import sonar.fluxnetworks.api.energy.IFNEnergyStorage;
 
@@ -52,12 +51,12 @@ public class FNEnergyCompat implements IEnergyCompat {
     }
 
     @Override
-    public LazyOptional<?> getHandlerAs(IStrictEnergyHandler handler) {
-        return LazyOptional.of(() -> new FNIntegration(handler));
+    public CapabilityReference<?> getHandlerAs(IStrictEnergyHandler handler) {
+        return CapabilityReference.of(() -> new FNIntegration(handler));
     }
 
     @Override
-    public LazyOptional<IStrictEnergyHandler> getLazyStrictEnergyHandler(ICapabilityProvider provider, @Nullable Direction side) {
+    public CapabilityReference<IStrictEnergyHandler> getLazyStrictEnergyHandler(Object provider, @Nullable Direction side) {
         return CapabilityUtils.getCapability(provider, FN_ENERGY_CAPABILITY, side).lazyMap(FNStrictEnergyHandler::new);
     }
 }

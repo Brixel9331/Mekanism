@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.pigment.IPigmentHandler;
@@ -16,7 +17,6 @@ import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.CapabilityUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 //TODO - V11: Improve this so it only invalidates the types needed instead of doing all chemical types at once
@@ -57,10 +57,10 @@ public class BoxedChemicalAcceptorCache extends AbstractAcceptorCache<BoxedChemi
     public boolean isChemicalAcceptorAndListen(@Nullable BlockEntity tile, Direction side) {
         //TODO: Improve this to make it easier to add more chemical types
         Direction opposite = side.getOpposite();
-        LazyOptional<IGasHandler> gasAcceptor = CapabilityUtils.getCapability(tile, Capabilities.GAS_HANDLER, opposite);
-        LazyOptional<IInfusionHandler> infusionAcceptor = CapabilityUtils.getCapability(tile, Capabilities.INFUSION_HANDLER, opposite);
-        LazyOptional<IPigmentHandler> pigmentAcceptor = CapabilityUtils.getCapability(tile, Capabilities.PIGMENT_HANDLER, opposite);
-        LazyOptional<ISlurryHandler> slurryAcceptor = CapabilityUtils.getCapability(tile, Capabilities.SLURRY_HANDLER, opposite);
+        CapabilityReference<IGasHandler> gasAcceptor = CapabilityUtils.getCapability(tile, Capabilities.GAS_HANDLER, opposite);
+        CapabilityReference<IInfusionHandler> infusionAcceptor = CapabilityUtils.getCapability(tile, Capabilities.INFUSION_HANDLER, opposite);
+        CapabilityReference<IPigmentHandler> pigmentAcceptor = CapabilityUtils.getCapability(tile, Capabilities.PIGMENT_HANDLER, opposite);
+        CapabilityReference<ISlurryHandler> slurryAcceptor = CapabilityUtils.getCapability(tile, Capabilities.SLURRY_HANDLER, opposite);
         if (gasAcceptor.isPresent() || infusionAcceptor.isPresent() || pigmentAcceptor.isPresent() || slurryAcceptor.isPresent()) {
             BoxedChemicalHandler chemicalHandler = new BoxedChemicalHandler();
             if (gasAcceptor.isPresent()) {
@@ -102,21 +102,21 @@ public class BoxedChemicalAcceptorCache extends AbstractAcceptorCache<BoxedChemi
     }
 
     @Override
-    public LazyOptional<BoxedChemicalHandler> getConnectedAcceptor(Direction side) {
+    public CapabilityReference<BoxedChemicalHandler> getConnectedAcceptor(Direction side) {
         if (cachedAcceptors.containsKey(side)) {
             BoxedChemicalAcceptorInfo acceptorInfo = cachedAcceptors.get(side);
             if (!acceptorInfo.getTile().isRemoved()) {
                 return acceptorInfo.getAsLazy();
             }
         }
-        return LazyOptional.empty();
+        return CapabilityReference.empty();
     }
 
     public static class BoxedChemicalAcceptorInfo extends AbstractAcceptorInfo {
 
         private BoxedChemicalHandler boxedHandler;
         @Nullable
-        private LazyOptional<BoxedChemicalHandler> asLazy;
+        private CapabilityReference<BoxedChemicalHandler> asLazy;
 
         private BoxedChemicalAcceptorInfo(BlockEntity tile, BoxedChemicalHandler boxedHandler) {
             super(tile);
@@ -128,10 +128,10 @@ public class BoxedChemicalAcceptorCache extends AbstractAcceptorCache<BoxedChemi
             asLazy = null;
         }
 
-        private LazyOptional<BoxedChemicalHandler> getAsLazy() {
+        private CapabilityReference<BoxedChemicalHandler> getAsLazy() {
             if (asLazy == null) {
                 //Lazily calculate the lazy optional value of the boxed chemical handler
-                asLazy = LazyOptional.of(() -> boxedHandler);
+                asLazy = CapabilityReference.of(() -> boxedHandler);
             }
             return asLazy;
         }

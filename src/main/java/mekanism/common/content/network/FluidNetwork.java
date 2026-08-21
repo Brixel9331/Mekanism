@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import mekanism.api.Action;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
@@ -24,7 +25,6 @@ import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -150,10 +150,10 @@ public class FluidNetwork extends DynamicBufferedNetwork<IFluidHandler, FluidNet
     }
 
     private int tickEmit(@NotNull FluidStack fluidToSend) {
-        Collection<Map<Direction, LazyOptional<IFluidHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
+        Collection<Map<Direction, CapabilityReference<IFluidHandler>>> acceptorValues = acceptorCache.getAcceptorValues();
         FluidHandlerTarget target = new FluidHandlerTarget(fluidToSend, acceptorValues.size() * 2);
-        for (Map<Direction, LazyOptional<IFluidHandler>> acceptors : acceptorValues) {
-            for (LazyOptional<IFluidHandler> lazyAcceptor : acceptors.values()) {
+        for (Map<Direction, CapabilityReference<IFluidHandler>> acceptors : acceptorValues) {
+            for (CapabilityReference<IFluidHandler> lazyAcceptor : acceptors.values()) {
                 lazyAcceptor.ifPresent(acceptor -> {
                     if (FluidUtils.canFill(acceptor, fluidToSend)) {
                         target.addHandler(acceptor);

@@ -7,6 +7,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.capabilities.Capability;
+import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.ISidedStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -15,15 +17,13 @@ import mekanism.common.capabilities.proxy.ProxyStrictEnergyHandler;
 import mekanism.common.capabilities.resolver.EnergyCapabilityResolver;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
 public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyContainer> {
 
-    private final Map<Direction, Map<Capability<?>, LazyOptional<?>>> cachedCapabilities;
-    private final Map<Capability<?>, LazyOptional<?>> cachedReadOnlyCapabilities;
+    private final Map<Direction, Map<Capability<?>, CapabilityReference<?>>> cachedCapabilities;
+    private final Map<Capability<?>, CapabilityReference<?>> cachedReadOnlyCapabilities;
     private final Map<Direction, IStrictEnergyHandler> handlers;
     private final ISidedStrictEnergyHandler baseHandler;
     private final boolean canHandle;
@@ -68,11 +68,11 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
      * @apiNote Assumes that {@link #canHandle} has been called before this and that it was {@code true}.
      */
     @Override
-    public <T> LazyOptional<T> resolve(Capability<T> capability, @Nullable Direction side) {
+    public <T> CapabilityReference<T> resolve(Capability<T> capability, @Nullable Direction side) {
         if (getContainers(side).isEmpty()) {
             //If we don't have any containers accessible from that side, don't return a handler
             //TODO: Evaluate moving this somehow into being done via the is disabled check
-            return LazyOptional.empty();
+            return CapabilityReference.empty();
         }
         if (side == null) {
             if (readOnlyHandler == null) {
@@ -95,7 +95,7 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
         if (side == null) {
             invalidate(cachedReadOnlyCapabilities.get(capability));
         } else {
-            Map<Capability<?>, LazyOptional<?>> cachedSide = cachedCapabilities.get(side);
+            Map<Capability<?>, CapabilityReference<?>> cachedSide = cachedCapabilities.get(side);
             if (cachedSide != null) {
                 invalidate(cachedSide.get(capability));
             }
@@ -106,17 +106,17 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
     public void invalidateAll() {
         //Note: We don't invalidate the base handlers as they are still valid regardless, and the holder just removes slots when they shouldn't be accessible
         // we only bother invalidating the lazy optionals
-        for (Map<Capability<?>, LazyOptional<?>> cachedSide : cachedCapabilities.values()) {
-            for (LazyOptional<?> lazyOptional : new ArrayList<>(cachedSide.values())) {
+        for (Map<Capability<?>, CapabilityReference<?>> cachedSide : cachedCapabilities.values()) {
+            for (CapabilityReference<?> lazyOptional : new ArrayList<>(cachedSide.values())) {
                 invalidate(lazyOptional);
             }
         }
-        for (LazyOptional<?> lazyOptional : new ArrayList<>(cachedReadOnlyCapabilities.values())) {
+        for (CapabilityReference<?> lazyOptional : new ArrayList<>(cachedReadOnlyCapabilities.values())) {
             invalidate(lazyOptional);
         }
     }
 
-    protected void invalidate(@Nullable LazyOptional<?> cachedCapability) {
+    protected void invalidate(@Nullable CapabilityReference<?> cachedCapability) {
         if (cachedCapability != null && cachedCapability.isPresent()) {
             cachedCapability.invalidate();
         }
