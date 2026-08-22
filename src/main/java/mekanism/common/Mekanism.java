@@ -338,7 +338,7 @@ public class Mekanism {
         });
 
         //Register player tracker
-        MinecraftForge.EVENT_BUS.register(new CommonPlayerTracker());
+        new CommonPlayerTracker();
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
         MinecraftForge.EVENT_BUS.register(Mekanism.worldTickHandler);
 

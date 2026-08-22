@@ -9,6 +9,7 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.UnitDisplayUtils;
 import mekanism.common.util.UnitDisplayUtils.RadiationUnit;
 import mekanism.common.util.text.TextUtils;
@@ -37,7 +38,7 @@ public class ItemDosimeter extends Item {
         ItemStack stack = player.getItemInHand(hand);
         if (!player.isShiftKeyDown()) {
             if (!world.isClientSide) {
-                player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(cap -> {
+                CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(cap -> {
                     sendDosimeterLevel(cap, player, MekanismLang.RADIATION_EXPOSURE);
                     CriteriaTriggers.USING_ITEM.trigger((ServerPlayer) player, stack);
                 });
@@ -52,7 +53,7 @@ public class ItemDosimeter extends Item {
     public InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player player, @NotNull LivingEntity entity, @NotNull InteractionHand hand) {
         if (!player.isShiftKeyDown()) {
             if (!player.level().isClientSide) {
-                entity.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(cap -> sendDosimeterLevel(cap, player, MekanismLang.RADIATION_EXPOSURE_ENTITY));
+                CapabilityUtils.getCapability(entity, Capabilities.RADIATION_ENTITY).ifPresent(cap -> sendDosimeterLevel(cap, player, MekanismLang.RADIATION_EXPOSURE_ENTITY));
             }
             return InteractionResult.sidedSuccess(player.level().isClientSide);
         }

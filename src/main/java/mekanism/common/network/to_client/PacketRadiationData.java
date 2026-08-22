@@ -1,10 +1,11 @@
 package mekanism.common.network.to_client;
 
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.lib.radiation.RadiationManager.LevelAndMaxMagnitude;
 import mekanism.common.lib.radiation.RadiationManager;
+import mekanism.common.lib.radiation.RadiationManager.LevelAndMaxMagnitude;
 import mekanism.common.network.IMekanismPacket;
 import mekanism.common.network.PacketContext;
+import mekanism.common.util.CapabilityUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,7 +37,7 @@ public class PacketRadiationData implements IMekanismPacket {
         } else if (type == RadiationPacketType.PLAYER) {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
-                player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> c.set(radiation));
+                CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(c -> c.set(radiation));
             }
         }
     }

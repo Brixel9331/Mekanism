@@ -7,32 +7,32 @@ import mekanism.common.block.BlockCardboardBox;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.radiation.RadiationManager;
-import mekanism.common.lib.radiation.capability.DefaultRadiationEntity;
+import mekanism.common.lib.radiation.capability.RadiationEntityAccess;
 import mekanism.common.network.to_client.PacketPlayerData;
 import mekanism.common.network.to_client.PacketRadiationData;
 import mekanism.common.network.to_client.PacketResetPlayerClient;
 import mekanism.common.network.to_client.PacketSecurityUpdate;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.tags.MekanismTags.Items;
+import mekanism.common.util.CapabilityUtils;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class CommonPlayerTracker {
 
@@ -41,12 +41,17 @@ public class CommonPlayerTracker {
                 "https://github.com/mekanism/Mekanism#alpha-status"), MekanismLang.ALPHA_WARNING_HERE));
 
     public CommonPlayerTracker() {
-        MinecraftForge.EVENT_BUS.register(this);
+        Capabilities.RADIATION_ENTITY.entity().registerFallback((entity, side) -> entity instanceof RadiationEntityAccess access ? access.mekanism$getRadiation() : null);
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerLoginEvent(handler.player));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> onPlayerLogoutEvent(handler.player));
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> onPlayerDimChangedEvent(player));
+        EntityTrackingEvents.START_TRACKING.register(this::onPlayerStartTrackingEvent);
+        ServerPlayerEvents.COPY_FROM.register(this::cloneEvent);
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> respawnEvent(player, alive));
+        UseBlockCallback.EVENT.register(this::rightClickEvent);
     }
 
-    @SubscribeEvent
-    public void onPlayerLoginEvent(PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
+    public void onPlayerLoginEvent(ServerPlayer player) {
         if (!player.level().isClientSide) {
             ServerPlayer serverPlayer = (ServerPlayer) player;
             Mekanism.packetHandler().sendTo(new PacketSecurityUpdate(), serverPlayer);
@@ -55,51 +60,33 @@ public class CommonPlayerTracker {
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerLogoutEvent(PlayerLoggedOutEvent event) {
-        Player player = event.getEntity();
+    public void onPlayerLogoutEvent(ServerPlayer player) {
         Mekanism.playerState.clearPlayer(player.getUUID(), false);
         Mekanism.playerState.clearPlayerServerSideOnly(player.getUUID());
     }
 
-    @SubscribeEvent
-    public void onPlayerDimChangedEvent(PlayerChangedDimensionEvent event) {
-        ServerPlayer player = (ServerPlayer) event.getEntity();
+    public void onPlayerDimChangedEvent(ServerPlayer player) {
         Mekanism.playerState.clearPlayer(player.getUUID(), false);
         Mekanism.playerState.reapplyServerSideOnly(player);
-        player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> Mekanism.packetHandler().sendTo(PacketRadiationData.createPlayer(c.getRadiation()), player));
+        CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(c -> Mekanism.packetHandler().sendTo(PacketRadiationData.createPlayer(c.getRadiation()), player));
         RadiationManager.get().updateClientRadiation(player);
     }
 
-    @SubscribeEvent
-    public void onPlayerStartTrackingEvent(PlayerEvent.StartTracking event) {
-        if (event.getTarget() instanceof Player player && event.getEntity() instanceof ServerPlayer serverPlayer) {
+    public void onPlayerStartTrackingEvent(Entity target, ServerPlayer serverPlayer) {
+        if (target instanceof Player player) {
             Mekanism.packetHandler().sendTo(new PacketPlayerData(player.getUUID()), serverPlayer);
         }
     }
 
-    @SubscribeEvent
-    public void attachCaps(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof LivingEntity) {
-            DefaultRadiationEntity.Provider radiationProvider = new DefaultRadiationEntity.Provider();
-            event.addCapability(DefaultRadiationEntity.Provider.NAME, radiationProvider);
-            event.addListener(radiationProvider::invalidate);
+    public void cloneEvent(ServerPlayer original, ServerPlayer replacement, boolean alive) {
+        if (original instanceof RadiationEntityAccess source && replacement instanceof RadiationEntityAccess target) {
+            target.mekanism$copyRadiation(source);
         }
     }
 
-    @SubscribeEvent
-    public void cloneEvent(PlayerEvent.Clone event) {
-        event.getOriginal().reviveCaps();
-        event.getOriginal().getCapability(Capabilities.RADIATION_ENTITY).ifPresent(cap ->
-              event.getEntity().getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
-        event.getOriginal().invalidateCaps();
-    }
-
-    @SubscribeEvent
-    public void respawnEvent(PlayerEvent.PlayerRespawnEvent event) {
-        ServerPlayer player = (ServerPlayer) event.getEntity();
-        player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
-            if (!event.isEndConquered()) {
+    public void respawnEvent(ServerPlayer player, boolean alive) {
+        CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+            if (!alive) {
                 //If the player is returning from the end don't reset radiation
                 c.set(RadiationManager.BASELINE);
             }
@@ -112,18 +99,21 @@ public class CommonPlayerTracker {
     /**
      * If the player is sneaking and the dest block is a cardboard box, ensure onBlockActivated is called, and that the item use is not.
      */
-    @SubscribeEvent
-    public void rightClickEvent(RightClickBlock event) {
-        ItemStack itemInHand = event.getEntity().getItemInHand(event.getHand());
+    public InteractionResult rightClickEvent(Player player, Level level, InteractionHand hand, BlockHitResult hit) {
+        if (player.isSpectator()) {
+            return InteractionResult.PASS;
+        }
+        ItemStack itemInHand = player.getItemInHand(hand);
         if (itemInHand.is(Items.CONFIGURATORS) && !itemInHand.is(MekanismItems.CONFIGURATOR.asItem())) {
             //it's a wrench, see if it's our block. Not the configurator, as it handles bypass correctly
-            Block block = event.getLevel().getBlockState(event.getPos()).getBlock();
-            if (block instanceof BlockMekanism || block instanceof BlockBounding) {
-                event.setUseBlock(Event.Result.ALLOW);//force it to use the item on the block
+            Block block = level.getBlockState(hit.getBlockPos()).getBlock();
+            if (player.isShiftKeyDown() && (block instanceof BlockMekanism || block instanceof BlockBounding)) {
+                return level.getBlockState(hit.getBlockPos()).use(level, player, hand, hit);
             }
-        } else if (event.getEntity().isShiftKeyDown() && event.getLevel().getBlockState(event.getPos()).getBlock() instanceof BlockCardboardBox) {
-            event.setUseBlock(Event.Result.ALLOW);
-            event.setUseItem(Event.Result.DENY);
+        } else if (player.isShiftKeyDown() && level.getBlockState(hit.getBlockPos()).getBlock() instanceof BlockCardboardBox) {
+            InteractionResult result = level.getBlockState(hit.getBlockPos()).use(level, player, hand, hit);
+            return result == InteractionResult.PASS ? InteractionResult.FAIL : result;
         }
+        return InteractionResult.PASS;
     }
 }

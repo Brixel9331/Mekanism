@@ -5,6 +5,7 @@ import mekanism.client.render.MekanismRenderer;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +30,7 @@ public class RadiationOverlay implements IGuiOverlay {
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTicks, int screenWidth, int screenHeight) {
         Player player = gui.getMinecraft().player;
         if (player != null && IRadiationManager.INSTANCE.isRadiationEnabled() && MekanismUtils.isPlayingMode(player)) {
-            player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+            CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                 double radiation = c.getRadiation();
                 double severity = RadiationScale.getScaledDoseSeverity(radiation) * 0.8;
                 //Only update the previous radiation level at most once a tick

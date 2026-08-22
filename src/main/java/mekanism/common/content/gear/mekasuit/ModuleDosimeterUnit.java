@@ -12,6 +12,7 @@ import mekanism.common.MekanismLang;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.radiation.RadiationManager;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import mekanism.common.util.UnitDisplayUtils;
@@ -29,7 +30,7 @@ public class ModuleDosimeterUnit implements ICustomModule<ModuleDosimeterUnit> {
     @Override
     public void addHUDElements(IModule<ModuleDosimeterUnit> module, Player player, Consumer<IHUDElement> hudElementAdder) {
         if (module.isEnabled()) {
-            player.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(capability -> {
+            CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(capability -> {
                 double radiation = IRadiationManager.INSTANCE.isRadiationEnabled() ? capability.getRadiation() : 0;
                 Component text = UnitDisplayUtils.getDisplayShort(radiation, RadiationUnit.SV, 2);
                 if (MekanismConfig.common.enableDecayTimers.get() && radiation > RadiationManager.MIN_MAGNITUDE) {

@@ -10,6 +10,7 @@ import mekanism.common.base.MekanismPermissions;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
+import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.UnitDisplayUtils;
 import mekanism.common.util.UnitDisplayUtils.RadiationUnit;
 import net.minecraft.commands.CommandSourceStack;
@@ -78,7 +79,7 @@ public class RadiationCommand {
                     .executes(ctx -> {
                         CommandSourceStack source = ctx.getSource();
                         double magnitude = DoubleArgumentType.getDouble(ctx, "magnitude");
-                        source.getPlayerOrException().getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                        CapabilityUtils.getCapability(source.getPlayerOrException(), Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                             c.radiate(magnitude);
                             source.sendSuccess(() -> MekanismLang.COMMAND_RADIATION_ADD_ENTITY.translateColored(EnumColor.GRAY, RadiationScale.getSeverityColor(magnitude),
                                   UnitDisplayUtils.getDisplayShort(magnitude, RadiationUnit.SVH, 3)), true);
@@ -94,7 +95,7 @@ public class RadiationCommand {
                               int addedTo = 0;
                               for (Entity entity : EntityArgument.getEntities(ctx, "targets")) {
                                   if (entity instanceof LivingEntity) {
-                                      entity.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                                      CapabilityUtils.getCapability(entity, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                                           c.radiate(magnitude);
                                           source.sendSuccess(() -> MekanismLang.COMMAND_RADIATION_ADD_ENTITY_TARGET.translateColored(EnumColor.GRAY,
                                                 RadiationScale.getSeverityColor(magnitude), UnitDisplayUtils.getDisplayShort(magnitude, RadiationUnit.SVH, 3),
@@ -136,7 +137,7 @@ public class RadiationCommand {
               .requires(MekanismPermissions.COMMAND_RADIATION_HEAL)
               .executes(ctx -> {
                   CommandSourceStack source = ctx.getSource();
-                  source.getPlayerOrException().getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                  CapabilityUtils.getCapability(source.getPlayerOrException(), Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                       c.set(RadiationManager.BASELINE);
                       source.sendSuccess(() -> MekanismLang.COMMAND_RADIATION_CLEAR.translateColored(EnumColor.GRAY), true);
                   });
@@ -148,7 +149,7 @@ public class RadiationCommand {
                         int healed = 0;
                         for (Entity entity : EntityArgument.getEntities(ctx, "targets")) {
                             if (entity instanceof LivingEntity) {
-                                entity.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                                CapabilityUtils.getCapability(entity, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                                     c.set(RadiationManager.BASELINE);
                                     source.sendSuccess(() -> MekanismLang.COMMAND_RADIATION_CLEAR_ENTITY.translateColored(EnumColor.GRAY, EnumColor.INDIGO,
                                           entity.getDisplayName()), true);
@@ -168,7 +169,7 @@ public class RadiationCommand {
                     .executes(ctx -> {
                         CommandSourceStack source = ctx.getSource();
                         double magnitude = DoubleArgumentType.getDouble(ctx, "magnitude");
-                        source.getPlayerOrException().getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                        CapabilityUtils.getCapability(source.getPlayerOrException(), Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                             double newValue = Math.max(RadiationManager.BASELINE, c.getRadiation() - magnitude);
                             double reduced = c.getRadiation() - newValue;
                             c.set(newValue);
@@ -186,7 +187,7 @@ public class RadiationCommand {
                               int reducedFrom = 0;
                               for (Entity entity : EntityArgument.getEntities(ctx, "targets")) {
                                   if (entity instanceof LivingEntity) {
-                                      entity.getCapability(Capabilities.RADIATION_ENTITY).ifPresent(c -> {
+                                      CapabilityUtils.getCapability(entity, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                                           double newValue = Math.max(RadiationManager.BASELINE, c.getRadiation() - magnitude);
                                           double reduced = c.getRadiation() - newValue;
                                           c.set(newValue);
