@@ -5,6 +5,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.capabilities.Capability;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.api.security.SecurityMode;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
 import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
@@ -23,7 +24,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public class TileEntitySecurityDesk extends TileEntityMekanism implements IBound
         //Even though there are inventory slots make this return none as accessible by automation, as then people could lock items to other
         // people unintentionally. We also disable the security object capability so that we only provide access to the security desk as an
         // "owner object" which means that all access checks will be handled as requiring the owner
-        addDisabledCapabilities(ForgeCapabilities.ITEM_HANDLER);
+        addDisabledCapabilities(Capabilities.ITEM_HANDLER);
     }
 
     @NotNull

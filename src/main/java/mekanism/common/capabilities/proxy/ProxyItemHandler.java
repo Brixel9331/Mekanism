@@ -2,15 +2,15 @@ package mekanism.common.capabilities.proxy;
 
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.inventory.ISidedItemHandler;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class ProxyItemHandler extends ProxyHandler implements IItemHandlerModifiable {
+public class ProxyItemHandler extends ProxyHandler implements IExtendedItemHandler {
 
     private final ISidedItemHandler inventory;
 

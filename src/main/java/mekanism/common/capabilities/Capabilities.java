@@ -10,7 +10,9 @@ import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.pigment.IPigmentHandler;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.api.heat.IHeatHandler;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.lasers.ILaserDissipation;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.radiation.capability.IRadiationEntity;
@@ -30,6 +32,10 @@ public class Capabilities {
     public static final Capability<IHeatHandler> HEAT_HANDLER = new Capability<>(new ResourceLocation("mekanism", "heat_handler"), IHeatHandler.class);
 
     public static final Capability<IStrictEnergyHandler> STRICT_ENERGY = new Capability<>(new ResourceLocation("mekanism", "strict_energy"), IStrictEnergyHandler.class);
+
+    public static final Capability<IExtendedItemHandler> ITEM_HANDLER = new Capability<>(new ResourceLocation("mekanism", "item_handler"), IExtendedItemHandler.class);
+
+    public static final Capability<IExtendedFluidHandler> FLUID_HANDLER = new Capability<>(new ResourceLocation("mekanism", "fluid_handler"), IExtendedFluidHandler.class);
 
     public static final Capability<IConfigurable> CONFIGURABLE = new Capability<>(new ResourceLocation("mekanism", "configurable"), IConfigurable.class);
 
