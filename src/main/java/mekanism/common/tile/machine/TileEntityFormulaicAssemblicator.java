@@ -16,6 +16,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.Mekanism;
@@ -64,7 +65,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

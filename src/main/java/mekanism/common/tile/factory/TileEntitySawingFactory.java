@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import mekanism.api.IContentsListener;
 import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.api.math.MathUtils;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.SawmillRecipe;
@@ -35,7 +36,6 @@ import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

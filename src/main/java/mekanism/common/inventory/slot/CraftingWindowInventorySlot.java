@@ -4,10 +4,10 @@ import java.util.function.BiPredicate;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.common.content.qio.QIOCraftingWindow;
 import mekanism.common.inventory.container.slot.VirtualInventoryContainerSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -29,6 +29,7 @@ import mekanism.api.Upgrade;
 import mekanism.api.capabilities.Capability;
 import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.base.MekFakePlayer;
@@ -108,7 +109,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

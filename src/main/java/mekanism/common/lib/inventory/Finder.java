@@ -1,11 +1,11 @@
 package mekanism.common.lib.inventory;
 
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.common.lib.WildcardMatcher;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public interface Finder {
 

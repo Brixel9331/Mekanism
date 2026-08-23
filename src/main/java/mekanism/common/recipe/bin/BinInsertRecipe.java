@@ -8,6 +8,7 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.common.inventory.slot.BinInventorySlot;
 import mekanism.common.item.block.ItemBlockBin;
 import mekanism.common.registries.MekanismRecipeSerializers;
@@ -22,7 +23,6 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 //TODO: Test this recipe in various modded crafting tables/auto crafters
 @NothingNullByDefault
