@@ -3,7 +3,9 @@ package mekanism.common.util;
 import java.util.List;
 import java.util.Optional;
 import mekanism.api.RelativeSide;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.text.EnumColor;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.content.network.transmitter.LogisticalTransporter;
 import mekanism.common.content.network.transmitter.LogisticalTransporterBase;
 import mekanism.common.content.transporter.TransporterManager;
@@ -18,8 +20,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 public final class TransporterUtils {
@@ -103,9 +103,9 @@ public final class TransporterUtils {
                 return false;
             }
         }
-        Optional<IItemHandler> capability = CapabilityUtils.getCapability(tile, ForgeCapabilities.ITEM_HANDLER, side.getOpposite()).resolve();
+        Optional<IExtendedItemHandler> capability = CapabilityUtils.getCapability(tile, Capabilities.ITEM_HANDLER, side.getOpposite()).resolve();
         if (capability.isPresent()) {
-            IItemHandler inventory = capability.get();
+            IExtendedItemHandler inventory = capability.get();
             for (int i = 0, slots = inventory.getSlots(); i < slots; i++) {
                 // Simulate insert, this will handle validating the item is valid for the inventory
                 ItemStack rejects = inventory.insertItem(i, itemStack, true);

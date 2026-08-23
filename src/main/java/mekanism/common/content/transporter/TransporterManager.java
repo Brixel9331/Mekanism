@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import mekanism.api.Coord4D;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.common.content.transporter.TransporterStack.Path;
+import mekanism.common.integration.item.fabric.FabricItemHandler;
 import mekanism.common.lib.inventory.TransitRequest;
 import mekanism.common.lib.inventory.TransitRequest.ItemData;
 import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
@@ -15,7 +17,7 @@ import mekanism.common.util.StackUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class TransporterManager {
 
@@ -58,7 +60,10 @@ public class TransporterManager {
      *
      * @return The amount that is left over from trying to insert into the destination.
      */
-    private static int simulateInsert(IItemHandler handler, InventoryInfo inventoryInfo, ItemStack stack, int count, boolean inFlight) {
+    private static int simulateInsert(IExtendedItemHandler handler, InventoryInfo inventoryInfo, ItemStack stack, int count, boolean inFlight) {
+        if (inventoryInfo.simulation != null) {
+            return inventoryInfo.simulation.insert(stack.copyWithCount(count));
+        }
         int maxStackSize = stack.getMaxStackSize();
         for (int slot = 0; slot < inventoryInfo.slots; slot++) {
             if (count == 0) {
@@ -183,24 +188,25 @@ public class TransporterManager {
      *
      * @return {@link TransitResponse} of expected items to use
      */
-    public static TransitResponse getPredictedInsert(Coord4D position, Direction side, IItemHandler handler, TransitRequest request,
+    public static TransitResponse getPredictedInsert(Coord4D position, Direction side, IExtendedItemHandler handler, TransitRequest request,
           Map<Coord4D, Set<TransporterStack>> additionalFlowingStacks) {
-        InventoryInfo inventoryInfo = new InventoryInfo(handler);
-        //Before we see if this item can fit in the destination, we must first check the stacks that are
-        // en-route. Note that we also have to simulate the current inventory after each stack; we'll keep
-        // track of the initial size of the inventory and then simulate each in-flight addition. If any
-        // in-flight stack can't be inserted, then we can fail fast.
-        //Note: that stackSizes for inventoryInfo is updated each time
-        if (!predictFlowing(position, side, handler, inventoryInfo, flowingStacks) || !predictFlowing(position, side, handler, inventoryInfo, additionalFlowingStacks)) {
-            return request.getEmptyResponse();
-        }
+        try (InventoryInfo inventoryInfo = new InventoryInfo(handler)) {
+            //Before we see if this item can fit in the destination, we must first check the stacks that are
+            // en-route. Note that we also have to simulate the current inventory after each stack; we'll keep
+            // track of the initial size of the inventory and then simulate each in-flight addition. If any
+            // in-flight stack can't be inserted, then we can fail fast.
+            //Note: that stackSizes for inventoryInfo is updated each time
+            if (!predictFlowing(position, side, handler, inventoryInfo, flowingStacks) || !predictFlowing(position, side, handler, inventoryInfo, additionalFlowingStacks)) {
+                return request.getEmptyResponse();
+            }
 
-        //Now for each of the items in the request, simulate the insert, using the state from all the in-flight
-        // items to ensure we have an accurate model of what will happen in the future.
-        return getPredictedInsert(inventoryInfo, handler, request);
+            //Now for each of the items in the request, simulate the insert, using the state from all the in-flight
+            // items to ensure we have an accurate model of what will happen in the future.
+            return getPredictedInsert(inventoryInfo, handler, request);
+        }
     }
 
-    private static boolean predictFlowing(Coord4D position, Direction side, IItemHandler handler, InventoryInfo inventoryInfo,
+    private static boolean predictFlowing(Coord4D position, Direction side, IExtendedItemHandler handler, InventoryInfo inventoryInfo,
           Map<Coord4D, Set<TransporterStack>> flowingStacks) {
         Set<TransporterStack> transporterStacks = flowingStacks.get(position);
         if (transporterStacks != null) {
@@ -243,7 +249,7 @@ public class TransporterManager {
      *
      * @return {@link TransitResponse} of expected items to use
      */
-    private static TransitResponse getPredictedInsert(InventoryInfo inventoryInfo, IItemHandler handler, TransitRequest request) {
+    private static TransitResponse getPredictedInsert(InventoryInfo inventoryInfo, IExtendedItemHandler handler, TransitRequest request) {
         //For each of the items in the request, simulate the insert. We try each stack in the
         // request; it might be possible to not send the first item, but the second could work, etc.
         for (ItemData data : request.getItemData()) {
@@ -271,8 +277,10 @@ public class TransporterManager {
      *
      * @return {@link TransitResponse} of expected items to use
      */
-    public static TransitResponse getPredictedInsert(IItemHandler handler, TransitRequest request) {
-        return getPredictedInsert(new InventoryInfo(handler), handler, request);
+    public static TransitResponse getPredictedInsert(IExtendedItemHandler handler, TransitRequest request) {
+        try (InventoryInfo inventoryInfo = new InventoryInfo(handler)) {
+            return getPredictedInsert(inventoryInfo, handler, request);
+        }
     }
 
     /**
@@ -280,7 +288,10 @@ public class TransporterManager {
      * has to call it anyway to get the stack size). This cache allows potentially expensive {@link IItemHandler#getStackInSlot(int)} implementations to only have to be
      * called once instead of potentially many times as well as allowing for lazily caching slot limits.
      */
-    private static class InventoryInfo {
+    private static class InventoryInfo implements AutoCloseable {
+
+        @Nullable
+        private final FabricItemHandler.InsertionSimulation simulation;
 
         private final ItemStack[] inventory;
         private final int[] stackSizes;
@@ -288,8 +299,9 @@ public class TransporterManager {
         private final int[] slotLimits;
         private final int slots;
 
-        public InventoryInfo(IItemHandler handler) {
-            slots = handler.getSlots();
+        public InventoryInfo(IExtendedItemHandler handler) {
+            simulation = handler instanceof FabricItemHandler fabric ? fabric.simulateInsertions() : null;
+            slots = simulation == null ? handler.getSlots() : 0;
             inventory = new ItemStack[slots];
             stackSizes = new int[slots];
             actualStackSizes = new int[slots];
@@ -303,12 +315,19 @@ public class TransporterManager {
             }
         }
 
-        public int getSlotLimit(IItemHandler handler, int slot) {
+        public int getSlotLimit(IExtendedItemHandler handler, int slot) {
             int limit = slotLimits[slot];
             if (limit == -1) {
                 return slotLimits[slot] = handler.getSlotLimit(slot);
             }
             return limit;
+        }
+
+        @Override
+        public void close() {
+            if (simulation != null) {
+                simulation.close();
+            }
         }
     }
 }

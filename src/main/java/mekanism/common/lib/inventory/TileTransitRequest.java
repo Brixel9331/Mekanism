@@ -6,23 +6,31 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.common.Mekanism;
 import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.RegistryUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class TileTransitRequest extends TransitRequest {
 
     private final BlockEntity tile;
     private final Direction side;
+    @Nullable
+    private final IExtendedItemHandler sourceHandler;
     private final Map<HashedItem, TileItemData> itemMap = new LinkedHashMap<>();
 
     public TileTransitRequest(BlockEntity tile, Direction side) {
+        this(tile, side, null);
+    }
+
+    public TileTransitRequest(BlockEntity tile, Direction side, @Nullable IExtendedItemHandler sourceHandler) {
         this.tile = tile;
         this.side = side;
+        this.sourceHandler = sourceHandler;
     }
 
     public void addItem(ItemStack stack, int slot) {
@@ -64,7 +72,7 @@ public class TileTransitRequest extends TransitRequest {
         @Override
         public ItemStack use(int amount) {
             Direction side = getSide();
-            IItemHandler handler = InventoryUtils.assertItemHandler("TileTransitRequest", tile, side);
+            IExtendedItemHandler handler = sourceHandler == null ? InventoryUtils.assertItemHandler("TileTransitRequest", tile, side) : sourceHandler;
             if (handler != null && !slotMap.isEmpty()) {
                 HashedItem itemType = getItemType();
                 ItemStack itemStack = itemType.getInternalStack();

@@ -11,8 +11,10 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import mekanism.api.NBTConstants;
 import mekanism.api.capabilities.CapabilityReference;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.math.MathUtils;
 import mekanism.common.Mekanism;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.content.qio.QIOFrequency.QIOItemTypeData;
 import mekanism.common.content.qio.filter.QIOFilter;
@@ -37,8 +39,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 
 public class TileEntityQIOExporter extends TileEntityQIOFilterHandler {
 
@@ -75,7 +75,7 @@ public class TileEntityQIOExporter extends TileEntityQIOFilterHandler {
         }
         Direction direction = getDirection();
         BlockEntity back = WorldUtils.getTileEntity(getLevel(), worldPosition.relative(direction.getOpposite()));
-        CapabilityReference<IItemHandler> backHandler = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
+        CapabilityReference<IExtendedItemHandler> backHandler = CapabilityUtils.getCapability(back, Capabilities.ITEM_HANDLER, direction);
         if (!backHandler.isPresent()) {
             return;
         }
@@ -182,7 +182,7 @@ public class TileEntityQIOExporter extends TileEntityQIOFilterHandler {
             this.ejectMapCalculator = ejectMapCalculator;
         }
 
-        private void eject(QIOFrequency freq, IItemHandler inventory) {
+        private void eject(QIOFrequency freq, IExtendedItemHandler inventory) {
             int slots = inventory.getSlots();
             if (slots == 0) {
                 //If the inventory has no slots just exit early and don't even bother calculating the eject map

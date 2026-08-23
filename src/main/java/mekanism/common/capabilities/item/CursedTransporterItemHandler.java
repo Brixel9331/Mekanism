@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.LongSupplier;
 import mekanism.api.Coord4D;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.common.content.network.transmitter.LogisticalTransporterBase;
 import mekanism.common.content.transporter.TransporterStack;
 import mekanism.common.content.transporter.TransporterStack.Path;
@@ -15,10 +16,9 @@ import mekanism.common.lib.inventory.TransitRequest;
 import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class CursedTransporterItemHandler implements IItemHandler {
+public class CursedTransporterItemHandler implements IExtendedItemHandler {
 
     private final Map<Coord4D, Set<TransporterStack>> simulatedFlowingStacks = new Object2ObjectOpenHashMap<>();
     //Note: We keep track of stacks that insert as simulate has seen and also stacks that actually inserting has seen
@@ -49,6 +49,11 @@ public class CursedTransporterItemHandler implements IItemHandler {
     @Override
     public ItemStack getStackInSlot(int slot) {
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        throw new UnsupportedOperationException("Transporter contents must be inserted through the network");
     }
 
     private TransitRequest getRequest(int limit, ItemStack stack) {

@@ -7,7 +7,9 @@ import java.util.function.Predicate;
 import mekanism.api.NBTConstants;
 import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.functions.ConstantPredicates;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.common.Mekanism;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.content.transporter.TransporterManager;
 import mekanism.common.integration.computer.ComputerException;
@@ -27,8 +29,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 
 public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
 
@@ -60,7 +60,7 @@ public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
         }
         Direction direction = getDirection();
         BlockEntity back = WorldUtils.getTileEntity(getLevel(), worldPosition.relative(direction.getOpposite()));
-        CapabilityReference<IItemHandler> lazyCapability = CapabilityUtils.getCapability(back, ForgeCapabilities.ITEM_HANDLER, direction);
+        CapabilityReference<IExtendedItemHandler> lazyCapability = CapabilityUtils.getCapability(back, Capabilities.ITEM_HANDLER, direction);
         if (!lazyCapability.isPresent()) {//Not an IItemHandler
             return;
         }
@@ -76,7 +76,7 @@ public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
             return;
         }
         //We know this is present from our earlier checks
-        IItemHandler inventory = lazyCapability.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
+        IExtendedItemHandler inventory = lazyCapability.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
         int slots = inventory.getSlots();
         if (slots == 0) {
             //If the inventory has no slots just exit early

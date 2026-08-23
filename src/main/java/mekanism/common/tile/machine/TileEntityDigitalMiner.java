@@ -107,7 +107,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.level.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -163,7 +162,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
         radius = DEFAULT_RADIUS;
         addCapabilityResolver(BasicCapabilityResolver.constant(Capabilities.CONFIG_CARD, this));
         //Return some capabilities as disabled, and handle them with offset capabilities instead
-        addDisabledCapabilities(ForgeCapabilities.ITEM_HANDLER);
+        addDisabledCapabilities(Capabilities.ITEM_HANDLER);
     }
 
     @NotNull
@@ -1073,7 +1072,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
     @NotNull
     @Override
     public <T> CapabilityReference<T> getOffsetCapabilityIfEnabled(@NotNull Capability<T> capability, Direction side, @NotNull Vec3i offset) {
-        if (capability == ForgeCapabilities.ITEM_HANDLER) {
+        if (capability == Capabilities.ITEM_HANDLER) {
             //Get item handler cap directly from here as we disable it entirely for the main block as we only have it enabled from ports
             return itemHandlerManager.resolve(capability, side);
         }
@@ -1086,7 +1085,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
         if (!capability.isAvailable()) {
             //Short circuit if a capability that is not registered is being queried
             return true;
-        } else if (capability == ForgeCapabilities.ITEM_HANDLER) {
+        } else if (capability == Capabilities.ITEM_HANDLER) {
             return notItemPort(side, offset);
         } else if (EnergyCompatUtils.isEnergyCapability(capability)) {
             return notEnergyPort(side, offset);

@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.common.Mekanism;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.content.transporter.TransporterManager;
 import mekanism.common.tile.TileEntityLogisticalSorter;
 import mekanism.common.util.CapabilityUtils;
@@ -14,8 +16,6 @@ import mekanism.common.util.StackUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class TransitRequest {
@@ -35,8 +35,8 @@ public abstract class TransitRequest {
     }
 
     public static TransitRequest definedItem(BlockEntity tile, Direction side, int min, int max, Finder finder) {
-        TileTransitRequest ret = new TileTransitRequest(tile, side);
-        IItemHandler inventory = InventoryUtils.assertItemHandler("TransitRequest", tile, side);
+        IExtendedItemHandler inventory = InventoryUtils.assertItemHandler("TransitRequest", tile, side);
+        TileTransitRequest ret = new TileTransitRequest(tile, side, inventory);
         if (inventory == null) {
             return ret;
         }
@@ -68,9 +68,9 @@ public abstract class TransitRequest {
         if (isEmpty()) {
             return getEmptyResponse();
         }
-        Optional<IItemHandler> capability = CapabilityUtils.getCapability(tile, ForgeCapabilities.ITEM_HANDLER, side.getOpposite()).resolve();
+        Optional<IExtendedItemHandler> capability = CapabilityUtils.getCapability(tile, Capabilities.ITEM_HANDLER, side.getOpposite()).resolve();
         if (capability.isPresent()) {
-            IItemHandler inventory = capability.get();
+            IExtendedItemHandler inventory = capability.get();
             int slots = inventory.getSlots();
             if (slots == 0) {
                 //If the inventory has no slots just exit early with the result that we can't send any items

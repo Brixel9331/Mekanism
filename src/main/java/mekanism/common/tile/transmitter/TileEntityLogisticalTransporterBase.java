@@ -7,7 +7,9 @@ import java.util.Map;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.capabilities.Capability;
 import mekanism.api.capabilities.CapabilityReference;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.providers.IBlockProvider;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.item.CursedTransporterItemHandler;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.content.network.transmitter.LogisticalTransporterBase;
@@ -19,8 +21,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +70,7 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
         // so we can check to ensure that if we are one of the two that the other isn't the other one we don't have a cap for
         if (type == ConnectionType.NONE && old != ConnectionType.PUSH ||
             type == ConnectionType.PUSH && old != ConnectionType.NONE) {
-            invalidateCapability(ForgeCapabilities.ITEM_HANDLER, side);
+            invalidateCapability(Capabilities.ITEM_HANDLER, side);
             //Notify the neighbor on that side our state changed and we no longer have a capability
             WorldUtils.notifyNeighborOfChange(level, side, worldPosition);
         } else if (old == ConnectionType.NONE && type != ConnectionType.PUSH ||
@@ -83,10 +83,10 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
     @NothingNullByDefault
     private class TransporterCapabilityResolver implements ICapabilityResolver {
 
-        private static final List<Capability<?>> SUPPORTED_CAPABILITY = Collections.singletonList(ForgeCapabilities.ITEM_HANDLER);
+        private static final List<Capability<?>> SUPPORTED_CAPABILITY = Collections.singletonList(Capabilities.ITEM_HANDLER);
 
         private final Map<Direction, CursedTransporterItemHandler> cursedHandlers = new EnumMap<>(Direction.class);
-        private final Map<Direction, CapabilityReference<IItemHandler>> handlers = new EnumMap<>(Direction.class);
+        private final Map<Direction, CapabilityReference<IExtendedItemHandler>> handlers = new EnumMap<>(Direction.class);
 
         @Override
         public List<Capability<?>> getSupportedCapabilities() {
@@ -102,7 +102,7 @@ public abstract class TileEntityLogisticalTransporterBase extends TileEntityTran
                 //We provide no readonly item handler view
                 return CapabilityReference.empty();
             }
-            CapabilityReference<IItemHandler> cachedCapability = handlers.get(side);
+            CapabilityReference<IExtendedItemHandler> cachedCapability = handlers.get(side);
             if (cachedCapability == null || !cachedCapability.isPresent()) {
                 LogisticalTransporterBase transporter = getTransmitter();
                 //Note: We check here whether it exposes the cap rather than in the cap itself as we invalidate the cached cap whenever this changes

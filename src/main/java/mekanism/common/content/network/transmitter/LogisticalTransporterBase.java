@@ -10,8 +10,10 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import mekanism.api.NBTConstants;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.content.network.InventoryNetwork;
 import mekanism.common.content.transporter.TransporterManager;
 import mekanism.common.content.transporter.TransporterStack;
@@ -34,12 +36,10 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler, InventoryNetwork, LogisticalTransporterBase> {
+public abstract class LogisticalTransporterBase extends Transmitter<IExtendedItemHandler, InventoryNetwork, LogisticalTransporterBase> {
 
     protected final Int2ObjectMap<TransporterStack> transit = new Int2ObjectOpenHashMap<>();
     protected final Int2ObjectMap<TransporterStack> needsSync = new Int2ObjectOpenHashMap<>();
@@ -54,9 +54,9 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
     }
 
     @Override
-    public AcceptorCache<IItemHandler> getAcceptorCache() {
+    public AcceptorCache<IExtendedItemHandler> getAcceptorCache() {
         //Cast it here to make things a bit easier, as we know createAcceptorCache by default returns an object of type AcceptorCache
-        return (AcceptorCache<IItemHandler>) super.getAcceptorCache();
+        return (AcceptorCache<IExtendedItemHandler>) super.getAcceptorCache();
     }
 
     @Override
@@ -101,7 +101,7 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
 
     @Override
     public boolean isValidAcceptor(BlockEntity tile, Direction side) {
-        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, ForgeCapabilities.ITEM_HANDLER);
+        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, Capabilities.ITEM_HANDLER);
     }
 
     public void onUpdateClient() {

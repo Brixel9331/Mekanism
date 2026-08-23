@@ -15,6 +15,7 @@ import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.RelativeSide;
 import mekanism.api.capabilities.CapabilityReference;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
@@ -33,11 +34,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class InventoryNetwork extends DynamicNetwork<IItemHandler, InventoryNetwork, LogisticalTransporterBase> {
+public class InventoryNetwork extends DynamicNetwork<IExtendedItemHandler, InventoryNetwork, LogisticalTransporterBase> {
 
     private final Map<BlockPos, LogisticalTransporterBase> positionedTransmitters = new Object2ObjectOpenHashMap<>();
 
@@ -53,7 +53,7 @@ public class InventoryNetwork extends DynamicNetwork<IItemHandler, InventoryNetw
     public List<AcceptorData> calculateAcceptors(TransitRequest request, TransporterStack stack, Long2ObjectMap<ChunkAccess> chunkMap,
           Map<Coord4D, Set<TransporterStack>> additionalFlowingStacks) {
         List<AcceptorData> toReturn = new ArrayList<>();
-        for (Map.Entry<BlockPos, Map<Direction, CapabilityReference<IItemHandler>>> entry : acceptorCache.getAcceptorEntrySet()) {
+        for (Map.Entry<BlockPos, Map<Direction, CapabilityReference<IExtendedItemHandler>>> entry : acceptorCache.getAcceptorEntrySet()) {
             BlockPos pos = entry.getKey();
             if (!pos.equals(stack.homeLocation)) {
                 BlockEntity acceptor = WorldUtils.getTileEntity(getWorld(), chunkMap, pos);
@@ -62,8 +62,8 @@ public class InventoryNetwork extends DynamicNetwork<IItemHandler, InventoryNetw
                 }
                 Map<TransitResponse, AcceptorData> dataMap = new HashMap<>();
                 Coord4D position = new Coord4D(pos, getWorld());
-                for (Map.Entry<Direction, CapabilityReference<IItemHandler>> acceptorEntry : entry.getValue().entrySet()) {
-                    Optional<IItemHandler> handler = acceptorEntry.getValue().resolve();
+                for (Map.Entry<Direction, CapabilityReference<IExtendedItemHandler>> acceptorEntry : entry.getValue().entrySet()) {
+                    Optional<IExtendedItemHandler> handler = acceptorEntry.getValue().resolve();
                     if (handler.isPresent()) {
                         Direction side = acceptorEntry.getKey();
                         //TODO: Figure out how we want to best handle the color check, as without doing it here we don't

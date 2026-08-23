@@ -7,10 +7,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
+import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.common.Mekanism;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.inventory.container.SelectedWindowData;
 import mekanism.common.item.interfaces.IDroppableContents;
 import mekanism.common.lib.inventory.TileTransitRequest;
@@ -20,8 +22,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,12 +99,12 @@ public final class InventoryUtils {
     }
 
     @Nullable
-    public static IItemHandler assertItemHandler(String desc, BlockEntity tile, Direction side) {
-        Optional<IItemHandler> capability = CapabilityUtils.getCapability(tile, ForgeCapabilities.ITEM_HANDLER, side).resolve();
+    public static IExtendedItemHandler assertItemHandler(String desc, BlockEntity tile, Direction side) {
+        Optional<IExtendedItemHandler> capability = CapabilityUtils.getCapability(tile, Capabilities.ITEM_HANDLER, side).resolve();
         if (capability.isPresent()) {
             return capability.get();
         }
-        Mekanism.logger.warn("'{}' was wrapped around a non-IItemHandler inventory. This should not happen!", desc, new Exception());
+        Mekanism.logger.warn("'{}' was wrapped around a non-IExtendedItemHandler inventory. This should not happen!", desc, new Exception());
         if (tile == null) {
             Mekanism.logger.warn(" - null tile");
         } else {
@@ -114,7 +114,7 @@ public final class InventoryUtils {
     }
 
     public static boolean isItemHandler(BlockEntity tile, Direction side) {
-        return CapabilityUtils.getCapability(tile, ForgeCapabilities.ITEM_HANDLER, side).isPresent();
+        return CapabilityUtils.getCapability(tile, Capabilities.ITEM_HANDLER, side).isPresent();
     }
 
     public static TileTransitRequest getEjectItemMap(BlockEntity tile, Direction side, List<IInventorySlot> slots) {
