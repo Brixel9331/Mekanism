@@ -32,6 +32,7 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.tags.TagUtils;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.EnumUtils;
+import mekanism.common.util.FluidContainerUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
@@ -50,7 +51,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,7 +169,7 @@ public class GuiDictionaryTarget extends GuiElement implements IJEIGhostTarget {
                     ));
                 }
                 //Get tags of any contained fluids
-                FluidUtil.getFluidHandler(stack).ifPresent(fluidHandler -> {
+                FluidContainerUtils.getFluidHandler(stack).ifPresent(fluidHandler -> {
                     Registry<Fluid> fluidManager = BuiltInRegistries.FLUID;
                     tags.put(DictionaryTagType.FLUID, TagCache.getTagsAsStrings(IntStream.range(0, fluidHandler.getTanks())
                           .mapToObj(fluidHandler::getFluidInTank)

@@ -20,6 +20,7 @@ import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IMekanismStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.math.FloatingLong;
@@ -38,8 +39,6 @@ import mekanism.common.util.text.EnergyDisplay;
 import mekanism.common.util.text.TextUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -115,9 +114,9 @@ public class StorageUtils {
 
     public static void addStoredFluid(@NotNull ItemStack stack, @NotNull List<Component> tooltip, boolean showMissingCap, ILangEntry emptyLangEntry,
           Function<FluidStack, Component> storedFunction) {
-        Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (cap.isPresent()) {
-            IFluidHandlerItem handler = cap.get();
+            IExtendedFluidHandlerItem handler = cap.get();
             for (int tank = 0, tanks = handler.getTanks(); tank < tanks; tank++) {
                 tooltip.add(storedFunction.apply(handler.getFluidInTank(tank)));
             }
@@ -306,9 +305,9 @@ public class StorageUtils {
         bestRatio = calculateRatio(stack, bestRatio, Capabilities.INFUSION_HANDLER);
         bestRatio = calculateRatio(stack, bestRatio, Capabilities.PIGMENT_HANDLER);
         bestRatio = calculateRatio(stack, bestRatio, Capabilities.SLURRY_HANDLER);
-        Optional<IFluidHandlerItem> fluidCapability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> fluidCapability = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (fluidCapability.isPresent()) {
-            IFluidHandlerItem fluidHandlerItem = fluidCapability.get();
+            IExtendedFluidHandlerItem fluidHandlerItem = fluidCapability.get();
             int tanks = fluidHandlerItem.getTanks();
             for (int tank = 0; tank < tanks; tank++) {
                 bestRatio = Math.max(bestRatio, getRatio(fluidHandlerItem.getFluidInTank(tank).getAmount(), fluidHandlerItem.getTankCapacity(tank)));

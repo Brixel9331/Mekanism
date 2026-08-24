@@ -6,8 +6,11 @@ import java.util.function.Consumer;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalTankBuilder;
+import mekanism.api.fluid.FluidAmounts;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.DynamicHandler.InteractPredicate;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicGasHandler;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicInfusionHandler;
@@ -23,16 +26,13 @@ import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class GaugeDropperContentsHandler extends MergedTankContentsHandler<MergedTank> implements IMekanismFluidHandler, IFluidHandlerItem {
+public class GaugeDropperContentsHandler extends MergedTankContentsHandler<MergedTank> implements IMekanismFluidHandler, IExtendedFluidHandlerItem {
 
-    private static final int CAPACITY = 16 * FluidType.BUCKET_VOLUME;
+    private static final int CAPACITY = 16 * FluidAmounts.MILLI_BUCKETS_PER_BUCKET;
     //TODO: Convert this to a long and make it a config option after making fluids be able to handle longs. Also make the gauge dropper override areCapabilityConfigsLoaded
     private static final int TRANSFER_RATE = 256;
 
@@ -87,6 +87,6 @@ public class GaugeDropperContentsHandler extends MergedTankContentsHandler<Merge
     @Override
     protected void gatherCapabilityResolvers(Consumer<ICapabilityResolver> consumer) {
         super.gatherCapabilityResolvers(consumer);
-        consumer.accept(BasicCapabilityResolver.constant(ForgeCapabilities.FLUID_HANDLER_ITEM, this));
+        consumer.accept(BasicCapabilityResolver.constant(Capabilities.FLUID_HANDLER_ITEM, this));
     }
 }

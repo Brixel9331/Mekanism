@@ -12,6 +12,7 @@ import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.chemical.IMekanismChemicalHandler;
 import mekanism.api.chemical.gas.IGasTank;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.radiation.IRadiationManager;
@@ -31,6 +32,7 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
@@ -38,8 +40,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 public class PacketDropperUse implements IMekanismPacket {
 
@@ -155,9 +155,9 @@ public class PacketDropperUse implements IMekanismPacket {
             MekanismCriteriaTriggers.USE_GAUGE_DROPPER.trigger(player, UseDropperAction.DUMP);
             return;
         }
-        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (capability.isPresent()) {
-            IFluidHandlerItem fluidHandlerItem = capability.get();
+            IExtendedFluidHandlerItem fluidHandlerItem = capability.get();
             if (fluidHandlerItem instanceof IMekanismFluidHandler fluidHandler) {
                 IExtendedFluidTank itemFluidTank = fluidHandler.getFluidTank(0, null);
                 if (itemFluidTank != null) {

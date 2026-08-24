@@ -9,20 +9,20 @@ import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.GenericTankSpec;
 import mekanism.common.capabilities.chemical.item.ChemicalTankSpec;
 import mekanism.common.capabilities.fluid.item.RateLimitMultiTankFluidHandler.FluidTankSpec;
 import mekanism.common.item.gear.ItemMekaSuitArmor;
 import mekanism.common.util.CapabilityUtils;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.FluidUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 public class MekaSuitBarDecorator implements IItemDecorator {
 
@@ -45,9 +45,9 @@ public class MekaSuitBarDecorator implements IItemDecorator {
 
         List<FluidTankSpec> fluidTankSpecs = armor.getFluidTankSpecs();
         if (!fluidTankSpecs.isEmpty()) {
-            Optional<IFluidHandlerItem> capabilityInstance = FluidUtil.getFluidHandler(stack).resolve();
+            Optional<IExtendedFluidHandlerItem> capabilityInstance = FluidContainerUtils.getFluidHandler(stack).resolve();
             if (capabilityInstance.isPresent()) {
-                IFluidHandlerItem fluidHandler = capabilityInstance.get();
+                IExtendedFluidHandlerItem fluidHandler = capabilityInstance.get();
                 int tank = getDisplayTank(fluidTankSpecs, stack, fluidHandler.getTanks());
                 if (tank != -1) {
                     FluidStack fluidInTank = fluidHandler.getFluidInTank(tank);

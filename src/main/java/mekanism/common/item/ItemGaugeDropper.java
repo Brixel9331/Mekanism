@@ -10,11 +10,12 @@ import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.fluid.FluidStack;
-import mekanism.api.fluid.IExtendedFluidHandler;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.merged.GaugeDropperContentsHandler;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -26,8 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemGaugeDropper extends CapabilityItem {
@@ -57,13 +56,11 @@ public class ItemGaugeDropper extends CapabilityItem {
         ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
             if (!world.isClientSide) {
-                Optional<IFluidHandlerItem> fluidCapability = FluidUtil.getFluidHandler(stack).resolve();
+                Optional<IExtendedFluidHandlerItem> fluidCapability = FluidContainerUtils.getFluidHandler(stack).resolve();
                 if (fluidCapability.isPresent()) {
-                    IFluidHandlerItem fluidHandler = fluidCapability.get();
-                    if (fluidHandler instanceof IExtendedFluidHandler fluidHandlerItem) {
-                        for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
-                            fluidHandlerItem.setFluidInTank(tank, FluidStack.EMPTY);
-                        }
+                    IExtendedFluidHandlerItem fluidHandler = fluidCapability.get();
+                    for (int tank = 0; tank < fluidHandler.getTanks(); tank++) {
+                        fluidHandler.setFluidInTank(tank, FluidStack.EMPTY);
                     }
                 }
                 clearChemicalTanks(stack, GasStack.EMPTY);

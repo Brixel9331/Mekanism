@@ -11,14 +11,13 @@ import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.inventory.container.slot.ContainerSlotType;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +32,7 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
      */
     public static FluidInventorySlot input(IExtendedFluidTank fluidTank, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(fluidTank, "Fluid tank cannot be null");
-        return new FluidInventorySlot(fluidTank, alwaysFalse, getInputPredicate(fluidTank), stack -> FluidUtil.getFluidHandler(stack).isPresent(), listener, x, y);
+        return new FluidInventorySlot(fluidTank, alwaysFalse, getInputPredicate(fluidTank), stack -> FluidContainerUtils.getFluidHandler(stack).isPresent(), listener, x, y);
     }
 
     protected static Predicate<ItemStack> getInputPredicate(IExtendedFluidTank fluidTank) {
@@ -41,9 +40,9 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
             //If we have more than one item in the input, check if we can fill a single item of it
             // The fluid handler for buckets returns false about being able to accept fluids if they are stacked
             // though we have special handling to only move one item at a time anyway
-            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack.getCount() > 1 ? stack.copyWithCount(1) : stack).resolve();
+            Optional<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack.getCount() > 1 ? stack.copyWithCount(1) : stack).resolve();
             if (cap.isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = cap.get();
+                IExtendedFluidHandlerItem fluidHandlerItem = cap.get();
                 boolean hasEmpty = false;
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
@@ -59,7 +58,7 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
                     //we return if there is at least one empty tank in the item so that we can then drain into it
                     return hasEmpty;
                 }
-                return fluidHandlerItem.fill(fluidTank.getFluid().copy(), FluidAction.SIMULATE) > 0;
+                return FluidContainerUtils.fill(fluidHandlerItem, fluidTank.getFluid().copy(), Action.SIMULATE) > 0;
             }
             return false;
         };
@@ -72,11 +71,11 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
         Objects.requireNonNull(fluidTank, "Fluid tank cannot be null");
         Objects.requireNonNull(modeSupplier, "Mode supplier cannot be null");
         return new FluidInventorySlot(fluidTank, alwaysFalse, stack -> {
-            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+            Optional<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack).resolve();
             if (cap.isPresent()) {
                 boolean mode = modeSupplier.getAsBoolean();
                 //Mode == true if fluid to gas
-                IFluidHandlerItem fluidHandlerItem = cap.get();
+                IExtendedFluidHandlerItem fluidHandlerItem = cap.get();
                 boolean allEmpty = true;
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
@@ -93,11 +92,11 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
             }
             return false;
         }, stack -> {
-            CapabilityReference<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack);
+            CapabilityReference<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack);
             if (capability.isPresent()) {
                 if (modeSupplier.getAsBoolean()) {
                     //Input tank, so we want to fill it
-                    IFluidHandlerItem fluidHandlerItem = capability.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
+                    IExtendedFluidHandlerItem fluidHandlerItem = capability.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
                     for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                         FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
                         if (!fluidInTank.isEmpty() && fluidTank.isFluidValid(fluidInTank)) {
@@ -121,9 +120,9 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
     public static FluidInventorySlot fill(IExtendedFluidTank fluidTank, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(fluidTank, "Fluid tank cannot be null");
         return new FluidInventorySlot(fluidTank, alwaysFalse, stack -> {
-            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+            Optional<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack).resolve();
             if (cap.isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = cap.get();
+                IExtendedFluidHandlerItem fluidHandlerItem = cap.get();
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
                     if (!fluidInTank.isEmpty() && fluidTank.insert(fluidInTank, Action.SIMULATE, AutomationType.INTERNAL).getAmount() < fluidInTank.getAmount()) {
@@ -138,7 +137,7 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
         }, stack -> {
             //Allow for any fluid containers, but we have a more restrictive canInsert so that we don't insert all items
             //TODO: Check the other ones to see if we need something like this for them
-            return FluidUtil.getFluidHandler(stack).isPresent();
+            return FluidContainerUtils.getFluidHandler(stack).isPresent();
         }, listener, x, y);
     }
 
@@ -153,25 +152,25 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
             //If we have more than one item in the input, check if we can fill a single item of it
             // The fluid handler for buckets returns false about being able to accept fluids if they are stacked
             // though we have special handling to only move one item at a time anyway
-            CapabilityReference<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack.getCount() > 1 ? stack.copyWithCount(1) : stack);
+            CapabilityReference<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack.getCount() > 1 ? stack.copyWithCount(1) : stack);
             if (cap.isPresent()) {
                 FluidStack fluidInTank = fluidTank.getFluid();
                 if (fluidInTank.isEmpty()) {
                     return true;
                 }
-                IFluidHandlerItem itemFluidHandler = cap.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
+                IExtendedFluidHandlerItem itemFluidHandler = cap.orElseThrow(MekanismUtils.MISSING_CAP_ERROR);
                 //True if the tanks contents are valid, and we can fill the item with any of the contents
-                return itemFluidHandler.fill(fluidInTank.copy(), FluidAction.SIMULATE) > 0;
+                return FluidContainerUtils.fill(itemFluidHandler, fluidInTank.copy(), Action.SIMULATE) > 0;
             }
             return false;
-        }, stack -> isNonFullFluidContainer(FluidUtil.getFluidHandler(stack)), listener, x, y);
+        }, stack -> isNonFullFluidContainer(FluidContainerUtils.getFluidHandler(stack)), listener, x, y);
     }
 
     //TODO: Should we make this also have the fluid type have to match a desired type???
-    private static boolean isNonFullFluidContainer(CapabilityReference<IFluidHandlerItem> capability) {
-        Optional<IFluidHandlerItem> cap = capability.resolve();
+    private static boolean isNonFullFluidContainer(CapabilityReference<IExtendedFluidHandlerItem> capability) {
+        Optional<IExtendedFluidHandlerItem> cap = capability.resolve();
         if (cap.isPresent()) {
-            IFluidHandlerItem fluidHandler = cap.get();
+            IExtendedFluidHandlerItem fluidHandler = cap.get();
             for (int tank = 0; tank < fluidHandler.getTanks(); tank++) {
                 if (fluidHandler.getFluidInTank(tank).getAmount() < fluidHandler.getTankCapacity(tank)) {
                     return true;

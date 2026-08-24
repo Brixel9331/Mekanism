@@ -10,6 +10,7 @@ import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidHandler;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.providers.IFluidProvider;
 import mekanism.common.capabilities.Capabilities;
@@ -23,9 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 
@@ -116,22 +114,22 @@ public final class FluidUtils {
 
     public static boolean handleTankInteraction(Player player, InteractionHand hand, ItemStack itemStack, IExtendedFluidTank fluidTank) {
         ItemStack copyStack = itemStack.copyWithCount(1);
-        Optional<IFluidHandlerItem> fluidHandlerItem = FluidUtil.getFluidHandler(copyStack).resolve();
+        Optional<IExtendedFluidHandlerItem> fluidHandlerItem = FluidContainerUtils.getFluidHandler(copyStack).resolve();
         if (fluidHandlerItem.isPresent()) {
-            IFluidHandlerItem handler = fluidHandlerItem.get();
+            IExtendedFluidHandlerItem handler = fluidHandlerItem.get();
             FluidStack fluidInItem;
             if (fluidTank.isEmpty()) {
                 //If we don't have a fluid stored try draining in general
-                fluidInItem = handler.drain(Integer.MAX_VALUE, FluidAction.SIMULATE);
+                fluidInItem = handler.extractFluid(Integer.MAX_VALUE, Action.SIMULATE);
             } else {
                 //Otherwise, try draining the same type of fluid we have stored
                 // We do this to better support multiple tanks in case the fluid we have stored we could pull out of a block's
                 // second tank but just asking to drain a specific amount
-                fluidInItem = handler.drain(new FluidStack(fluidTank.getFluid(), Integer.MAX_VALUE), FluidAction.SIMULATE);
+                fluidInItem = handler.extractFluid(new FluidStack(fluidTank.getFluid(), Integer.MAX_VALUE), Action.SIMULATE);
             }
             if (fluidInItem.isEmpty()) {
                 if (!fluidTank.isEmpty()) {
-                    int filled = handler.fill(fluidTank.getFluid().copy(), player.isCreative() ? FluidAction.SIMULATE : FluidAction.EXECUTE);
+                    int filled = FluidContainerUtils.fill(handler, fluidTank.getFluid().copy(), player.isCreative() ? Action.SIMULATE : Action.EXECUTE);
                     ItemStack container = handler.getContainer();
                     if (filled > 0) {
                         if (itemStack.getCount() == 1) {
@@ -152,7 +150,7 @@ public final class FluidUtils {
                 int storedAmount = fluidInItem.getAmount();
                 if (remainder < storedAmount) {
                     boolean filled = false;
-                    FluidStack drained = handler.drain(new FluidStack(fluidInItem, storedAmount - remainder), player.isCreative() ? FluidAction.SIMULATE : FluidAction.EXECUTE);
+                    FluidStack drained = handler.extractFluid(new FluidStack(fluidInItem, storedAmount - remainder), player.isCreative() ? Action.SIMULATE : Action.EXECUTE);
                     if (!drained.isEmpty()) {
                         ItemStack container = handler.getContainer();
                         if (player.isCreative()) {

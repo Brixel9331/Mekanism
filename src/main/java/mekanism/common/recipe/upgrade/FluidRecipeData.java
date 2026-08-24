@@ -7,19 +7,19 @@ import mekanism.api.Action;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,10 +55,10 @@ public class FluidRecipeData implements RecipeUpgradeData<FluidRecipeData> {
             return true;
         }
         Item item = stack.getItem();
-        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack).resolve();
         List<IExtendedFluidTank> fluidTanks = new ArrayList<>();
         if (capability.isPresent()) {
-            IFluidHandlerItem fluidHandler = capability.get();
+            IExtendedFluidHandlerItem fluidHandler = capability.get();
             for (int i = 0; i < fluidHandler.getTanks(); i++) {
                 int tank = i;
                 fluidTanks.add(BasicFluidTank.create(fluidHandler.getTankCapacity(tank), fluid -> fluidHandler.isFluidValid(tank, fluid), null));

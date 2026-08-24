@@ -159,7 +159,7 @@ public final class FabricFluidHandler implements IExtendedFluidHandler {
         return FluidStack.fromVariant(variant, transfer(amount, action, (requested, transaction) -> storage.extract(variant, requested, transaction)));
     }
 
-    private static int transfer(int milliBuckets, Action action, FluidTransfer operation) {
+    static int transfer(int milliBuckets, Action action, FluidTransfer operation) {
         try (Transaction transaction = action.execute() ? Transaction.openOuter() : Transaction.openNested(Transaction.getCurrentUnsafe())) {
             long requested = FluidAmounts.toFabric(milliBuckets);
             long transferred;
@@ -196,7 +196,7 @@ public final class FabricFluidHandler implements IExtendedFluidHandler {
     }
 
     @FunctionalInterface
-    private interface FluidTransfer {
+    interface FluidTransfer {
 
         long transfer(long amount, TransactionContext transaction);
     }

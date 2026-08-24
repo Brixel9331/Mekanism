@@ -11,6 +11,7 @@ import mekanism.api.chemical.pigment.IPigmentHandler;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.fluid.IExtendedFluidHandler;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.api.inventory.IExtendedItemHandler;
 import mekanism.api.lasers.ILaserDissipation;
@@ -18,6 +19,7 @@ import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.radiation.capability.IRadiationEntity;
 import mekanism.api.radiation.capability.IRadiationShielding;
 import mekanism.common.integration.fluid.fabric.FabricFluidHandler;
+import mekanism.common.integration.fluid.fabric.FabricItemFluidHandler;
 import mekanism.common.integration.item.fabric.FabricItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -44,6 +46,8 @@ public class Capabilities {
 
     public static final Capability<IExtendedFluidHandler> FLUID_HANDLER = new Capability<>(new ResourceLocation("mekanism", "fluid_handler"), IExtendedFluidHandler.class);
 
+    public static final Capability<IExtendedFluidHandlerItem> FLUID_HANDLER_ITEM = new Capability<>(new ResourceLocation("mekanism", "fluid_handler_item"), IExtendedFluidHandlerItem.class);
+
     public static final Capability<IConfigurable> CONFIGURABLE = new Capability<>(new ResourceLocation("mekanism", "configurable"), IConfigurable.class);
 
     public static final Capability<IAlloyInteraction> ALLOY_INTERACTION = new Capability<>(new ResourceLocation("mekanism", "alloy_interaction"), IAlloyInteraction.class);
@@ -61,6 +65,7 @@ public class Capabilities {
     public static final Capability<IRadiationEntity> RADIATION_ENTITY = new Capability<>(new ResourceLocation("mekanism", "radiation_entity"), IRadiationEntity.class);
 
     static {
+        FLUID_HANDLER_ITEM.item().registerFallback((stack, context) -> FabricItemFluidHandler.create(stack));
         FLUID_HANDLER.block().registerFallback((level, pos, state, tile, side) -> {
             Storage<FluidVariant> storage = FluidStorage.SIDED.find(level, pos, state, tile, side);
             return storage == null ? null : new FabricFluidHandler(storage);

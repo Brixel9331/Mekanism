@@ -17,6 +17,7 @@ import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.ICustomModule.ModuleDamageAbsorbInfo;
 import mekanism.api.gear.IModule;
@@ -57,6 +58,7 @@ import mekanism.common.registries.MekanismModules;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
@@ -89,8 +91,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -308,9 +308,9 @@ public class ItemMekaSuitArmor extends ItemSpecialArmor implements IModuleContai
     }
 
     public FluidStack getContainedFluid(ItemStack stack, FluidStack type) {
-        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (capability.isPresent()) {
-            IFluidHandlerItem fluidHandlerItem = capability.get();
+            IExtendedFluidHandlerItem fluidHandlerItem = capability.get();
             for (int i = 0; i < fluidHandlerItem.getTanks(); i++) {
                 FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(i);
                 if (fluidInTank.isFluidEqual(type)) {

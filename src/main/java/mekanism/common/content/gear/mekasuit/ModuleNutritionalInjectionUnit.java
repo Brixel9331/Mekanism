@@ -2,8 +2,10 @@ package mekanism.common.content.gear.mekasuit;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import mekanism.api.Action;
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.IHUDElement;
 import mekanism.api.gear.IModule;
@@ -12,15 +14,13 @@ import mekanism.api.math.FloatingLong;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.gear.ItemMekaSuitArmor;
 import mekanism.common.registries.MekanismFluids;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 @ParametersAreNotNullByDefault
 public class ModuleNutritionalInjectionUnit implements ICustomModule<ModuleNutritionalInjectionUnit> {
@@ -39,8 +39,8 @@ public class ModuleNutritionalInjectionUnit implements ICustomModule<ModuleNutri
             int toFeed = Math.min(module.getContainerEnergy().divideToInt(usage), needed);
             if (toFeed > 0) {
                 module.useEnergy(player, usage.multiply(toFeed));
-                FluidUtil.getFluidHandler(container).ifPresent(handler ->
-                      handler.drain(MekanismFluids.NUTRITIONAL_PASTE.getFluidStack(toFeed * MekanismConfig.general.nutritionalPasteMBPerFood.get()), FluidAction.EXECUTE));
+                FluidContainerUtils.getFluidHandler(container).ifPresent(handler ->
+                      handler.extractFluid(MekanismFluids.NUTRITIONAL_PASTE.getFluidStack(toFeed * MekanismConfig.general.nutritionalPasteMBPerFood.get()), Action.EXECUTE));
                 player.getFoodData().eat(needed, MekanismConfig.general.nutritionalPasteSaturation.get());
             }
         }
@@ -50,11 +50,11 @@ public class ModuleNutritionalInjectionUnit implements ICustomModule<ModuleNutri
     public void addHUDElements(IModule<ModuleNutritionalInjectionUnit> module, Player player, Consumer<IHUDElement> hudElementAdder) {
         if (module.isEnabled()) {
             ItemStack container = module.getContainer();
-            Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(container).resolve();
+            Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(container).resolve();
             if (capability.isPresent()) {
-                IFluidHandlerItem handler = capability.get();
+                IExtendedFluidHandlerItem handler = capability.get();
                 int max = MekanismConfig.gear.mekaSuitNutritionalMaxStorage.getAsInt();
-                handler.drain(MekanismFluids.NUTRITIONAL_PASTE.getFluidStack(max), FluidAction.SIMULATE);
+                handler.extractFluid(MekanismFluids.NUTRITIONAL_PASTE.getFluidStack(max), Action.SIMULATE);
             }
             FluidStack stored = ((ItemMekaSuitArmor) container.getItem()).getContainedFluid(container, MekanismFluids.NUTRITIONAL_PASTE.getFluidStack(1));
             double ratio = StorageUtils.getRatio(stored.getAmount(), MekanismConfig.gear.mekaSuitNutritionalMaxStorage.get());

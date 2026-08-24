@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
@@ -13,8 +15,6 @@ import mekanism.common.util.ItemDataUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @ParametersAreNotNullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ItemStackMekanismFluidHandler extends ItemCapability implements IMekanismFluidHandler, IFluidHandlerItem {
+public abstract class ItemStackMekanismFluidHandler extends ItemCapability implements IMekanismFluidHandler, IExtendedFluidHandlerItem {
 
     protected List<IExtendedFluidTank> tanks;
 
@@ -60,6 +60,6 @@ public abstract class ItemStackMekanismFluidHandler extends ItemCapability imple
 
     @Override
     protected void gatherCapabilityResolvers(Consumer<ICapabilityResolver> consumer) {
-        consumer.accept(BasicCapabilityResolver.constant(ForgeCapabilities.FLUID_HANDLER_ITEM, this));
+        consumer.accept(BasicCapabilityResolver.constant(Capabilities.FLUID_HANDLER_ITEM, this));
     }
 }

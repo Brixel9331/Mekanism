@@ -7,6 +7,7 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.security.ISecurityUtils;
@@ -20,6 +21,7 @@ import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.fluid.item.RateLimitFluidHandler;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.tier.FluidTankTier;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.RegistryUtils;
@@ -63,10 +65,8 @@ import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -230,9 +230,9 @@ public class ItemBlockFluidTank extends ItemBlockMachine implements IModeItem {
     }
 
     private static IExtendedFluidTank getExtendedFluidTank(@NotNull ItemStack stack) {
-        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (capability.isPresent()) {
-            IFluidHandlerItem fluidHandlerItem = capability.get();
+            IExtendedFluidHandlerItem fluidHandlerItem = capability.get();
             if (fluidHandlerItem instanceof IMekanismFluidHandler fluidHandler) {
                 return fluidHandler.getFluidTank(0, null);
             }

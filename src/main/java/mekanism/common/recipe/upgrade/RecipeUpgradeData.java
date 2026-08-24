@@ -33,6 +33,7 @@ import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.factory.TileEntityFactory;
 import mekanism.common.util.CapabilityUtils;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.BlockItem;
@@ -40,7 +41,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,7 +80,7 @@ public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {
             //If we are for a block that handles energy, or we have an energy handler capability
             supportedTypes.add(RecipeUpgradeType.ENERGY);
         }
-        if (FluidUtil.getFluidHandler(stack).isPresent() || tile != null && tile.handles(SubstanceType.FLUID)) {
+        if (FluidContainerUtils.getFluidHandler(stack).isPresent() || tile != null && tile.handles(SubstanceType.FLUID)) {
             //If we are for a block that handles fluid, or we have a fluid handler capability
             supportedTypes.add(RecipeUpgradeType.FLUID);
         }

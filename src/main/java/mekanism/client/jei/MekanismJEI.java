@@ -21,6 +21,7 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.gui.GuiMekanism;
@@ -67,6 +68,7 @@ import mekanism.common.registries.MekanismFluids;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.ChemicalUtil;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.RegistryUtils;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -91,8 +93,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
@@ -155,9 +155,9 @@ public class MekanismJEI implements IModPlugin {
     }
 
     private static String getFluidComponent(ItemStack stack) {
-        Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (cap.isPresent()) {
-            IFluidHandlerItem handler = cap.get();
+            IExtendedFluidHandlerItem handler = cap.get();
             String component = "";
             for (int tank = 0, tanks = handler.getTanks(); tank < tanks; tank++) {
                 FluidStack fluidStack = handler.getFluidInTank(tank);
@@ -212,7 +212,7 @@ public class MekanismJEI implements IModPlugin {
             ItemStack itemStack = itemProvider.getItemStack();
             if (CapabilityUtils.getCapability(itemStack, Capabilities.STRICT_ENERGY).isPresent() || CapabilityUtils.getCapability(itemStack, Capabilities.GAS_HANDLER).isPresent() ||
                 CapabilityUtils.getCapability(itemStack, Capabilities.INFUSION_HANDLER).isPresent() || CapabilityUtils.getCapability(itemStack, Capabilities.PIGMENT_HANDLER).isPresent() ||
-                CapabilityUtils.getCapability(itemStack, Capabilities.SLURRY_HANDLER).isPresent() || FluidUtil.getFluidHandler(itemStack).isPresent()) {
+                CapabilityUtils.getCapability(itemStack, Capabilities.SLURRY_HANDLER).isPresent() || FluidContainerUtils.getFluidHandler(itemStack).isPresent()) {
                 registry.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, itemProvider.asItem(), MEKANISM_NBT_INTERPRETER);
             }
         }

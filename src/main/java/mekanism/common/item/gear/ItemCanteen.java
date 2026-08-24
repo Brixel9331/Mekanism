@@ -2,7 +2,9 @@ package mekanism.common.item.gear;
 
 import java.util.List;
 import java.util.Optional;
+import mekanism.api.Action;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.common.MekanismLang;
@@ -13,6 +15,7 @@ import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.CapabilityItem;
 import mekanism.common.registration.impl.CreativeTabDeferredRegister.ICustomCreativeTabContents;
 import mekanism.common.registries.MekanismFluids;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -28,9 +31,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,8 +72,8 @@ public class ItemCanteen extends CapabilityItem implements ICustomCreativeTabCon
             int needed = Math.min(20 - player.getFoodData().getFoodLevel(), getFluid(stack).getAmount() / MekanismConfig.general.nutritionalPasteMBPerFood.get());
             if (needed > 0) {
                 player.getFoodData().eat(needed, MekanismConfig.general.nutritionalPasteSaturation.get());
-                FluidUtil.getFluidHandler(stack).ifPresent(handler -> handler.drain(needed * MekanismConfig.general.nutritionalPasteMBPerFood.get(),
-                      FluidAction.EXECUTE));
+                FluidContainerUtils.getFluidHandler(stack).ifPresent(handler -> handler.extractFluid(needed * MekanismConfig.general.nutritionalPasteMBPerFood.get(),
+                      Action.EXECUTE));
                 entityLiving.gameEvent(GameEvent.DRINK);
             }
         }
@@ -104,9 +104,9 @@ public class ItemCanteen extends CapabilityItem implements ICustomCreativeTabCon
     }
 
     private FluidStack getFluid(ItemStack stack) {
-        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
+        Optional<IExtendedFluidHandlerItem> capability = FluidContainerUtils.getFluidHandler(stack).resolve();
         if (capability.isPresent()) {
-            IFluidHandlerItem fluidHandlerItem = capability.get();
+            IExtendedFluidHandlerItem fluidHandlerItem = capability.get();
             if (fluidHandlerItem instanceof IMekanismFluidHandler fluidHandler) {
                 IExtendedFluidTank fluidTank = fluidHandler.getFluidTank(0, null);
                 if (fluidTank != null) {

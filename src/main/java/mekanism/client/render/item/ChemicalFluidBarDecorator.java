@@ -6,9 +6,11 @@ import mekanism.api.capabilities.Capability;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.math.MathUtils;
 import mekanism.client.gui.GuiUtils;
 import mekanism.common.util.CapabilityUtils;
+import mekanism.common.util.FluidContainerUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.Minecraft;
@@ -17,8 +19,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 public class ChemicalFluidBarDecorator implements IItemDecorator {
 
@@ -58,9 +58,9 @@ public class ChemicalFluidBarDecorator implements IItemDecorator {
         }
 
         if (showFluid) {
-            Optional<IFluidHandlerItem> capabilityInstance = FluidUtil.getFluidHandler(stack).resolve();
+            Optional<IExtendedFluidHandlerItem> capabilityInstance = FluidContainerUtils.getFluidHandler(stack).resolve();
             if (capabilityInstance.isPresent()) {
-                IFluidHandlerItem fluidHandler = capabilityInstance.get();
+                IExtendedFluidHandlerItem fluidHandler = capabilityInstance.get();
                 int tank = getDisplayTank(fluidHandler.getTanks());
                 if (tank != -1) {
                     FluidStack fluidInTank = fluidHandler.getFluidInTank(tank);
