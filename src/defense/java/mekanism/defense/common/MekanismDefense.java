@@ -44,7 +44,7 @@ public class MekanismDefense implements IModModule {
         modEventBus.addListener(this::commonSetup);
         DefenseItems.ITEMS.register(modEventBus);
         DefenseBlocks.BLOCKS.register(modEventBus);
-        DefenseCreativeTabs.CREATIVE_TABS.register(modEventBus);
+        DefenseCreativeTabs.CREATIVE_TABS.register();
         DefenseContainerTypes.CONTAINER_TYPES.register(modEventBus);
         DefenseTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
 

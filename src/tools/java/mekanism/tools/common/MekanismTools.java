@@ -44,7 +44,7 @@ public class MekanismTools implements IModModule {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
         ToolsItems.ITEMS.register();
-        ToolsCreativeTabs.CREATIVE_TABS.register(modEventBus);
+        ToolsCreativeTabs.CREATIVE_TABS.register();
         ToolsRecipeSerializers.RECIPE_SERIALIZERS.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());

@@ -1,20 +1,22 @@
 package mekanism.client.render.lib;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import mekanism.common.Mekanism;
 import mekanism.common.lib.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public class ColorAtlas {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final int ATLAS_SIZE = 16;
 
     private final String name;
@@ -38,7 +40,7 @@ public class ColorAtlas {
     public void parse(ResourceLocation rl) {
         List<Color> parsed = load(rl, colors.size());
         if (parsed.size() < colors.size()) {
-            Mekanism.logger.error("Failed to parse '{}' color atlas.", name);
+            LOGGER.error("Failed to parse '{}' color atlas.", name);
             return;
         }
         for (int i = 0; i < parsed.size(); i++) {
@@ -51,7 +53,7 @@ public class ColorAtlas {
         try {
             loadColorAtlas(rl, count, ret);
         } catch (Exception e) {
-            Mekanism.logger.error("Failed to load color atlas: {}", rl, e);
+            LOGGER.error("Failed to load color atlas: {}", rl, e);
         }
         return ret;
     }
@@ -65,7 +67,7 @@ public class ColorAtlas {
                     //Don't allow fully transparent colors, fallback to default color.
                     // Mark as null for now so that it can default to the proper color
                     ret.add(null);
-                    Mekanism.logger.warn("Unable to retrieve color marker: '{}' for atlas: '{}'. This is likely due to an out of date resource pack.", count, rl);
+                    LOGGER.warn("Unable to retrieve color marker: '{}' for atlas: '{}'. This is likely due to an out of date resource pack.", count, rl);
                 } else {
                     ret.add(Color.argb(argb));
                 }

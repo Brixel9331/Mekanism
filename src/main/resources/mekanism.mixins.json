@@ -8,6 +8,9 @@
     "ItemStackCapabilityMixin",
     "LivingEntityRadiationMixin"
   ],
+  "client": [
+    "client.CreativeModeInventoryScreenMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -198,7 +198,7 @@ public class Mekanism {
         MekanismBlocks.BLOCKS.register();
         MekanismFluids.FLUIDS.register(modEventBus);
         MekanismContainerTypes.CONTAINER_TYPES.register();
-        MekanismCreativeTabs.CREATIVE_TABS.register(modEventBus);
+        MekanismCreativeTabs.CREATIVE_TABS.register();
         MekanismDataSerializers.DATA_SERIALIZERS.register();
         MekanismEntityTypes.ENTITY_TYPES.register();
         MekanismTileEntityTypes.TILE_ENTITY_TYPES.register();
