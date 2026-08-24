@@ -15,6 +15,7 @@ import mekanism.api.chemical.merged.MergedChemicalTank;
 import mekanism.api.chemical.merged.MergedChemicalTank.Current;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.text.ILangEntry;
@@ -36,8 +37,6 @@ import mekanism.common.util.CapabilityUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,7 +92,7 @@ public class LookingAtUtils {
         if (displayTanks) {
             //Fluid - only add it to our own tiles in which we disable the default display for
             if (displayFluidTanks && tile instanceof TileEntityUpdateable) {
-                Optional<IFluidHandler> fluidCapability = CapabilityUtils.getCapability(tile, ForgeCapabilities.FLUID_HANDLER, null).resolve();
+                Optional<IExtendedFluidHandler> fluidCapability = CapabilityUtils.getCapability(tile, Capabilities.FLUID_HANDLER, null).resolve();
                 if (fluidCapability.isPresent()) {
                     displayFluid(info, fluidCapability.get());
                 } else if (structure != null && structure.isFormed()) {
@@ -109,7 +108,7 @@ public class LookingAtUtils {
         }
     }
 
-    private static void displayFluid(LookingAtHelper info, IFluidHandler fluidHandler) {
+    private static void displayFluid(LookingAtHelper info, IExtendedFluidHandler fluidHandler) {
         if (fluidHandler instanceof IMekanismFluidHandler mekFluidHandler) {
             for (IExtendedFluidTank fluidTank : mekFluidHandler.getFluidTanks(null)) {
                 if (fluidTank instanceof FluidTankWrapper wrapper) {

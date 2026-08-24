@@ -17,7 +17,10 @@ import mekanism.api.lasers.ILaserDissipation;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.radiation.capability.IRadiationEntity;
 import mekanism.api.radiation.capability.IRadiationShielding;
+import mekanism.common.integration.fluid.fabric.FabricFluidHandler;
 import mekanism.common.integration.item.fabric.FabricItemHandler;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -58,6 +61,10 @@ public class Capabilities {
     public static final Capability<IRadiationEntity> RADIATION_ENTITY = new Capability<>(new ResourceLocation("mekanism", "radiation_entity"), IRadiationEntity.class);
 
     static {
+        FLUID_HANDLER.block().registerFallback((level, pos, state, tile, side) -> {
+            Storage<FluidVariant> storage = FluidStorage.SIDED.find(level, pos, state, tile, side);
+            return storage == null ? null : new FabricFluidHandler(storage);
+        });
         ITEM_HANDLER.block().registerFallback((level, pos, state, tile, side) -> {
             Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, pos, state, tile, side);
             return storage == null ? null : new FabricItemHandler(storage);

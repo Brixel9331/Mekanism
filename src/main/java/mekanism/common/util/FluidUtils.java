@@ -9,8 +9,10 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.providers.IFluidProvider;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.config.value.CachedIntValue;
 import mekanism.common.content.network.distribution.FluidHandlerTarget;
@@ -21,9 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -98,7 +98,7 @@ public final class FluidUtils {
         FluidHandlerTarget target = new FluidHandlerTarget(stack, 6);
         EmitUtils.forEachSide(from.getLevel(), from.getBlockPos(), sides, (acceptor, side) -> {
             //Insert to access side and collect the cap if it is present, and we can insert the type of the stack into it
-            CapabilityUtils.getCapability(acceptor, ForgeCapabilities.FLUID_HANDLER, side.getOpposite()).ifPresent(handler -> {
+            CapabilityUtils.getCapability(acceptor, Capabilities.FLUID_HANDLER, side.getOpposite()).ifPresent(handler -> {
                 if (canFill(handler, toSend)) {
                     target.addHandler(handler);
                 }
@@ -110,8 +110,8 @@ public final class FluidUtils {
         return 0;
     }
 
-    public static boolean canFill(IFluidHandler handler, @NotNull FluidStack stack) {
-        return handler.fill(stack.copy(), FluidAction.SIMULATE) > 0;
+    public static boolean canFill(IExtendedFluidHandler handler, @NotNull FluidStack stack) {
+        return handler.insertFluid(stack, Action.SIMULATE).getAmount() < stack.getAmount();
     }
 
     public static boolean handleTankInteraction(Player player, InteractionHand hand, ItemStack itemStack, IExtendedFluidTank fluidTank) {

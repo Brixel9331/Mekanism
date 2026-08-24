@@ -2,13 +2,13 @@ package mekanism.common.lib.transmitter;
 
 import mekanism.api.chemical.merged.BoxedChemical;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.common.capabilities.chemical.BoxedChemicalHandler;
 import mekanism.common.content.network.BoxedChemicalNetwork;
 import mekanism.common.content.network.FluidNetwork;
 import mekanism.common.content.network.transmitter.BoxedPressurizedTube;
 import mekanism.common.content.network.transmitter.MechanicalPipe;
 import mekanism.common.content.network.transmitter.Transmitter;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class CompatibleTransmitterValidator<ACCEPTOR, NETWORK extends DynamicNetwork<ACCEPTOR, NETWORK, TRANSMITTER>,
       TRANSMITTER extends Transmitter<ACCEPTOR, NETWORK, TRANSMITTER>> {
@@ -64,7 +64,7 @@ public class CompatibleTransmitterValidator<ACCEPTOR, NETWORK extends DynamicNet
         }
     }
 
-    public static class CompatibleFluidTransmitterValidator extends CompatibleTransmitterValidator<IFluidHandler, FluidNetwork, MechanicalPipe> {
+    public static class CompatibleFluidTransmitterValidator extends CompatibleTransmitterValidator<IExtendedFluidHandler, FluidNetwork, MechanicalPipe> {
 
         private FluidStack buffer;
 

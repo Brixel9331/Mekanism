@@ -1,20 +1,20 @@
 package mekanism.common.content.network.distribution;
 
 import java.util.Collection;
+import mekanism.api.Action;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.jetbrains.annotations.NotNull;
 
-public class FluidHandlerTarget extends Target<IFluidHandler, Integer, @NotNull FluidStack> {
+public class FluidHandlerTarget extends Target<IExtendedFluidHandler, Integer, @NotNull FluidStack> {
 
     public FluidHandlerTarget(@NotNull FluidStack type) {
         this.extra = type;
     }
 
-    public FluidHandlerTarget(@NotNull FluidStack type, Collection<IFluidHandler> allHandlers) {
+    public FluidHandlerTarget(@NotNull FluidStack type, Collection<IExtendedFluidHandler> allHandlers) {
         super(allHandlers);
         this.extra = type;
     }
@@ -25,12 +25,12 @@ public class FluidHandlerTarget extends Target<IFluidHandler, Integer, @NotNull 
     }
 
     @Override
-    protected void acceptAmount(IFluidHandler handler, SplitInfo<Integer> splitInfo, Integer amount) {
-        splitInfo.send(handler.fill(new FluidStack(extra, amount), FluidAction.EXECUTE));
+    protected void acceptAmount(IExtendedFluidHandler handler, SplitInfo<Integer> splitInfo, Integer amount) {
+        splitInfo.send(amount - handler.insertFluid(new FluidStack(extra, amount), Action.EXECUTE).getAmount());
     }
 
     @Override
-    protected Integer simulate(IFluidHandler handler, @NotNull FluidStack fluidStack) {
-        return handler.fill(fluidStack.copy(), FluidAction.SIMULATE);
+    protected Integer simulate(IExtendedFluidHandler handler, @NotNull FluidStack fluidStack) {
+        return fluidStack.getAmount() - handler.insertFluid(fluidStack, Action.SIMULATE).getAmount();
     }
 }

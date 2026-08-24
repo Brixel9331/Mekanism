@@ -9,11 +9,13 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.fluid.FluidStack;
+import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.math.MathUtils;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.block.attribute.Attribute;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.content.network.FluidNetwork;
 import mekanism.common.lib.transmitter.CompatibleTransmitterValidator;
@@ -31,12 +33,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MechanicalPipe extends BufferedTransmitter<IFluidHandler, FluidNetwork, FluidStack, MechanicalPipe> implements IMekanismFluidHandler,
+public class MechanicalPipe extends BufferedTransmitter<IExtendedFluidHandler, FluidNetwork, FluidStack, MechanicalPipe> implements IMekanismFluidHandler,
       IUpgradeableTransmitter<MechanicalPipeUpgradeData> {
 
     public final PipeTier tier;
@@ -54,9 +54,9 @@ public class MechanicalPipe extends BufferedTransmitter<IFluidHandler, FluidNetw
     }
 
     @Override
-    public AcceptorCache<IFluidHandler> getAcceptorCache() {
+    public AcceptorCache<IExtendedFluidHandler> getAcceptorCache() {
         //Cast it here to make things a bit easier, as we know createAcceptorCache by default returns an object of type AcceptorCache
-        return (AcceptorCache<IFluidHandler>) super.getAcceptorCache();
+        return (AcceptorCache<IExtendedFluidHandler>) super.getAcceptorCache();
     }
 
     @Override
@@ -68,25 +68,25 @@ public class MechanicalPipe extends BufferedTransmitter<IFluidHandler, FluidNetw
     public void pullFromAcceptors() {
         Set<Direction> connections = getConnections(ConnectionType.PULL);
         if (!connections.isEmpty()) {
-            for (IFluidHandler connectedAcceptor : getAcceptorCache().getConnectedAcceptors(connections)) {
+            for (IExtendedFluidHandler connectedAcceptor : getAcceptorCache().getConnectedAcceptors(connections)) {
                 FluidStack received;
                 //Note: We recheck the buffer each time in case we ended up accepting fluid somewhere
                 // and our buffer changed and is no longer empty
                 FluidStack bufferWithFallback = getBufferWithFallback();
                 if (bufferWithFallback.isEmpty()) {
                     //If we don't have a fluid stored try pulling as much as we are able to
-                    received = connectedAcceptor.drain(getAvailablePull(), FluidAction.SIMULATE);
+                    received = connectedAcceptor.extractFluid(getAvailablePull(), Action.SIMULATE);
                 } else {
                     //Otherwise, try draining the same type of fluid we have stored requesting up to as much as we are able to pull
                     // We do this to better support multiple tanks in case the fluid we have stored we could pull out of a block's
                     // second tank but just asking to drain a specific amount
-                    received = connectedAcceptor.drain(new FluidStack(bufferWithFallback, getAvailablePull()), FluidAction.SIMULATE);
+                    received = connectedAcceptor.extractFluid(new FluidStack(bufferWithFallback, getAvailablePull()), Action.SIMULATE);
                 }
                 if (!received.isEmpty() && takeFluid(received, Action.SIMULATE).isEmpty()) {
                     //If we received some fluid and are able to insert it all, then actually extract it and insert it into our thing.
                     // Note: We extract first after simulating ourselves because if the target gave a faulty simulation value, we want to handle it properly
                     // and not accidentally dupe anything, and we know our simulation we just performed on taking it is valid
-                    takeFluid(connectedAcceptor.drain(received.copy(), FluidAction.EXECUTE), Action.EXECUTE);
+                    takeFluid(connectedAcceptor.extractFluid(received.copy(), Action.EXECUTE), Action.EXECUTE);
                 }
             }
         }
@@ -145,11 +145,11 @@ public class MechanicalPipe extends BufferedTransmitter<IFluidHandler, FluidNetw
 
     @Override
     public boolean isValidAcceptor(BlockEntity tile, Direction side) {
-        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, ForgeCapabilities.FLUID_HANDLER);
+        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, Capabilities.FLUID_HANDLER);
     }
 
     @Override
-    public CompatibleTransmitterValidator<IFluidHandler, FluidNetwork, MechanicalPipe> getNewOrphanValidator() {
+    public CompatibleTransmitterValidator<IExtendedFluidHandler, FluidNetwork, MechanicalPipe> getNewOrphanValidator() {
         return new CompatibleFluidTransmitterValidator(this);
     }
 
