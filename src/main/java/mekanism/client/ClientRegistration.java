@@ -3,8 +3,8 @@ package mekanism.client;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table.Cell;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import mekanism.api.gear.IModule;
@@ -100,6 +100,7 @@ import mekanism.client.particle.JetpackSmokeParticle;
 import mekanism.client.particle.LaserParticle;
 import mekanism.client.particle.RadiationParticle;
 import mekanism.client.particle.ScubaBubbleParticle;
+import mekanism.client.render.FluidRenderRegistration;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.RenderTickHandler;
 import mekanism.client.render.armor.FreeRunnerArmor;
@@ -158,7 +159,6 @@ import mekanism.common.lib.Color;
 import mekanism.common.lib.FieldReflectionHelper;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.registration.impl.BlockRegistryObject;
-import mekanism.common.registration.impl.FluidRegistryObject;
 import mekanism.common.registration.impl.ItemRegistryObject;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismContainerTypes;
@@ -177,7 +177,6 @@ import mekanism.common.util.RegistryUtils;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.ElytraLayer;
@@ -247,9 +246,7 @@ public class ClientRegistration {
 
         event.enqueueWork(() -> {
             //Set fluids to a translucent render layer
-            for (FluidRegistryObject<?, ?, ?, ?, ?> fluidRO : MekanismFluids.FLUIDS.getAllFluids()) {
-                ClientRegistrationUtil.setRenderLayer(RenderType.translucent(), fluidRO);
-            }
+            FluidRenderRegistration.register(MekanismFluids.FLUIDS);
             ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
                   (stack, world, entity, seed) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(world, stack) == null ? 0 : 1);
 
@@ -549,7 +546,6 @@ public class ClientRegistration {
                   return -1;
               }, MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK, MekanismBlocks.ULTIMATE_FLUID_TANK,
               MekanismBlocks.CREATIVE_FLUID_TANK);
-        ClientRegistrationUtil.registerBucketColorHandler(event, MekanismFluids.FLUIDS);
         for (Cell<ResourceType, PrimaryResource, ItemRegistryObject<Item>> item : MekanismItems.PROCESSED_RESOURCES.cellSet()) {
             int tint = item.getColumnKey().getTint();
             ClientRegistrationUtil.registerItemColorHandler(event, (stack, index) -> index == 1 ? tint : -1, item.getValue());

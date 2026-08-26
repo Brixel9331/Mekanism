@@ -17,14 +17,15 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.config.value.CachedIntValue;
 import mekanism.common.content.network.distribution.FluidHandlerTarget;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 
 public final class FluidUtils {
@@ -56,10 +57,10 @@ public final class FluidUtils {
             // chemicals
             if (stack.getFluid().isSame(Fluids.LAVA)) {//Special case lava
                 return OptionalInt.of(0xFFDB6B19);
-            } else if (FMLEnvironment.dist.isClient()) {
+            } else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
                 //Note: We can only return an accurate result on the client side. This method should never be called from the server
                 // but in case it is make sure we only run on the client side
-                return OptionalInt.of(IClientFluidTypeExtensions.of(stack.getFluid()).getTintColor(stack));
+                return OptionalInt.of(FluidVariantRendering.getColor(stack.getVariant()));
             }
         }
         return OptionalInt.empty();

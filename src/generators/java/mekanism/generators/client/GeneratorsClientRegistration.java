@@ -4,9 +4,9 @@ import mekanism.api.gear.IModuleHelper;
 import mekanism.client.ClientRegistration;
 import mekanism.client.ClientRegistrationUtil;
 import mekanism.client.model.baked.ExtensionBakedModel.TransformedBakedModel;
+import mekanism.client.render.FluidRenderRegistration;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
-import mekanism.common.registration.impl.FluidRegistryObject;
 import mekanism.generators.client.gui.GuiBioGenerator;
 import mekanism.generators.client.gui.GuiFissionReactor;
 import mekanism.generators.client.gui.GuiFissionReactorLogicAdapter;
@@ -39,7 +39,6 @@ import mekanism.generators.common.registries.GeneratorsModules;
 import mekanism.generators.common.registries.GeneratorsTileEntityTypes;
 import mekanism.generators.common.tile.TileEntityAdvancedSolarGenerator;
 import mekanism.generators.common.tile.TileEntitySolarGenerator;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -66,9 +65,7 @@ public class GeneratorsClientRegistration {
     public static void init(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             //Set fluids to a translucent render layer
-            for (FluidRegistryObject<?, ?, ?, ?, ?> fluidRO : GeneratorsFluids.FLUIDS.getAllFluids()) {
-                ClientRegistrationUtil.setRenderLayer(RenderType.translucent(), fluidRO);
-            }
+            FluidRenderRegistration.register(GeneratorsFluids.FLUIDS);
         });
 
         // adv solar gen requires to be translated up 1 block, so handle the model separately
@@ -130,11 +127,6 @@ public class GeneratorsClientRegistration {
             ClientRegistrationUtil.registerScreen(GeneratorsContainerTypes.TURBINE_STATS, GuiTurbineStats::new);
             ClientRegistrationUtil.registerScreen(GeneratorsContainerTypes.WIND_GENERATOR, GuiWindGenerator::new);
         });
-    }
-
-    @SubscribeEvent
-    public static void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
-        ClientRegistrationUtil.registerBucketColorHandler(event, GeneratorsFluids.FLUIDS);
     }
 
     @SubscribeEvent

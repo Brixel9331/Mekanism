@@ -21,7 +21,6 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.loaders.DynamicFluidContainerModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -122,9 +121,11 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
 
     //Note: This isn't the best way to do this in terms of model file validation, but it works
     protected void registerBucket(FluidRegistryObject<?, ?, ?, ?, ?> fluidRO) {
-        withExistingParent(RegistryUtils.getPath(fluidRO.getBucket()), new ResourceLocation("forge", "item/bucket"))
-              .customLoader(DynamicFluidContainerModelBuilder::begin)
-              .fluid(fluidRO.getStillFluid());
+        withExistingParent(RegistryUtils.getPath(fluidRO.getBucket()), new ResourceLocation("item/generated"))
+              .texture("layer0", "minecraft:item/bucket")
+              .texture("fluid", fluidRO.getFluidType().stillTexture)
+              .texture("fluid_mask", "mekanism:item/bucket_fluid")
+              .texture("particle", "#fluid");
     }
 
     private static class TrimModelDataHelper<TMD_CLASS> {

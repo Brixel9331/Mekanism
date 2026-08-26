@@ -1,5 +1,9 @@
 {
-  "parent": "forge:item/bucket",
-  "fluid": "mekanismgenerators:deuterium",
-  "loader": "forge:fluid_container"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/bucket",
+    "fluid": "mekanism:liquid/liquid",
+    "fluid_mask": "mekanism:item/bucket_fluid",
+    "particle": "#fluid"
+  }
 }

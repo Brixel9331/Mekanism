@@ -20,8 +20,8 @@ import mekanism.client.model.baked.DigitalMinerBakedModel;
 import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.client.render.data.FluidRenderData;
 import mekanism.client.render.data.ValveRenderData;
-import mekanism.client.render.lib.ColorAtlas;
 import mekanism.client.render.lib.ColorAtlas.ColorRegistryObject;
+import mekanism.client.render.lib.ColorAtlas;
 import mekanism.client.render.tileentity.RenderDigitalMiner;
 import mekanism.client.render.tileentity.RenderDimensionalStabilizer;
 import mekanism.client.render.tileentity.RenderFluidTank;
@@ -38,6 +38,9 @@ import mekanism.common.lib.multiblock.IValveHandler.ValveData;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -52,7 +55,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
@@ -79,25 +81,11 @@ public class MekanismRenderer {
      * @return the sprite, or missing sprite if not found
      */
     public static TextureAtlasSprite getBaseFluidTexture(@NotNull Fluid fluid, @NotNull FluidTextureType type) {
-        IClientFluidTypeExtensions properties = IClientFluidTypeExtensions.of(fluid);
-        ResourceLocation spriteLocation;
-        if (type == FluidTextureType.STILL) {
-            spriteLocation = properties.getStillTexture();
-        } else {
-            spriteLocation = properties.getFlowingTexture();
-        }
-        return getSprite(spriteLocation);
+        return FluidRenderRegistration.getSprite(FluidVariant.of(fluid), type == FluidTextureType.FLOWING);
     }
 
     public static TextureAtlasSprite getFluidTexture(@NotNull FluidStack fluidStack, @NotNull FluidTextureType type) {
-        IClientFluidTypeExtensions properties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        ResourceLocation spriteLocation;
-        if (type == FluidTextureType.STILL) {
-            spriteLocation = properties.getStillTexture(fluidStack);
-        } else {
-            spriteLocation = properties.getFlowingTexture(fluidStack);
-        }
-        return getSprite(spriteLocation);
+        return FluidRenderRegistration.getSprite(fluidStack.getVariant(), type == FluidTextureType.FLOWING);
     }
 
     public static TextureAtlasSprite getChemicalTexture(@NotNull Chemical<?> chemical) {
@@ -188,7 +176,7 @@ public class MekanismRenderer {
 
     public static void color(GuiGraphics guiGraphics, @NotNull FluidStack fluid) {
         if (!fluid.isEmpty()) {
-            color(guiGraphics, IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid));
+            color(guiGraphics, FluidVariantRendering.getColor(fluid.getVariant()));
         }
     }
 
@@ -220,7 +208,7 @@ public class MekanismRenderer {
     }
 
     public static int getColorARGB(@NotNull FluidStack fluidStack) {
-        return IClientFluidTypeExtensions.of(fluidStack.getFluid()).getTintColor(fluidStack);
+        return FluidVariantRendering.getColor(fluidStack.getVariant());
     }
 
     public static int getColorARGB(@NotNull FluidStack fluidStack, float fluidScale) {
@@ -261,7 +249,7 @@ public class MekanismRenderer {
     }
 
     public static int calculateGlowLight(int combinedLight, @NotNull FluidStack fluid) {
-        return fluid.isEmpty() ? combinedLight : calculateGlowLight(combinedLight, fluid.getFluid().getFluidType().getLightLevel(fluid));
+        return fluid.isEmpty() ? combinedLight : calculateGlowLight(combinedLight, FluidVariantAttributes.getLuminance(fluid.getVariant()));
     }
 
     public static int calculateGlowLight(int combinedLight, int glow) {

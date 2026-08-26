@@ -11,21 +11,16 @@ import mekanism.common.block.interfaces.IColoredBlock;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.item.interfaces.IColoredItem;
 import mekanism.common.registration.impl.ContainerTypeRegistryObject;
-import mekanism.common.registration.impl.FluidDeferredRegister;
-import mekanism.common.registration.impl.FluidDeferredRegister.MekanismFluidType;
-import mekanism.common.registration.impl.FluidRegistryObject;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
 import mekanism.common.tile.prefab.TileEntityElectricMachine;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.MenuScreens.ScreenConstructor;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -43,7 +38,6 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.model.DynamicFluidContainerModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +71,6 @@ public class ClientRegistrationUtil {
         }
         return -1;
     };
-    private static final ItemColor BUCKET_ITEM_COLOR = new DynamicFluidContainerModel.Colors();
 
     private ClientRegistrationUtil() {
     }
@@ -172,12 +165,6 @@ public class ClientRegistrationUtil {
         }
     }
 
-    public static void registerBucketColorHandler(RegisterColorHandlersEvent.Item event, FluidDeferredRegister register) {
-        for (FluidRegistryObject<? extends MekanismFluidType, ?, ?, ?, ?> fluidRO : register.getAllFluids()) {
-            event.register(BUCKET_ITEM_COLOR, fluidRO.getBucket());
-        }
-    }
-
     public static void registerIColoredBlockHandler(RegisterColorHandlersEvent event, IBlockProvider... blocks) {
         if (event instanceof RegisterColorHandlersEvent.Block blockEvent) {
             registerBlockColorHandler(blockEvent, COLORED_BLOCK_COLOR, blocks);
@@ -190,10 +177,4 @@ public class ClientRegistrationUtil {
         registerItemColorHandler(event, COLORED_ITEM_COLOR, items);
     }
 
-    public static void setRenderLayer(RenderType type, FluidRegistryObject<?, ?, ?, ?, ?>... fluidROs) {
-        for (FluidRegistryObject<?, ?, ?, ?, ?> fluidRO : fluidROs) {
-            ItemBlockRenderTypes.setRenderLayer(fluidRO.getStillFluid(), type);
-            ItemBlockRenderTypes.setRenderLayer(fluidRO.getFlowingFluid(), type);
-        }
-    }
 }
