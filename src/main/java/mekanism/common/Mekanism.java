@@ -196,7 +196,7 @@ public class Mekanism {
         modEventBus.addListener(this::imcHandle);
         MekanismItems.ITEMS.register();
         MekanismBlocks.BLOCKS.register();
-        MekanismFluids.FLUIDS.register(modEventBus);
+        MekanismFluids.FLUIDS.register();
         MekanismContainerTypes.CONTAINER_TYPES.register();
         MekanismCreativeTabs.CREATIVE_TABS.register();
         MekanismDataSerializers.DATA_SERIALIZERS.register();

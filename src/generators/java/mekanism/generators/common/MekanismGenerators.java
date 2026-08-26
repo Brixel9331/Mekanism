@@ -76,7 +76,7 @@ public class MekanismGenerators implements IModModule {
 
         GeneratorsItems.ITEMS.register();
         GeneratorsBlocks.BLOCKS.register();
-        GeneratorsFluids.FLUIDS.register(modEventBus);
+        GeneratorsFluids.FLUIDS.register();
         GeneratorsCreativeTabs.CREATIVE_TABS.register();
         GeneratorsSounds.SOUND_EVENTS.register();
         GeneratorsContainerTypes.CONTAINER_TYPES.register();

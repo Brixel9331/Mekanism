@@ -3,15 +3,15 @@ package mekanism.common.registries;
 import java.util.function.UnaryOperator;
 import mekanism.common.ChemicalConstants;
 import mekanism.common.Mekanism;
+import mekanism.common.fluid.MekanismFlowingFluid.Flowing;
+import mekanism.common.fluid.MekanismFlowingFluid.Source;
 import mekanism.common.item.ItemNutritionalPasteBucket;
-import mekanism.common.registration.impl.FluidDeferredRegister;
 import mekanism.common.registration.impl.FluidDeferredRegister.MekanismFluidType;
+import mekanism.common.registration.impl.FluidDeferredRegister;
 import mekanism.common.registration.impl.FluidRegistryObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Flowing;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Source;
 
 public class MekanismFluids {
 
