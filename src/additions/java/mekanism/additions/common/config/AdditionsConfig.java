@@ -8,6 +8,7 @@ import mekanism.additions.common.registries.AdditionsEntityTypes;
 import mekanism.api.providers.IEntityTypeProvider;
 import mekanism.common.config.BaseMekanismConfig;
 import mekanism.common.config.IMekanismConfig;
+import mekanism.common.config.MekanismConfigHelper;
 import mekanism.common.config.value.CachedBooleanValue;
 import mekanism.common.config.value.CachedDoubleValue;
 import mekanism.common.config.value.CachedFloatValue;
@@ -18,7 +19,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class AdditionsConfig extends BaseMekanismConfig {
 
@@ -75,6 +75,7 @@ public class AdditionsConfig extends BaseMekanismConfig {
     }
 
     public SpawnConfig getConfig(BabyType babyType) {
+        MekanismConfigHelper.prepareWorldgenConfig(this);
         return spawnConfigs.get(babyType);
     }
 
@@ -115,7 +116,7 @@ public class AdditionsConfig extends BaseMekanismConfig {
                   .worldRestart()
                   .defineInRange("maxSpawnCostPercentage", 1D, 0, 100));
             this.biomeBlackList = CachedResourceLocationListValue.define(config, builder.comment("The list of biome ids that " + name + " will not spawn in even if the normal mob variant can spawn.")
-                  .worldRestart(), "biomeBlackList", ForgeRegistries.BIOMES::containsKey);
+                  .worldRestart(), "biomeBlackList", location -> true);
             this.structureBlackList = CachedResourceLocationListValue.define(config, builder.comment("The list of structure ids that " + name + " will not spawn in even if the normal mob variant can spawn.")
                   .worldRestart(), "structureBlackList", BuiltInRegistries.STRUCTURE_TYPE::containsKey);
             builder.pop();
