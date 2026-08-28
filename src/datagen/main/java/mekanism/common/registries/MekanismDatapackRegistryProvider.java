@@ -16,8 +16,8 @@ import mekanism.common.entity.RobitPrideSkinData;
 import mekanism.common.registration.impl.FeatureRegistryObject;
 import mekanism.common.registries.MekanismDamageTypes.MekanismDamageType;
 import mekanism.common.resource.ore.OreBlockType;
-import mekanism.common.resource.ore.OreType;
 import mekanism.common.resource.ore.OreType.OreVeinType;
+import mekanism.common.resource.ore.OreType;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.world.ConfigurableConstantInt;
@@ -27,6 +27,8 @@ import mekanism.common.world.ResizableDiskConfig;
 import mekanism.common.world.ResizableOreFeature;
 import mekanism.common.world.ResizableOreFeatureConfig;
 import mekanism.common.world.height.ConfigurableHeightProvider;
+import mekanism.common.world.modifier.AddFeaturesBiomeModifier;
+import mekanism.common.world.modifier.WorldgenModifiers;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -44,8 +46,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.RuleBasedBlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
@@ -56,8 +58,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.world.ForgeBiomeModifiers.AddFeaturesBiomeModifier;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class MekanismDatapackRegistryProvider extends BaseDatapackRegistryProvider {
 
@@ -125,7 +125,7 @@ public class MekanismDatapackRegistryProvider extends BaseDatapackRegistryProvid
                     BiomeFilter.biome()
               ));
           })
-          .add(ForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
+          .add(WorldgenModifiers.BIOME_MODIFIERS, context -> {
               HolderSet.Named<Biome> isOverworldTag = context.lookup(Registries.BIOME).getOrThrow(MekanismTags.Biomes.SPAWN_ORES);
               HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
               for (OreType type : EnumUtils.ORE_TYPES) {

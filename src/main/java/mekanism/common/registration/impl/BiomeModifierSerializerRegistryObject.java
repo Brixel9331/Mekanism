@@ -1,11 +1,10 @@
 package mekanism.common.registration.impl;
 
 import com.mojang.serialization.Codec;
-import mekanism.common.registration.WrappedRegistryObject;
-import net.minecraftforge.common.world.BiomeModifier;
-import net.minecraftforge.registries.RegistryObject;
+import mekanism.common.registration.RegistryObject;
+import mekanism.common.world.modifier.BiomeModifier;
 
-public class BiomeModifierSerializerRegistryObject<T extends BiomeModifier> extends WrappedRegistryObject<Codec<T>> {
+public class BiomeModifierSerializerRegistryObject<T extends BiomeModifier> extends RegistryObject<Codec<T>> {
 
     public BiomeModifierSerializerRegistryObject(RegistryObject<Codec<T>> registryObject) {
         super(registryObject);

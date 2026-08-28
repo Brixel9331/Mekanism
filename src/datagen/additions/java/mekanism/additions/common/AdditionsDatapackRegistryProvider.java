@@ -5,10 +5,10 @@ import mekanism.additions.common.entity.baby.BabyType;
 import mekanism.additions.common.world.modifier.BabyEntitySpawnBiomeModifier;
 import mekanism.additions.common.world.modifier.BabyEntitySpawnStructureModifier;
 import mekanism.common.registries.BaseDatapackRegistryProvider;
+import mekanism.common.world.modifier.WorldgenModifiers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class AdditionsDatapackRegistryProvider extends BaseDatapackRegistryProvider {
 
@@ -17,12 +17,12 @@ public class AdditionsDatapackRegistryProvider extends BaseDatapackRegistryProvi
     }
 
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
-          .add(ForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
+          .add(WorldgenModifiers.BIOME_MODIFIERS, context -> {
               for (BabyType babyType : BabyType.values()) {
                   context.register(biomeModifier(MekanismAdditions.rl(babyType.getSerializedName())), new BabyEntitySpawnBiomeModifier(babyType));
               }
           })
-          .add(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, context -> {
+          .add(WorldgenModifiers.STRUCTURE_MODIFIERS, context -> {
               for (BabyType babyType : BabyType.values()) {
                   context.register(structureModifier(MekanismAdditions.rl(babyType.getSerializedName())), new BabyEntitySpawnStructureModifier(babyType));
               }

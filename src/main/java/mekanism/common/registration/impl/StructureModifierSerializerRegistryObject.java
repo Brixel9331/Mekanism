@@ -1,11 +1,10 @@
 package mekanism.common.registration.impl;
 
 import com.mojang.serialization.Codec;
-import mekanism.common.registration.WrappedRegistryObject;
-import net.minecraftforge.common.world.StructureModifier;
-import net.minecraftforge.registries.RegistryObject;
+import mekanism.common.registration.RegistryObject;
+import mekanism.common.world.modifier.StructureModifier;
 
-public class StructureModifierSerializerRegistryObject<T extends StructureModifier> extends WrappedRegistryObject<Codec<T>> {
+public class StructureModifierSerializerRegistryObject<T extends StructureModifier> extends RegistryObject<Codec<T>> {
 
     public StructureModifierSerializerRegistryObject(RegistryObject<Codec<T>> registryObject) {
         super(registryObject);

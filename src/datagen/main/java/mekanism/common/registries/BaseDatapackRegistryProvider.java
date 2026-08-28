@@ -4,8 +4,11 @@ import it.unimi.dsi.fastutil.booleans.Boolean2ObjectFunction;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.core.Holder;
+import mekanism.common.world.modifier.BiomeModifier;
+import mekanism.common.world.modifier.StructureModifier;
+import mekanism.common.world.modifier.WorldgenModifiers;
 import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
@@ -18,9 +21,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
-import net.minecraftforge.common.world.BiomeModifier;
-import net.minecraftforge.common.world.StructureModifier;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseDatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
@@ -63,11 +63,11 @@ public abstract class BaseDatapackRegistryProvider extends DatapackBuiltinEntrie
     }
 
     protected static ResourceKey<BiomeModifier> biomeModifier(ResourceLocation name) {
-        return ResourceKey.create(ForgeRegistries.Keys.BIOME_MODIFIERS, name);
+        return ResourceKey.create(WorldgenModifiers.BIOME_MODIFIERS, name);
     }
 
     protected static ResourceKey<StructureModifier> structureModifier(ResourceLocation name) {
-        return ResourceKey.create(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, name);
+        return ResourceKey.create(WorldgenModifiers.STRUCTURE_MODIFIERS, name);
     }
 
     protected record PlacedFeaturesHolder(Holder.Reference<PlacedFeature> feature, Holder.Reference<PlacedFeature> retrogen) {

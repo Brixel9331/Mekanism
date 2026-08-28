@@ -68,8 +68,8 @@ public class MekanismAdditions implements IModModule {
         AdditionsBlocks.BLOCKS.register();
         AdditionsCreativeTabs.CREATIVE_TABS.register();
         AdditionsSounds.SOUND_EVENTS.register();
-        AdditionsBiomeModifierSerializers.BIOME_MODIFIER_SERIALIZERS.register(modEventBus);
-        AdditionsStructureModifierSerializers.STRUCTURE_MODIFIER_SERIALIZERS.register(modEventBus);
+        AdditionsBiomeModifierSerializers.BIOME_MODIFIER_SERIALIZERS.register();
+        AdditionsStructureModifierSerializers.STRUCTURE_MODIFIER_SERIALIZERS.register();
 
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());

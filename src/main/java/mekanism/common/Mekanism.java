@@ -95,6 +95,7 @@ import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.component.TileComponentChunkLoader.ChunkValidationCallback;
 import mekanism.common.tile.machine.TileEntityOredictionificator.ODConfigValueInvalidationListener;
 import mekanism.common.world.GenHandler;
+import mekanism.common.world.modifier.WorldgenModifiers;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -209,6 +210,7 @@ public class Mekanism {
         MekanismIntProviderTypes.INT_PROVIDER_TYPES.register();
         MekanismPlacementModifiers.PLACEMENT_MODIFIERS.register();
         MekanismFeatures.FEATURES.register();
+        WorldgenModifiers.register();
         MekanismRecipeType.RECIPE_TYPES.register();
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register();
         MekanismLootFunctions.REGISTER.register();

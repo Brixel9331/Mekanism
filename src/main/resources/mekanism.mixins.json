@@ -6,7 +6,9 @@
   "mixins": [
     "EntityCapabilityMixin",
     "ItemStackCapabilityMixin",
-    "LivingEntityRadiationMixin"
+    "LivingEntityRadiationMixin",
+    "BiomeSelectionContextAccessor",
+    "StructureSettingsAccessor"
   ],
   "client": [
     "client.CreativeModeInventoryScreenMixin"
