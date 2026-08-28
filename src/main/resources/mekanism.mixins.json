@@ -8,7 +8,10 @@
     "ItemStackCapabilityMixin",
     "LivingEntityRadiationMixin",
     "BiomeSelectionContextAccessor",
-    "StructureSettingsAccessor"
+    "StructureSettingsAccessor",
+    "ChunkWorldgenStateMixin",
+    "ChunkSerializerMixin",
+    "LevelChunkGenerationMixin"
   ],
   "client": [
     "client.CreativeModeInventoryScreenMixin"

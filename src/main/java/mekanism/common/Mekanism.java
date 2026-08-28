@@ -95,7 +95,9 @@ import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.component.TileComponentChunkLoader.ChunkValidationCallback;
 import mekanism.common.tile.machine.TileEntityOredictionificator.ODConfigValueInvalidationListener;
 import mekanism.common.world.GenHandler;
+import mekanism.common.world.RetrogenHandler;
 import mekanism.common.world.modifier.WorldgenModifiers;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -172,6 +174,9 @@ public class Mekanism {
     public static final KeySync keyMap = new KeySync();
     public static final Set<Coord4D> activeVibrators = new ObjectOpenHashSet<>();
 
+    public static final RetrogenHandler retrogenHandler = new RetrogenHandler(() -> MekanismConfig.world.userGenVersion.get(),
+          () -> MekanismConfig.world.enableRegeneration.get(), GenHandler::generate);
+
     private ReloadListener recipeCacheManager;
 
     public Mekanism() {
@@ -211,6 +216,8 @@ public class Mekanism {
         MekanismPlacementModifiers.PLACEMENT_MODIFIERS.register();
         MekanismFeatures.FEATURES.register();
         WorldgenModifiers.register();
+        retrogenHandler.register();
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> GenHandler.reset());
         MekanismRecipeType.RECIPE_TYPES.register();
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register();
         MekanismLootFunctions.REGISTER.register();
@@ -273,7 +280,6 @@ public class Mekanism {
         //Clear all cache data, wait until server stopper though so that we make sure saving can use any data it needs
         playerState.clear(false);
         activeVibrators.clear();
-        worldTickHandler.resetChunkData();
         FrequencyType.clear();
         BoilerMultiblockData.hotMap.clear();
 
@@ -285,7 +291,6 @@ public class Mekanism {
         TransporterManager.reset();
         PathfinderCache.reset();
         TransmitterNetworkRegistry.reset();
-        GenHandler.reset();
         PersonalStorageManager.reset();
     }
 
