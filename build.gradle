@@ -205,6 +205,8 @@ tasks.named('sourcesJar', Jar) {
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+    workingDir = layout.buildDirectory.dir('test-runtime')
+    doFirst { workingDir.mkdirs() }
 }
 
 tasks.named('wrapper', Wrapper) {
