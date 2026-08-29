@@ -33,7 +33,6 @@ import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
 import mekanism.common.network.to_server.PacketModeChange;
 import mekanism.common.network.to_server.PacketPortableTeleporterTeleport;
-import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.registries.MekanismModules;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
@@ -53,7 +52,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.client.event.InputEvent.MouseScrollingEvent;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
@@ -329,15 +327,6 @@ public class ClientTickHandler {
                 event.setCanceled(true);
             }
         }
-    }
-
-    @SubscribeEvent
-    public void recipesUpdated(RecipesUpdatedEvent event) {
-        //Note: Dedicated servers first connection the server sends recipes then tags, and on reload sends tags then recipes.
-        // We ignore this fact and only clear the cache in the recipes updated event however, as the cache should already be
-        // empty on our initial connection, and even if it isn't the client has no way to query the recipes and cause the
-        // caches to be initialized before the tags are then received as we lazily initialize our recipe caches.
-        MekanismRecipeType.clearCache();
     }
 
     @SubscribeEvent

@@ -59,6 +59,8 @@ import mekanism.common.recipe.lookup.cache.InputRecipeCache.SingleItem;
 import mekanism.common.recipe.lookup.cache.RotaryInputRecipeCache;
 import mekanism.common.registration.impl.RecipeTypeDeferredRegister;
 import mekanism.common.registration.impl.RecipeTypeRegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -71,13 +73,9 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@EventBusSubscriber(modid = Mekanism.MODID)
 public class MekanismRecipeType<RECIPE extends MekanismRecipe, INPUT_CACHE extends IInputRecipeCache> implements RecipeType<RECIPE>,
       IMekanismRecipeTypeProvider<RECIPE, INPUT_CACHE> {
 
@@ -229,10 +227,11 @@ public class MekanismRecipeType<RECIPE extends MekanismRecipe, INPUT_CACHE exten
         if (world == null) {
             //Try to get a fallback world if we are in a context that may not have one
             //If we are on the client get the client's world, if we are on the server get the current server's world
-            if (FMLEnvironment.dist.isClient()) {
+            if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
                 world = MekanismClient.tryGetClientWorld();
             } else {
-                world = ServerLifecycle.getCurrentServer().overworld();
+                MinecraftServer server = ServerLifecycle.getCurrentServer();
+                world = server == null ? null : server.overworld();
             }
             if (world == null) {
                 //If we failed, then return no recipes

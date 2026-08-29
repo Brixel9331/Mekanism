@@ -12,7 +12,6 @@ import mekanism.api.Coord4D;
 import mekanism.api.MekanismAPI;
 import mekanism.api.MekanismIMC;
 import mekanism.api.providers.IItemProvider;
-import mekanism.client.IncompleteRecipeScanner;
 import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.base.IModModule;
 import mekanism.common.base.KeySync;
@@ -69,7 +68,9 @@ import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.PacketHandler;
 import mekanism.common.network.to_client.PacketTransmitterUpdate;
+import mekanism.common.recipe.IncompleteRecipeScanner;
 import mekanism.common.recipe.MekanismRecipeType;
+import mekanism.common.recipe.RecipeLifecycle;
 import mekanism.common.recipe.condition.MekanismResourceConditions;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismContainerTypes;
@@ -99,6 +100,7 @@ import mekanism.common.tile.machine.TileEntityOredictionificator.ODConfigValueIn
 import mekanism.common.world.GenHandler;
 import mekanism.common.world.RetrogenHandler;
 import mekanism.common.world.modifier.WorldgenModifiers;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -111,10 +113,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.ForgeChunkManager;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -178,7 +177,7 @@ public class Mekanism {
     public static final RetrogenHandler retrogenHandler = new RetrogenHandler(() -> MekanismConfig.world.userGenVersion.get(),
           () -> MekanismConfig.world.enableRegeneration.get(), GenHandler::generate);
 
-    private ReloadListener recipeCacheManager;
+    private final ReloadListener recipeCacheManager = new ReloadListener();
 
     public Mekanism() {
         instance = this;
@@ -197,9 +196,10 @@ public class Mekanism {
         ServerLifecycle.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
         worldTickHandler.register();
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::addReloadListenersLowest);
-        MinecraftForge.EVENT_BUS.addListener(this::onTagsReload);
-        MinecraftForge.EVENT_BUS.register(IncompleteRecipeScanner.class);
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> TagCache.resetTagCaches());
+        RecipeLifecycle.register();
+        recipeCacheManager.register();
+        IncompleteRecipeScanner.register();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::imcQueue);
@@ -250,25 +250,8 @@ public class Mekanism {
         return new ResourceLocation(Mekanism.MODID, path);
     }
 
-    private void setRecipeCacheManager(ReloadListener manager) {
-        if (recipeCacheManager == null) {
-            recipeCacheManager = manager;
-        } else {
-            logger.warn("Recipe cache manager has already been set.");
-        }
-    }
-
     public ReloadListener getRecipeCacheManager() {
         return recipeCacheManager;
-    }
-
-    private void onTagsReload(TagsUpdatedEvent event) {
-        TagCache.resetTagCaches();
-    }
-
-    private void addReloadListenersLowest(AddReloadListenerEvent event) {
-        //Note: We register reload listeners here which we want to make sure run after CraftTweaker or any other mods that may modify recipes or loot tables
-        event.addListener(getRecipeCacheManager());
     }
 
     private void registerCommands(RegisterCommandsEvent event) {
@@ -323,7 +306,6 @@ public class Mekanism {
         //Initialization notification
         logger.info("Version {} initializing...", versionNumber);
         hooks.hookCommonSetup();
-        setRecipeCacheManager(new ReloadListener());
 
         event.enqueueWork(() -> {
             //Ensure our tags are all initialized

@@ -16,7 +16,8 @@
   ],
   "client": [
     "client.CreativeModeInventoryScreenMixin",
-    "client.MinecraftWorldLifecycleMixin"
+    "client.MinecraftWorldLifecycleMixin",
+    "client.ClientRecipesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
