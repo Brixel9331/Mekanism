@@ -62,6 +62,7 @@ import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.inventory.warning.WarningTracker.WarningType;
 import mekanism.common.item.ItemConfigurator;
 import mekanism.common.item.ItemRobit;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.ISingleRecipeLookupHandler.ItemRecipeLookupHandler;
@@ -127,7 +128,6 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -311,7 +311,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
             }
 
             if (tickCount % 20 == 0) {
-                Level serverWorld = ServerLifecycleHooks.getCurrentServer().getLevel(homeLocation.dimension);
+                Level serverWorld = ServerLifecycle.getCurrentServer().getLevel(homeLocation.dimension);
                 BlockPos homePos = homeLocation.getPos();
                 if (WorldUtils.isBlockLoaded(serverWorld, homePos) && WorldUtils.getTileEntity(TileEntityChargepad.class, serverWorld, homePos) == null) {
                     drop();

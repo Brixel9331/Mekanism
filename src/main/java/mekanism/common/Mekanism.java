@@ -57,6 +57,7 @@ import mekanism.common.item.loot.MekanismLootFunctions;
 import mekanism.common.item.predicate.FullCanteenItemPredicate;
 import mekanism.common.item.predicate.MaxedModuleContainerItemPredicate;
 import mekanism.common.lib.MekAnnotationScanner;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.Version;
 import mekanism.common.lib.frequency.FrequencyManager;
 import mekanism.common.lib.frequency.FrequencyType;
@@ -102,6 +103,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -112,7 +114,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -192,7 +193,9 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.addListener(this::onWorldLoad);
         MinecraftForge.EVENT_BUS.addListener(this::onWorldUnload);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
-        MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
+        ServerLifecycle.register();
+        ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
+        worldTickHandler.register();
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::addReloadListenersLowest);
         MinecraftForge.EVENT_BUS.addListener(this::onTagsReload);
         MinecraftForge.EVENT_BUS.register(IncompleteRecipeScanner.class);
@@ -276,7 +279,7 @@ public class Mekanism {
         event.getDispatcher().register(CommandMek.register());
     }
 
-    private void serverStopped(ServerStoppedEvent event) {
+    private void serverStopped(MinecraftServer server) {
         //Clear all cache data, wait until server stopper though so that we make sure saving can use any data it needs
         playerState.clear(false);
         activeVibrators.clear();
@@ -347,7 +350,6 @@ public class Mekanism {
         //Register player tracker
         new CommonPlayerTracker();
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
-        MinecraftForge.EVENT_BUS.register(Mekanism.worldTickHandler);
 
         MinecraftForge.EVENT_BUS.register(RadiationManager.get());
 

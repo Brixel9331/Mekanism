@@ -38,6 +38,7 @@ import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableByte;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.chunkloading.IChunkLoader;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.lib.frequency.FrequencyType;
@@ -74,7 +75,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -283,7 +283,7 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
         if (teleportInfo.closest == null || level == null || teleportInfo.toTeleport.isEmpty()) {
             return;
         }
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = ServerLifecycle.getCurrentServer();
         boolean sameDimension = level.dimension() == teleportInfo.closest.dimension;
         Level teleWorld = sameDimension ? level : currentServer.getLevel(teleportInfo.closest.dimension);
         BlockPos closestPos = teleportInfo.closest.getPos();
@@ -438,7 +438,7 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
      */
     @Nullable
     public static FloatingLong calculateEnergyCost(Entity entity, Coord4D coords) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = ServerLifecycle.getCurrentServer();
         if (currentServer != null) {
             Level targetWorld = currentServer.getLevel(coords.dimension);
             if (targetWorld != null) {

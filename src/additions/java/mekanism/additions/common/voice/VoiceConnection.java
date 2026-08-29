@@ -12,14 +12,14 @@ import java.util.UUID;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.item.ItemWalkieTalkie;
 import mekanism.common.Mekanism;
+import mekanism.common.lib.ServerLifecycle;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class VoiceConnection extends Thread {
 
-    private final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+    private final MinecraftServer server = ServerLifecycle.getCurrentServer();
     private DataOutputStream output;
     private DataInputStream input;
     private boolean open = true;

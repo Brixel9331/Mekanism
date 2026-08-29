@@ -2,12 +2,11 @@ package mekanism.common.lib;
 
 import java.io.File;
 import java.util.function.Supplier;
-import mekanism.common.Mekanism;
+import mekanism.api.MekanismAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MekanismSavedData extends SavedData {
@@ -22,10 +21,10 @@ public abstract class MekanismSavedData extends SavedData {
             File tempFile = file.toPath().getParent().resolve(file.getName() + ".tmp").toFile();
             super.save(tempFile);
             if (file.exists() && !file.delete()) {
-                Mekanism.logger.error("Failed to delete " + file.getName());
+                MekanismAPI.logger.error("Failed to delete " + file.getName());
             }
             if (!tempFile.renameTo(file)) {
-                Mekanism.logger.error("Failed to rename " + tempFile.getName());
+                MekanismAPI.logger.error("Failed to rename " + tempFile.getName());
             }
         }
     }
@@ -34,7 +33,7 @@ public abstract class MekanismSavedData extends SavedData {
      * Note: This should only be called from the server side
      */
     public static <DATA extends MekanismSavedData> DATA createSavedData(Supplier<DATA> createFunction, String name) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = ServerLifecycle.getCurrentServer();
         if (currentServer == null) {
             throw new IllegalStateException("Current server is null");
         }
@@ -50,6 +49,6 @@ public abstract class MekanismSavedData extends SavedData {
             DATA handler = createFunction.get();
             handler.load(tag);
             return handler;
-        }, createFunction, Mekanism.MODID + "_" + name);
+        }, createFunction, MekanismAPI.MEKANISM_MODID + "_" + name);
     }
 }

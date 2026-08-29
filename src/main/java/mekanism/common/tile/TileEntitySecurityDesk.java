@@ -11,6 +11,7 @@ import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
 import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
 import mekanism.common.inventory.container.ISecurityContainer;
 import mekanism.common.inventory.slot.SecurityInventorySlot;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.security.SecurityFrequency;
 import mekanism.common.network.to_client.PacketSecurityUpdate;
@@ -24,7 +25,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 public class TileEntitySecurityDesk extends TileEntityMekanism implements IBoundingBlock {
@@ -130,7 +130,7 @@ public class TileEntitySecurityDesk extends TileEntityMekanism implements IBound
     public void addTrusted(String name) {
         SecurityFrequency frequency = getFreq();
         if (frequency != null) {
-            ServerLifecycleHooks.getCurrentServer().getProfileCache().get(name).ifPresent(profile -> frequency.addTrusted(profile.getId(), profile.getName()));
+            ServerLifecycle.getCurrentServer().getProfileCache().get(name).ifPresent(profile -> frequency.addTrusted(profile.getId(), profile.getName()));
         }
     }
 

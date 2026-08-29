@@ -38,6 +38,7 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.integration.curios.CuriosIntegration;
 import mekanism.common.lib.MekanismSavedData;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.collection.HashList;
 import mekanism.common.network.to_client.PacketRadiationData;
 import mekanism.common.registries.MekanismDamageTypes;
@@ -68,7 +69,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -334,7 +334,7 @@ public class RadiationManager implements IRadiationManager {
     }
 
     private void updateClientRadiationForAll(Predicate<ServerPlayer> clearForPlayer) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = ServerLifecycle.getCurrentServer();
         if (server != null) {
             //Validate it is not null in case we somehow are being called from the client or at some other unexpected time
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {

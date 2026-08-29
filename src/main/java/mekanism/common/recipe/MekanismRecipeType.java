@@ -44,6 +44,7 @@ import mekanism.api.recipes.ingredients.creator.IItemStackIngredientCreator;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.client.MekanismClient;
 import mekanism.common.Mekanism;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.recipe.impl.SmeltingIRecipe;
 import mekanism.common.recipe.lookup.cache.ChemicalCrystallizerInputRecipeCache;
 import mekanism.common.recipe.lookup.cache.IInputRecipeCache;
@@ -73,7 +74,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -232,7 +232,7 @@ public class MekanismRecipeType<RECIPE extends MekanismRecipe, INPUT_CACHE exten
             if (FMLEnvironment.dist.isClient()) {
                 world = MekanismClient.tryGetClientWorld();
             } else {
-                world = ServerLifecycleHooks.getCurrentServer().overworld();
+                world = ServerLifecycle.getCurrentServer().overworld();
             }
             if (world == null) {
                 //If we failed, then return no recipes
