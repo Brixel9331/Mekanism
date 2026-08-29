@@ -4,12 +4,12 @@ import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.api.text.EnumColor;
-import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.BlockCardboardBox;
 import mekanism.common.block.BlockCardboardBox.BlockData;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.lib.DropCapture;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.TileEntityCardboardBox;
 import mekanism.common.util.ItemDataUtils;
@@ -106,12 +106,9 @@ public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> 
                     if (!player.isCreative()) {
                         stack.shrink(1);
                     }
-                    //Mark that we are monitoring item drops that might have been created due to using the cardboard box
-                    // and then replace the block with the cardboard box, which will cause items to drop and then get
-                    // cancelled by our listener in CommonWorldTickHandler
-                    CommonWorldTickHandler.monitoringCardboardBox = true;
-                    world.setBlockAndUpdate(pos, getBlock().defaultBlockState().setValue(BlockStateHelper.storageProperty, true));
-                    CommonWorldTickHandler.monitoringCardboardBox = false;
+                    try (DropCapture.Scope ignored = DropCapture.suppress()) {
+                        world.setBlockAndUpdate(pos, getBlock().defaultBlockState().setValue(BlockStateHelper.storageProperty, true));
+                    }
                     TileEntityCardboardBox box = WorldUtils.getTileEntity(TileEntityCardboardBox.class, world, pos);
                     if (box != null) {
                         box.storedData = data;

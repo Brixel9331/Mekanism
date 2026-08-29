@@ -31,7 +31,6 @@ import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.base.MekFakePlayer;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.energy.MinerEnergyContainer;
@@ -61,6 +60,7 @@ import mekanism.common.inventory.container.tile.DigitalMinerConfigContainer;
 import mekanism.common.inventory.slot.BasicInventorySlot;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
 import mekanism.common.item.gear.ItemAtomicDisassembler;
+import mekanism.common.lib.DropCapture;
 import mekanism.common.lib.chunkloading.IChunkLoader;
 import mekanism.common.lib.inventory.Finder;
 import mekanism.common.lib.inventory.HashedItem;
@@ -485,28 +485,27 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
                             //If we can, then validate we can fit the drops and try to see if we can replace it properly as well
                             List<ItemStack> drops = getDrops(state, pos);
                             if (canInsert(drops)) {
-                                CommonWorldTickHandler.fallbackItemCollector = overflowCollector;
-                                if (setReplace(state, pos, matchingFilter)) {
-                                    add(drops);
-                                    //Try to add any drops that might have been caused by breaking the block but didn't show up in the loot table.
-                                    // This mainly will be the case for some single block multiblocks and also for storage containers like chests
-                                    tryAddOverflow();
-                                    missingStack = ItemStack.EMPTY;
-                                    level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
-                                    //Remove the block from our list of blocks to mine, and reduce the number of blocks we have to mine
-                                    cachedToMine--;
-                                    chunkToMine.clear(index);
-                                    if (chunkToMine.isEmpty()) {
-                                        // if we are out of stored elements then we remove this chunk and continue to check other chunks
-                                        // remove it so that we don't have to check the chunk next time around
-                                        it.remove();
-                                        // we no longer have a chunk we are targeting, so remove it. We might get a new chunk to target
-                                        // next time we try to mine but there is no reason to keep the old chunk in memory in the meantime
-                                        updateTargetChunk(null);
+                                try (DropCapture.Scope ignored = DropCapture.collect(overflowCollector)) {
+                                    if (setReplace(state, pos, matchingFilter)) {
+                                        add(drops);
+                                        //Try to add any drops that might have been caused by breaking the block but didn't show up in the loot table.
+                                        // This mainly will be the case for some single block multiblocks and also for storage containers like chests
+                                        tryAddOverflow();
+                                        missingStack = ItemStack.EMPTY;
+                                        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
+                                        //Remove the block from our list of blocks to mine, and reduce the number of blocks we have to mine
+                                        cachedToMine--;
+                                        chunkToMine.clear(index);
+                                        if (chunkToMine.isEmpty()) {
+                                            // if we are out of stored elements then we remove this chunk and continue to check other chunks
+                                            // remove it so that we don't have to check the chunk next time around
+                                            it.remove();
+                                            // we no longer have a chunk we are targeting, so remove it. We might get a new chunk to target
+                                            // next time we try to mine but there is no reason to keep the old chunk in memory in the meantime
+                                            updateTargetChunk(null);
+                                        }
                                     }
                                 }
-                                //Reset the global fallback collector to null as we are done collecting for this miner and block
-                                CommonWorldTickHandler.fallbackItemCollector = null;
                             }
                             //Exit out. We either mined the block or don't have room so there is no reason to continue checking
                             return;

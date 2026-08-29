@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EntityCapabilityMixin",
+    "ServerLevelDropMixin",
     "ItemStackCapabilityMixin",
     "LivingEntityRadiationMixin",
     "BiomeSelectionContextAccessor",

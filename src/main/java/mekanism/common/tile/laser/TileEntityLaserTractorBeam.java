@@ -6,7 +6,6 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.inventory.IInventorySlot;
-import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.energy.LaserEnergyContainer;
 import mekanism.common.capabilities.holder.energy.EnergyContainerHelper;
@@ -16,6 +15,7 @@ import mekanism.common.integration.computer.ComputerException;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.container.slot.ContainerSlotType;
 import mekanism.common.inventory.slot.OutputInventorySlot;
+import mekanism.common.lib.DropCapture;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.WorldUtils;
@@ -61,9 +61,9 @@ public class TileEntityLaserTractorBeam extends TileEntityLaserReceptor {
         //Collect any extra drops that might have happened due to say breaking the top part of a door or flower and try to add them
         //Note: Technically we should just always return true rather than relying on the return result of the add method,
         // but as array lists always will return true as they are modified we don't have to worry about that
-        CommonWorldTickHandler.fallbackItemCollector = drops::add;
-        breakBlock(state, hitPos);
-        CommonWorldTickHandler.fallbackItemCollector = null;
+        try (DropCapture.Scope ignored = DropCapture.collect(drops::add)) {
+            breakBlock(state, hitPos);
+        }
         if (!drops.isEmpty()) {
             Lazy<Direction> direction = Lazy.of(this::getDirection);
             Lazy<BlockPos> dropPos = Lazy.of(() -> worldPosition.relative(direction.get(), 2));
