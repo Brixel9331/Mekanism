@@ -1,9 +1,16 @@
 package mekanism.common.lib;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.function.Supplier;
 import mekanism.api.MekanismAPI;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -18,13 +25,21 @@ public abstract class MekanismSavedData extends SavedData {
         if (isDirty()) {
             //This is loosely based on Refined Storage's RSSavedData's system of saving first to a temp file
             // to reduce the odds of corruption if the user's computer crashes while the file is being written
-            File tempFile = file.toPath().getParent().resolve(file.getName() + ".tmp").toFile();
-            super.save(tempFile);
-            if (file.exists() && !file.delete()) {
-                MekanismAPI.logger.error("Failed to delete " + file.getName());
-            }
-            if (!tempFile.renameTo(file)) {
-                MekanismAPI.logger.error("Failed to rename " + tempFile.getName());
+            Path target = file.toPath();
+            Path temporary = target.resolveSibling(file.getName() + ".tmp");
+            CompoundTag data = new CompoundTag();
+            data.put("data", save(new CompoundTag()));
+            NbtUtils.addCurrentDataVersion(data);
+            try {
+                NbtIo.writeCompressed(data, temporary.toFile());
+                try {
+                    Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                } catch (AtomicMoveNotSupportedException ignored) {
+                    Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
+                }
+                setDirty(false);
+            } catch (IOException failure) {
+                MekanismAPI.logger.error("Failed to save {}", file, failure);
             }
         }
     }
