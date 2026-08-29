@@ -15,7 +15,8 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
-    "client.CreativeModeInventoryScreenMixin"
+    "client.CreativeModeInventoryScreenMixin",
+    "client.MinecraftWorldLifecycleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

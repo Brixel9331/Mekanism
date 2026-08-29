@@ -59,6 +59,7 @@ import mekanism.common.item.predicate.MaxedModuleContainerItemPredicate;
 import mekanism.common.lib.MekAnnotationScanner;
 import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.Version;
+import mekanism.common.lib.WorldLifecycle;
 import mekanism.common.lib.frequency.FrequencyManager;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.inventory.personalstorage.PersonalStorageManager;
@@ -113,7 +114,6 @@ import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -190,8 +190,9 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.addListener(this::onEnergyTransferred);
         MinecraftForge.EVENT_BUS.addListener(this::onChemicalTransferred);
         MinecraftForge.EVENT_BUS.addListener(this::onLiquidTransferred);
-        MinecraftForge.EVENT_BUS.addListener(this::onWorldLoad);
-        MinecraftForge.EVENT_BUS.addListener(this::onWorldUnload);
+        WorldLifecycle.register();
+        WorldLifecycle.LOAD.register(this::onWorldLoad);
+        WorldLifecycle.UNLOAD.register(this::onWorldUnload);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
         ServerLifecycle.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
@@ -392,20 +393,20 @@ public class Mekanism {
         packetHandler.sendToReceivers(new PacketTransmitterUpdate(event.network, event.fluidType), event.network);
     }
 
-    private void onWorldLoad(LevelEvent.Load event) {
-        playerState.init(event.getLevel());
+    private void onWorldLoad(Level world) {
+        playerState.init(world);
     }
 
-    private void onWorldUnload(LevelEvent.Unload event) {
+    private void onWorldUnload(Level world) {
         // Make sure the global fake player drops its reference to the World
         // when the server shuts down
-        if (event.getLevel() instanceof ServerLevel level) {
+        if (world instanceof ServerLevel level) {
             MekFakePlayer.releaseInstance(level);
         }
-        if (event.getLevel() instanceof Level level && MekanismConfig.general.validOredictionificatorFilters.hasInvalidationListeners()) {
+        if (MekanismConfig.general.validOredictionificatorFilters.hasInvalidationListeners()) {
             //Remove any invalidation listeners that loaded oredictionificators might have added if the OD was in the given level
             MekanismConfig.general.validOredictionificatorFilters.removeInvalidationListenersMatching(listener ->
-                  listener instanceof ODConfigValueInvalidationListener odListener && odListener.isIn(level));
+                  listener instanceof ODConfigValueInvalidationListener odListener && odListener.isIn(world));
         }
     }
 }
