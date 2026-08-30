@@ -26,6 +26,7 @@ import mekanism.common.item.gear.ItemScubaMask;
 import mekanism.common.item.gear.ItemScubaTank;
 import mekanism.common.item.interfaces.IJetpackItem;
 import mekanism.common.item.interfaces.IJetpackItem.JetpackMode;
+import mekanism.common.lib.LivingDamageCallback;
 import mekanism.common.lib.LivingEntityJumpCallback;
 import mekanism.common.lib.PlayerTickCallback;
 import mekanism.common.lib.radiation.RadiationManager;
@@ -35,9 +36,11 @@ import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,8 +49,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +61,8 @@ public class CommonPlayerTickHandler {
         if (!registered) {
             PlayerTickCallback.EVENT.register(this::onPlayerTick);
             LivingEntityJumpCallback.EVENT.register(this::onLivingJump);
+            ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::onEntityAttacked);
+            LivingDamageCallback.EVENT.register(this::onLivingHurt);
             registered = true;
         }
     }
@@ -186,10 +189,8 @@ public class CommonPlayerTickHandler {
         return isGravitationalModulationReady(player) && player.getAbilities().flying;
     }
 
-    @SubscribeEvent
-    public void onEntityAttacked(LivingAttackEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (event.getAmount() <= 0 || !entity.isAlive()) {
+    private boolean onEntityAttacked(LivingEntity entity, DamageSource source, float amount) {
+        if (amount <= 0 || !entity.isAlive()) {
             //If some mod does weird things and causes the damage value to be negative or zero then exit
             // as our logic assumes there is actually damage happening and can crash if someone tries to
             // use a negative number as the damage value. We also check to make sure that we don't do
@@ -197,39 +198,35 @@ public class CommonPlayerTickHandler {
             // for things like fall damage if the entity dies before hitting the ground, and then energy
             // would be depleted regardless if keep inventory is on even if no damage was stopped as the
             // entity can't take damage while dead
-            return;
+            return true;
         }
         //Gas Mask checks
-        if (event.getSource().is(MekanismTags.DamageTypes.IS_PREVENTABLE_MAGIC)) {
+        if (source.is(MekanismTags.DamageTypes.IS_PREVENTABLE_MAGIC)) {
             ItemStack headStack = entity.getItemBySlot(EquipmentSlot.HEAD);
             if (!headStack.isEmpty() && headStack.getItem() instanceof ItemScubaMask) {
                 ItemStack chestStack = entity.getItemBySlot(EquipmentSlot.CHEST);
                 if (!chestStack.isEmpty() && chestStack.getItem() instanceof ItemScubaTank tank && tank.getFlowing(chestStack) && ChemicalUtil.hasGas(chestStack)) {
-                    event.setCanceled(true);
-                    return;
+                    return false;
                 }
             }
         }
-        //Note: We have this here in addition to listening to LivingHurt, so as if we can fully block the damage
-        // then we don't play the hurt effect/sound, as cancelling LivingHurtEvent still causes that to happen
-        if (event.getSource().is(DamageTypeTags.IS_FALL)) {
+        if (source.is(DamageTypeTags.IS_FALL)) {
             //Free runner checks
             FallEnergyInfo info = getFallAbsorptionEnergyInfo(entity);
-            if (info != null && tryAbsorbAll(event, info.container, info.damageRatio, info.energyCost)) {
-                return;
+            if (info != null && tryAbsorbAll(amount, info.container, info.damageRatio, info.energyCost)) {
+                return false;
             }
         }
         if (entity instanceof Player player) {
-            if (ItemMekaSuitArmor.tryAbsorbAll(player, event.getSource(), event.getAmount())) {
-                event.setCanceled(true);
+            if (ItemMekaSuitArmor.tryAbsorbAll(player, source, amount)) {
+                return false;
             }
         }
+        return true;
     }
 
-    @SubscribeEvent
-    public void onLivingHurt(LivingHurtEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (event.getAmount() <= 0 || !entity.isAlive()) {
+    private float onLivingHurt(LivingEntity entity, DamageSource source, float amount) {
+        if (amount <= 0 || !entity.isAlive()) {
             //If some mod does weird things and causes the damage value to be negative or zero then exit
             // as our logic assumes there is actually damage happening and can crash if someone tries to
             // use a negative number as the damage value. We also check to make sure that we don't do
@@ -239,51 +236,48 @@ public class CommonPlayerTickHandler {
             // entity can't take damage while dead. While living hurt is not fired, we catch this case
             // just in case anyway because it is a simple boolean check and there is no guarantee that
             // other mods may not be firing the event manually even when the entity is dead
-            return;
+            return amount;
         }
-        if (event.getSource().is(DamageTypeTags.IS_FALL)) {
+        if (source.is(DamageTypeTags.IS_FALL)) {
             FallEnergyInfo info = getFallAbsorptionEnergyInfo(entity);
-            if (info != null && handleDamage(event, info.container, info.damageRatio, info.energyCost)) {
-                return;
-            }
-        }
-        if (entity instanceof Player player) {
-            float ratioAbsorbed = ItemMekaSuitArmor.getDamageAbsorbed(player, event.getSource(), event.getAmount());
-            if (ratioAbsorbed > 0) {
-                float damageRemaining = event.getAmount() * Math.max(0, 1 - ratioAbsorbed);
-                if (damageRemaining <= 0) {
-                    event.setCanceled(true);
-                } else {
-                    event.setAmount(damageRemaining);
+            if (info != null) {
+                amount = handleDamage(amount, info.container, info.damageRatio, info.energyCost);
+                if (amount <= 0) {
+                    return 0;
                 }
             }
         }
+        if (entity instanceof Player player) {
+            float ratioAbsorbed = ItemMekaSuitArmor.getDamageAbsorbed(player, source, amount);
+            if (ratioAbsorbed > 0) {
+                return amount * Math.max(0, 1 - ratioAbsorbed);
+            }
+        }
+        return amount;
     }
 
-    private boolean tryAbsorbAll(LivingAttackEvent event, @Nullable IEnergyContainer energyContainer, FloatSupplier absorptionRatio, FloatingLongSupplier energyCost) {
+    private boolean tryAbsorbAll(float amount, @Nullable IEnergyContainer energyContainer, FloatSupplier absorptionRatio, FloatingLongSupplier energyCost) {
         if (energyContainer != null && absorptionRatio.getAsFloat() == 1) {
-            FloatingLong energyRequirement = energyCost.get().multiply(event.getAmount());
+            FloatingLong energyRequirement = energyCost.get().multiply(amount);
             if (energyRequirement.isZero()) {
                 //No energy is actually needed to absorb the damage, either because of the config
                 // or how small the amount to absorb is
-                event.setCanceled(true);
                 return true;
             }
             FloatingLong simulatedExtract = energyContainer.extract(energyRequirement, Action.SIMULATE, AutomationType.MANUAL);
             if (simulatedExtract.equals(energyRequirement)) {
                 //If we could fully negate the damage cancel the event and extract it
                 energyContainer.extract(energyRequirement, Action.EXECUTE, AutomationType.MANUAL);
-                event.setCanceled(true);
                 return true;
             }
         }
         return false;
     }
 
-    private boolean handleDamage(LivingHurtEvent event, @Nullable IEnergyContainer energyContainer, FloatSupplier absorptionRatio, FloatingLongSupplier energyCost) {
+    private float handleDamage(float damage, @Nullable IEnergyContainer energyContainer, FloatSupplier absorptionRatio, FloatingLongSupplier energyCost) {
         if (energyContainer != null) {
             float absorption = absorptionRatio.getAsFloat();
-            float amount = event.getAmount() * absorption;
+            float amount = damage * absorption;
             FloatingLong energyRequirement = energyCost.get().multiply(amount);
             float ratioAbsorbed;
             if (energyRequirement.isZero()) {
@@ -294,16 +288,10 @@ public class CommonPlayerTickHandler {
                 ratioAbsorbed = absorption * energyContainer.extract(energyRequirement, Action.EXECUTE, AutomationType.MANUAL).divide(amount).floatValue();
             }
             if (ratioAbsorbed > 0) {
-                float damageRemaining = event.getAmount() * Math.max(0, 1 - ratioAbsorbed);
-                if (damageRemaining <= 0) {
-                    event.setCanceled(true);
-                    return true;
-                } else {
-                    event.setAmount(damageRemaining);
-                }
+                return damage * Math.max(0, 1 - ratioAbsorbed);
             }
         }
-        return false;
+        return damage;
     }
 
     private void onLivingJump(LivingEntity entity) {
