@@ -181,6 +181,7 @@ public class Mekanism {
           () -> MekanismConfig.world.enableRegeneration.get(), GenHandler::generate);
 
     private final ReloadListener recipeCacheManager = new ReloadListener();
+    private final CommonPlayerTickHandler playerTickHandler = new CommonPlayerTickHandler();
 
     public Mekanism() {
         instance = this;
@@ -199,6 +200,7 @@ public class Mekanism {
         ServerLifecycle.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
         worldTickHandler.register();
+        playerTickHandler.register();
         LivingEntityTickCallback.EVENT.register(RadiationManager.get()::onLivingTick);
         CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> TagCache.resetTagCaches());
         RecipeLifecycle.register();
@@ -336,7 +338,7 @@ public class Mekanism {
 
         //Register player tracker
         new CommonPlayerTracker();
-        MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
+        MinecraftForge.EVENT_BUS.register(playerTickHandler);
 
         //Register with TransmitterNetworkRegistry
         TransmitterNetworkRegistry.initiate();

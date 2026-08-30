@@ -9,6 +9,8 @@
     "ItemStackCapabilityMixin",
     "LivingEntityRadiationMixin",
     "LivingEntityTickMixin",
+    "LivingEntityJumpMixin",
+    "PlayerTickMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",

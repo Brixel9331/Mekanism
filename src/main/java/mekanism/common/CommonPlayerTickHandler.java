@@ -26,6 +26,8 @@ import mekanism.common.item.gear.ItemScubaMask;
 import mekanism.common.item.gear.ItemScubaTank;
 import mekanism.common.item.interfaces.IJetpackItem;
 import mekanism.common.item.interfaces.IJetpackItem.JetpackMode;
+import mekanism.common.lib.LivingEntityJumpCallback;
+import mekanism.common.lib.PlayerTickCallback;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.registries.MekanismGameEvents;
 import mekanism.common.registries.MekanismModules;
@@ -44,16 +46,23 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class CommonPlayerTickHandler {
+
+    private boolean registered;
+
+    public void register() {
+        if (!registered) {
+            PlayerTickCallback.EVENT.register(this::onPlayerTick);
+            LivingEntityJumpCallback.EVENT.register(this::onLivingJump);
+            registered = true;
+        }
+    }
 
     public static boolean isOnGroundOrSleeping(Player player) {
         return player.onGround() || player.isSleeping();
@@ -94,10 +103,9 @@ public class CommonPlayerTickHandler {
         return 0;
     }
 
-    @SubscribeEvent
-    public void onTick(PlayerTickEvent event) {
-        if (event.phase == Phase.END && event.side.isServer()) {
-            tickEnd(event.player);
+    private void onPlayerTick(Player player) {
+        if (!player.level().isClientSide) {
+            tickEnd(player);
         }
     }
 
@@ -298,9 +306,8 @@ public class CommonPlayerTickHandler {
         return false;
     }
 
-    @SubscribeEvent
-    public void onLivingJump(LivingJumpEvent event) {
-        if (event.getEntity() instanceof Player player) {
+    private void onLivingJump(LivingEntity entity) {
+        if (entity instanceof Player player) {
             IModule<ModuleHydraulicPropulsionUnit> module = IModuleHelper.INSTANCE.load(player.getItemBySlot(EquipmentSlot.FEET), MekanismModules.HYDRAULIC_PROPULSION_UNIT);
             if (module != null && module.isEnabled() && Mekanism.keyMap.has(player.getUUID(), KeySync.BOOST)) {
                 float boost = module.getCustomInstance().getBoost();
