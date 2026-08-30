@@ -25,14 +25,13 @@ import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ChunkLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.level.ChunkTicketLevelUpdatedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import mekanism.common.lib.ChunkTicketCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
 
 public class TransmitterNetworkRegistry {
@@ -69,7 +68,8 @@ public class TransmitterNetworkRegistry {
     public static void initiate() {
         if (!loaderRegistered) {
             loaderRegistered = true;
-            MinecraftForge.EVENT_BUS.register(INSTANCE);
+            ServerTickEvents.END_SERVER_TICK.register(INSTANCE::onTick);
+            ChunkTicketCallback.EVENT.register(INSTANCE::onTicketLevelChange);
         }
     }
 
@@ -131,35 +131,29 @@ public class TransmitterNetworkRegistry {
         networksToChange.remove(network);
     }
 
-    @SubscribeEvent
-    public void onTick(ServerTickEvent event) {
-        if (event.phase == Phase.END && event.side.isServer()) {
-            handleChangedChunks();
-            removeInvalidTransmitters();
-            assignOrphans();
-            commitChanges();
-            for (DynamicNetwork<?, ?, ?> net : networks) {
-                net.onUpdate();
-            }
+    public void onTick(MinecraftServer server) {
+        handleChangedChunks();
+        removeInvalidTransmitters();
+        assignOrphans();
+        commitChanges();
+        for (DynamicNetwork<?, ?, ?> net : networks) {
+            net.onUpdate();
         }
     }
 
-    @SubscribeEvent
-    public void onTicketLevelChange(ChunkTicketLevelUpdatedEvent event) {
-        int newTicketLevel = event.getNewTicketLevel();
-        int oldTicketLevel = event.getOldTicketLevel();
+    public void onTicketLevelChange(ServerLevel level, long chunkPos, int oldTicketLevel, int newTicketLevel) {
         boolean loaded;
-        if (oldTicketLevel > ChunkMap.MAX_VIEW_DISTANCE && newTicketLevel <= ChunkMap.MAX_VIEW_DISTANCE) {
+        if (!ChunkLevel.isLoaded(oldTicketLevel) && ChunkLevel.isLoaded(newTicketLevel)) {
             //Went from "unloaded" to loaded
             loaded = true;
-        } else if (newTicketLevel > ChunkMap.MAX_VIEW_DISTANCE && oldTicketLevel <= ChunkMap.MAX_VIEW_DISTANCE) {
+        } else if (!ChunkLevel.isLoaded(newTicketLevel) && ChunkLevel.isLoaded(oldTicketLevel)) {
             //Went from loaded to "unloaded"
             loaded = false;
         } else {
             //Load type stayed the same, just exit
             return;
         }
-        Chunk3D chunk = new Chunk3D(event.getLevel().dimension(), event.getChunkPos());
+        Chunk3D chunk = new Chunk3D(level.dimension(), chunkPos);
         if (transmitters.containsKey(chunk)) {
             //Only track it if we have any transmitters in that chunk
             if (changedTicketChunks.getOrDefault(chunk, loaded) != loaded) {

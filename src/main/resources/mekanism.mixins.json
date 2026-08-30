@@ -10,7 +10,7 @@
     "LivingEntityRadiationMixin",
     "LivingEntityTickMixin",
     "LivingEntityJumpMixin",
-    "LivingDamageMixin",
+    "LivingDamageMixin", "ChunkTicketMixin",
     "PlayerTickMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",

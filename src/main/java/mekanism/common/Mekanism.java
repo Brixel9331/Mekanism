@@ -68,6 +68,7 @@ import mekanism.common.lib.multiblock.MultiblockCache;
 import mekanism.common.lib.multiblock.MultiblockManager;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
+import mekanism.common.lib.transmitter.DynamicBufferedNetwork.TransferEvent;
 import mekanism.common.network.PacketHandler;
 import mekanism.common.network.to_client.PacketTransmitterUpdate;
 import mekanism.common.recipe.IncompleteRecipeScanner;
@@ -190,9 +191,15 @@ public class Mekanism {
         //Register our custom serializer condition
         MekanismResourceConditions.register();
 
-        MinecraftForge.EVENT_BUS.addListener(this::onEnergyTransferred);
-        MinecraftForge.EVENT_BUS.addListener(this::onChemicalTransferred);
-        MinecraftForge.EVENT_BUS.addListener(this::onLiquidTransferred);
+        TransferEvent.EVENT.register(event -> {
+            if (event instanceof EnergyTransferEvent energy) {
+                onEnergyTransferred(energy);
+            } else if (event instanceof ChemicalTransferEvent chemical) {
+                onChemicalTransferred(chemical);
+            } else if (event instanceof FluidTransferEvent fluid) {
+                onLiquidTransferred(fluid);
+            }
+        });
         WorldLifecycle.register();
         WorldLifecycle.LOAD.register(this::onWorldLoad);
         WorldLifecycle.UNLOAD.register(this::onWorldUnload);

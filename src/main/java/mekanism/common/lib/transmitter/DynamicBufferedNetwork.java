@@ -11,7 +11,8 @@ import mekanism.common.lib.math.Range3D;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraftforge.eventbus.api.Event;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -215,12 +216,27 @@ public abstract class DynamicBufferedNetwork<ACCEPTOR, NETWORK extends DynamicBu
         return new Range3D(minX, minZ, maxX, maxZ, world.dimension());
     }
 
-    public static class TransferEvent<NETWORK extends DynamicBufferedNetwork<?, NETWORK, ?, ?>> extends Event {
+    public static class TransferEvent<NETWORK extends DynamicBufferedNetwork<?, NETWORK, ?, ?>> {
+
+        public static final Event<Listener> EVENT = EventFactory.createArrayBacked(Listener.class, listeners -> event -> {
+            for (Listener listener : listeners) {
+                listener.transferred(event);
+            }
+        });
 
         public final NETWORK network;
 
         public TransferEvent(NETWORK network) {
             this.network = network;
+        }
+
+        public void dispatch() {
+            EVENT.invoker().transferred(this);
+        }
+
+        @FunctionalInterface
+        public interface Listener {
+            void transferred(TransferEvent<?> event);
         }
     }
 }

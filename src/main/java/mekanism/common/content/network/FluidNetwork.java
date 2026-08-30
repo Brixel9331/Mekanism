@@ -25,7 +25,6 @@ import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,7 +167,7 @@ public class FluidNetwork extends DynamicBufferedNetwork<IExtendedFluidHandler, 
     public void onUpdate() {
         super.onUpdate();
         if (needsUpdate) {
-            MinecraftForge.EVENT_BUS.post(new FluidTransferEvent(this, lastFluid));
+            new FluidTransferEvent(this, lastFluid).dispatch();
             needsUpdate = false;
         }
         if (fluidTank.isEmpty()) {
