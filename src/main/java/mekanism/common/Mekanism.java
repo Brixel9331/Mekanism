@@ -1,6 +1,7 @@
 package mekanism.common;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.charset.StandardCharsets;
@@ -100,9 +101,11 @@ import mekanism.common.tile.machine.TileEntityOredictionificator.ODConfigValueIn
 import mekanism.common.world.GenHandler;
 import mekanism.common.world.RetrogenHandler;
 import mekanism.common.world.modifier.WorldgenModifiers;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
@@ -113,7 +116,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.ForgeChunkManager;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -192,7 +194,7 @@ public class Mekanism {
         WorldLifecycle.register();
         WorldLifecycle.LOAD.register(this::onWorldLoad);
         WorldLifecycle.UNLOAD.register(this::onWorldUnload);
-        MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
+        CommandRegistrationCallback.EVENT.register((dispatcher, registries, selection) -> registerCommands(dispatcher));
         ServerLifecycle.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
         worldTickHandler.register();
@@ -254,13 +256,13 @@ public class Mekanism {
         return recipeCacheManager;
     }
 
-    private void registerCommands(RegisterCommandsEvent event) {
+    private void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         BuildCommand.register("boiler", MekanismLang.BOILER, new BoilerBuilder());
         BuildCommand.register("matrix", MekanismLang.MATRIX, new MatrixBuilder());
         BuildCommand.register("tank", MekanismLang.DYNAMIC_TANK, new TankBuilder());
         BuildCommand.register("evaporation", MekanismLang.EVAPORATION_PLANT, new EvaporationBuilder());
         BuildCommand.register("sps", MekanismLang.SPS, new SPSBuilder());
-        event.getDispatcher().register(CommandMek.register());
+        dispatcher.register(CommandMek.register());
     }
 
     private void serverStopped(MinecraftServer server) {
