@@ -1,7 +1,6 @@
 package mekanism.common;
 
 import java.util.Map;
-import java.util.Optional;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.chemical.gas.GasStack;
@@ -26,6 +25,7 @@ import mekanism.common.item.gear.ItemScubaMask;
 import mekanism.common.item.gear.ItemScubaTank;
 import mekanism.common.item.interfaces.IJetpackItem;
 import mekanism.common.item.interfaces.IJetpackItem.JetpackMode;
+import mekanism.common.lib.BlockBreakSpeedCallback;
 import mekanism.common.lib.LivingDamageCallback;
 import mekanism.common.lib.LivingEntityJumpCallback;
 import mekanism.common.lib.PlayerTickCallback;
@@ -40,6 +40,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -48,9 +49,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class CommonPlayerTickHandler {
@@ -63,6 +61,7 @@ public class CommonPlayerTickHandler {
             LivingEntityJumpCallback.EVENT.register(this::onLivingJump);
             ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::onEntityAttacked);
             LivingDamageCallback.EVENT.register(this::onLivingHurt);
+            BlockBreakSpeedCallback.EVENT.register(this::getBreakSpeed);
             registered = true;
         }
     }
@@ -337,34 +336,26 @@ public class CommonPlayerTickHandler {
     private record FallEnergyInfo(@Nullable IEnergyContainer container, FloatSupplier damageRatio, FloatingLongSupplier energyCost) {
     }
 
-    @SubscribeEvent
-    public void getBreakSpeed(BreakSpeed event) {
-        Player player = event.getEntity();
-        float speed = event.getNewSpeed();
-
-        Optional<BlockPos> position = event.getPosition();
-        if (position.isPresent()) {
-            BlockPos pos = position.get();
-            // Blasting item speed check
-            ItemStack mainHand = player.getMainHandItem();
-            if (!mainHand.isEmpty() && mainHand.getItem() instanceof IBlastingItem tool) {
-                Map<BlockPos, BlockState> blocks = tool.getBlastedBlocks(player.level(), player, mainHand, pos, event.getState());
-                if (!blocks.isEmpty()) {
-                    // Scales mining speed based on hardest block
-                    // Does not take into account the tool check for those blocks or other mining speed changes that don't apply to the target block.
-                    float targetHardness = event.getState().getDestroySpeed(player.level(), pos);
-                    float maxHardness = blocks.entrySet().stream()
-                          .map(entry -> entry.getValue().getDestroySpeed(player.level(), entry.getKey()))
-                          .reduce(targetHardness, Float::max);
-                    speed *= (targetHardness / maxHardness);
-                }
+    private float getBreakSpeed(Player player, BlockState state, BlockPos pos, float speed) {
+        // Blasting item speed check
+        ItemStack mainHand = player.getMainHandItem();
+        if (!mainHand.isEmpty() && mainHand.getItem() instanceof IBlastingItem tool) {
+            Map<BlockPos, BlockState> blocks = tool.getBlastedBlocks(player.level(), player, mainHand, pos, state);
+            if (!blocks.isEmpty()) {
+                // Scales mining speed based on hardest block
+                // Does not take into account the tool check for those blocks or other mining speed changes that don't apply to the target block.
+                float targetHardness = state.getDestroySpeed(player.level(), pos);
+                float maxHardness = blocks.entrySet().stream()
+                      .map(entry -> entry.getValue().getDestroySpeed(player.level(), entry.getKey()))
+                      .reduce(targetHardness, Float::max);
+                speed *= (targetHardness / maxHardness);
             }
         }
 
         //Gyroscopic stabilization check
         ItemStack legs = player.getItemBySlot(EquipmentSlot.LEGS);
         if (!legs.isEmpty() && IModuleHelper.INSTANCE.isEnabled(legs, MekanismModules.GYROSCOPIC_STABILIZATION_UNIT)) {
-            if (player.isEyeInFluidType(ForgeMod.WATER_TYPE.get()) && !EnchantmentHelper.hasAquaAffinity(player)) {
+            if (player.isEyeInFluid(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(player)) {
                 speed *= 5.0F;
             }
 
@@ -373,6 +364,6 @@ public class CommonPlayerTickHandler {
             }
         }
 
-        event.setNewSpeed(speed);
+        return speed;
     }
 }
