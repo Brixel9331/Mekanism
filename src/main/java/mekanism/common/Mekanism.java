@@ -56,6 +56,7 @@ import mekanism.common.item.block.machine.ItemBlockFluidTank.FluidTankItemDispen
 import mekanism.common.item.loot.MekanismLootFunctions;
 import mekanism.common.item.predicate.FullCanteenItemPredicate;
 import mekanism.common.item.predicate.MaxedModuleContainerItemPredicate;
+import mekanism.common.lib.LivingEntityTickCallback;
 import mekanism.common.lib.MekAnnotationScanner;
 import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.Version;
@@ -198,6 +199,7 @@ public class Mekanism {
         ServerLifecycle.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
         worldTickHandler.register();
+        LivingEntityTickCallback.EVENT.register(RadiationManager.get()::onLivingTick);
         CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> TagCache.resetTagCaches());
         RecipeLifecycle.register();
         recipeCacheManager.register();
@@ -335,8 +337,6 @@ public class Mekanism {
         //Register player tracker
         new CommonPlayerTracker();
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
-
-        MinecraftForge.EVENT_BUS.register(RadiationManager.get());
 
         //Register with TransmitterNetworkRegistry
         TransmitterNetworkRegistry.initiate();

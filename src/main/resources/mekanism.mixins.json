@@ -8,6 +8,7 @@
     "ServerLevelDropMixin",
     "ItemStackCapabilityMixin",
     "LivingEntityRadiationMixin",
+    "LivingEntityTickMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",

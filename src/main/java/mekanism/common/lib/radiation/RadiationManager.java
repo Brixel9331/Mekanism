@@ -66,8 +66,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -498,11 +496,10 @@ public class RadiationManager implements IRadiationManager {
         playerExposureMap.remove(uuid);
     }
 
-    @SubscribeEvent
-    public void onLivingTick(LivingTickEvent event) {
-        Level world = event.getEntity().level();
-        if (!world.isClientSide() && !(event.getEntity() instanceof Player)) {
-            updateEntityRadiation(event.getEntity());
+    public void onLivingTick(LivingEntity entity) {
+        Level world = entity.level();
+        if (!world.isClientSide() && !(entity instanceof Player)) {
+            updateEntityRadiation(entity);
         }
     }
 
