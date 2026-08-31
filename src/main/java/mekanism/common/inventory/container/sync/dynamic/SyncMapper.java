@@ -43,8 +43,8 @@ import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.network.to_client.container.property.PropertyType;
 import mekanism.common.util.LambdaMetaFactoryUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.forgespi.language.IModFileInfo;
-import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
+import net.fabricmc.loader.api.ModContainer;
+import mekanism.common.lib.FieldAnnotationReader.AnnotationData;
 import org.objectweb.asm.Type;
 
 public class SyncMapper extends BaseAnnotationScanner {
@@ -107,7 +107,7 @@ public class SyncMapper extends BaseAnnotationScanner {
     }
 
     @Override
-    protected void collectScanData(Map<String, Class<?>> classNameCache, Map<Class<?>, List<AnnotationData>> knownClasses, Set<IModFileInfo> modFileData) {
+    protected void collectScanData(Map<String, Class<?>> classNameCache, Map<Class<?>, List<AnnotationData>> knownClasses, Set<ModContainer> modFileData) {
         Map<Class<?>, List<PropertyFieldInfo>> rawPropertyMap = new Object2ObjectOpenHashMap<>();
         //Only create the list once for the default fallback
         List<String> fallbackTagsList = Collections.singletonList(DEFAULT_TAG);

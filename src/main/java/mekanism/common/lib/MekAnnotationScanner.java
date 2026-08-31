@@ -2,6 +2,8 @@ package mekanism.common.lib;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
@@ -17,12 +19,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 import mekanism.common.Mekanism;
+import mekanism.common.lib.FieldAnnotationReader.AnnotationData;
+import mekanism.common.lib.FieldAnnotationReader.EnumHolder;
 import mekanism.common.inventory.container.sync.dynamic.SyncMapper;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation;
-import net.minecraftforge.forgespi.language.IModFileInfo;
-import net.minecraftforge.forgespi.language.ModFileScanData;
-import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 
@@ -34,10 +35,15 @@ public class MekAnnotationScanner {
         Map<ElementType, List<ScanData>> elementBasedScanData = new EnumMap<>(ElementType.class);
         addScanningSupport(scanners, elementBasedScanData, SyncMapper.INSTANCE);
         try {
-            for (ModFileScanData scanData : ModList.get().getAllScanData()) {
-                for (AnnotationData data : scanData.getAnnotations()) {
-                    //If the annotation is on a field, and is the sync type
-                    gatherScanData(elementBasedScanData, classNameCache, data, scanData.getIModInfoData());
+            for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
+                for (Path root : mod.getRootPaths()) {
+                    try (var files = Files.walk(root)) {
+                        for (Path path : files.filter(file -> file.toString().endsWith(".class")).sorted().toList()) {
+                            for (AnnotationData data : FieldAnnotationReader.readFieldAnnotations(path)) {
+                                gatherScanData(elementBasedScanData, classNameCache, data, List.of(mod));
+                            }
+                        }
+                    }
                 }
             }
         } catch (Throwable throwable) {
@@ -59,7 +65,7 @@ public class MekAnnotationScanner {
     }
 
     private static void gatherScanData(Map<ElementType, List<ScanData>> elementBasedScanData, Map<String, Class<?>> classNameCache, AnnotationData data,
-          List<IModFileInfo> modFileData) {
+          List<ModContainer> modFileData) {
         ElementType targetType = data.targetType();
         List<ScanData> elementScanData = elementBasedScanData.getOrDefault(targetType, Collections.emptyList());
         for (ScanData scannerData : elementScanData) {
@@ -99,7 +105,7 @@ public class MekAnnotationScanner {
         }
         Class<?> clazz;
         try {
-            clazz = Class.forName(className);
+            clazz = Class.forName(className, false, MekAnnotationScanner.class.getClassLoader());
         } catch (ClassNotFoundException e) {
             Mekanism.logger.error("Failed to find class '{}'", className);
             clazz = null;
@@ -114,7 +120,7 @@ public class MekAnnotationScanner {
     private static class ScanData {
 
         private final Map<Class<?>, List<AnnotationData>> knownClasses = new Object2ObjectOpenHashMap<>();
-        private final Set<IModFileInfo> modFileData = new HashSet<>();
+        private final Set<ModContainer> modFileData = new HashSet<>();
         private final Map<ElementType, Type[]> supportedTypes;
 
         public ScanData(BaseAnnotationScanner scanner) {
@@ -130,7 +136,7 @@ public class MekAnnotationScanner {
 
         protected abstract Map<ElementType, Type[]> getSupportedTypes();
 
-        protected abstract void collectScanData(Map<String, Class<?>> classNameCache, Map<Class<?>, List<AnnotationData>> knownClasses, Set<IModFileInfo> modFileData);
+        protected abstract void collectScanData(Map<String, Class<?>> classNameCache, Map<Class<?>, List<AnnotationData>> knownClasses, Set<ModContainer> modFileData);
 
         /**
          * Gets the value of an annotation or null if it is not present. Used for getting classes
@@ -156,13 +162,13 @@ public class MekAnnotationScanner {
             if (annotationData.containsKey(key)) {
                 Object value = annotationData.get(key);
                 //This should always be an enum holder, but check just in case
-                if (value instanceof ModAnnotation.EnumHolder enumHolder) {
+                if (value instanceof EnumHolder enumHolder) {
                     //Note: We ignore the description on the enumHolder, as we can just grab the enum's class
                     // directly from the default value
                     try {
-                        return Enum.valueOf(defaultValue.getDeclaringClass(), enumHolder.getValue());
+                        return Enum.valueOf(defaultValue.getDeclaringClass(), enumHolder.value());
                     } catch (IllegalArgumentException e) {
-                        Mekanism.logger.error("Could not find enum value of: {}. Defaulting.", enumHolder.getValue());
+                        Mekanism.logger.error("Could not find enum value of: {}. Defaulting.", enumHolder.value());
                     }
                 } else {
                     Mekanism.logger.warn("Unknown property value for enum should have been an enum holder. Defaulting.");
@@ -193,16 +199,16 @@ public class MekAnnotationScanner {
             if (annotationData.containsKey(key)) {
                 Object value = annotationData.get(key);
                 //This should always be an enum holder, but check just in case
-                if (value instanceof ModAnnotation.EnumHolder enumHolder) {
+                if (value instanceof EnumHolder enumHolder) {
                     //Note: We ignore the description on the enumHolder, as we can just grab the enum's class
                     // directly from the default value
                     try {
-                        T returnValue = Enum.valueOf(defaultValue.getDeclaringClass(), enumHolder.getValue());
+                        T returnValue = Enum.valueOf(defaultValue.getDeclaringClass(), enumHolder.value());
                         if (validator.test(returnValue)) {
                             return returnValue;
                         }
                     } catch (IllegalArgumentException e) {
-                        Mekanism.logger.error("Could not find enum value of: {}. Defaulting.", enumHolder.getValue());
+                        Mekanism.logger.error("Could not find enum value of: {}. Defaulting.", enumHolder.value());
                     }
                 } else {
                     Mekanism.logger.warn("Unknown property value for enum should have been an enum holder. Defaulting.");
