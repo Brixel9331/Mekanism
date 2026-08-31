@@ -18,6 +18,10 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = 'https://mvn.devos.one/releases/'
+        content { includeGroup 'io.github.fabricators_of_create.Porting-Lib' }
+    }
     maven { url = 'https://maven.blamejared.com' }
     maven { url = 'https://maven.shedaniel.me' }
     maven { url = 'https://maven.terraformersmc.com/releases' }
@@ -121,6 +125,11 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    for (String portingModule : ['core', 'chunk_loading']) {
+        modImplementation include("io.github.fabricators_of_create.Porting-Lib:${portingModule}:${porting_lib_version}") {
+            transitive = false
+        }
+    }
     modImplementation include("teamreborn:energy:${team_reborn_energy_version}")
     modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:8.0.3") {
         transitive = false
