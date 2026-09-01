@@ -106,7 +106,7 @@ import mekanism.common.world.modifier.WorldgenModifiers;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import mekanism.common.item.predicate.CustomItemPredicate;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -337,8 +337,8 @@ public class Mekanism {
             registerDispenseBehavior(new MekaSuitDispenseBehavior(), MekanismItems.MEKASUIT_HELMET, MekanismItems.MEKASUIT_BODYARMOR, MekanismItems.MEKASUIT_PANTS,
                   MekanismItems.MEKASUIT_BOOTS);
             //Register custom item predicates
-            ItemPredicate.register(FullCanteenItemPredicate.ID, json -> FullCanteenItemPredicate.INSTANCE);
-            ItemPredicate.register(MaxedModuleContainerItemPredicate.ID, MaxedModuleContainerItemPredicate::fromJson);
+            CustomItemPredicate.register(FullCanteenItemPredicate.ID, json -> FullCanteenItemPredicate.INSTANCE);
+            CustomItemPredicate.register(MaxedModuleContainerItemPredicate.ID, MaxedModuleContainerItemPredicate::fromJson);
             //Add any extra game event frequencies
             MekanismGameEvents.addFrequencies();
         });
