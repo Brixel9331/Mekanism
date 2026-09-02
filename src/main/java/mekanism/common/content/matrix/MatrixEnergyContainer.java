@@ -8,16 +8,19 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.energy.ITransactionalEnergyContainer;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import mekanism.common.tier.InductionProviderTier;
 import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.tile.multiblock.TileEntityInductionProvider;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
 @NothingNullByDefault
-public class MatrixEnergyContainer implements IEnergyContainer {
+public class MatrixEnergyContainer extends SnapshotParticipant<MatrixEnergyContainer.QueuedEnergy> implements ITransactionalEnergyContainer {
 
     private final Map<BlockPos, InductionProviderTier> providers = new Object2ObjectOpenHashMap<>();
     private final Map<BlockPos, IEnergyContainer> cells = new Object2ObjectOpenHashMap<>();
@@ -193,6 +196,32 @@ public class MatrixEnergyContainer implements IEnergyContainer {
             queuedOutput = queuedOutput.plusEqual(amount);
         }
         return amount;
+    }
+
+    @Override
+    public FloatingLong insert(FloatingLong amount, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        return insert(amount, Action.EXECUTE, automationType);
+    }
+
+    @Override
+    public FloatingLong extract(FloatingLong amount, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        return extract(amount, Action.EXECUTE, automationType);
+    }
+
+    @Override
+    protected QueuedEnergy createSnapshot() {
+        return new QueuedEnergy(queuedInput.copy(), queuedOutput.copy());
+    }
+
+    @Override
+    protected void readSnapshot(QueuedEnergy snapshot) {
+        queuedInput = snapshot.input.copy();
+        queuedOutput = snapshot.output.copy();
+    }
+
+    protected record QueuedEnergy(FloatingLong input, FloatingLong output) {
     }
 
     @Override

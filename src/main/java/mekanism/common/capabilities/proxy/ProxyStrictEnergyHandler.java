@@ -2,6 +2,8 @@ package mekanism.common.capabilities.proxy;
 
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.energy.IMekanismStrictEnergyHandler;
 import mekanism.api.energy.ISidedStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
@@ -17,6 +19,11 @@ public class ProxyStrictEnergyHandler extends ProxyHandler implements IStrictEne
     public ProxyStrictEnergyHandler(ISidedStrictEnergyHandler energyHandler, @Nullable Direction side, @Nullable IHolder holder) {
         super(side, holder);
         this.energyHandler = energyHandler;
+    }
+
+    @Nullable
+    public IEnergyContainer getEnergyContainer(int container) {
+        return energyHandler instanceof IMekanismStrictEnergyHandler handler ? handler.getEnergyContainer(container, side) : null;
     }
 
     @Override

@@ -10,8 +10,8 @@ import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.listener.ConfigBasedCachedSupplier;
 import mekanism.common.config.value.CachedValue;
-import mekanism.common.integration.energy.fluxnetworks.FNEnergyCompat;
-import mekanism.common.integration.energy.forgeenergy.ForgeEnergyCompat;
+import mekanism.common.integration.energy.fabric.FabricEnergyIntegration;
+import mekanism.common.util.UnitDisplayUtils.EnergyUnit;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,10 +25,7 @@ public class EnergyCompatUtils {
 
     private static final List<IEnergyCompat> energyCompats = List.of(
           //We always have our own energy capability as the first one we check
-          new StrictEnergyCompat(),
-          //Note: We check the Flux Networks capability above Forge's so that we allow it to use the higher throughput amount supported by Flux Networks
-          new FNEnergyCompat(),
-          new ForgeEnergyCompat()
+          new StrictEnergyCompat()
     );
 
     //Default the list of enabled caps to our own energy capability
@@ -39,6 +36,7 @@ public class EnergyCompatUtils {
      * settings.
      */
     public static void initLoadedCache() {
+        FabricEnergyIntegration.register(EnergyUnit.FORGE_ENERGY);
         Set<CachedValue<?>> configs = new HashSet<>();
         for (IEnergyCompat energyCompat : energyCompats) {
             configs.addAll(energyCompat.getBackingConfigs());
