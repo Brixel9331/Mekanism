@@ -57,7 +57,13 @@ public class ModuleHelper implements IModuleHelper {
     private final Map<ModuleData<?>, Set<Item>> supportedContainers = new IdentityHashMap<>();
     private final Map<ModuleData<?>, Set<ModuleData<?>>> conflictingModules = new IdentityHashMap<>();
 
-    public void processIMC() {
+    private long supportRevision = -1;
+
+    public synchronized void processIMC() {
+        long revision = MekanismIMC.getRevision();
+        if (supportRevision == revision) {
+            return;
+        }
         supportedModules.clear();
         supportedContainers.clear();
         conflictingModules.clear();
@@ -70,6 +76,7 @@ public class ModuleHelper implements IModuleHelper {
         for (Map.Entry<ModuleData<?>, ImmutableSet.Builder<Item>> entry : supportedContainersBuilderMap.entrySet()) {
             supportedContainers.put(entry.getKey(), entry.getValue().build());
         }
+        supportRevision = revision;
     }
 
     private void mapSupportedModules(String imcMethod, IItemProvider moduleContainer,
@@ -104,16 +111,19 @@ public class ModuleHelper implements IModuleHelper {
     }
 
     private Set<ModuleData<?>> getSupported(Item item) {
+        processIMC();
         return supportedModules.getOrDefault(item, Collections.emptySet());
     }
 
     @Override
     public Set<Item> getSupported(IModuleDataProvider<?> typeProvider) {
+        processIMC();
         return supportedContainers.getOrDefault(typeProvider.getModuleData(), Collections.emptySet());
     }
 
     @Override
     public Set<ModuleData<?>> getConflicting(IModuleDataProvider<?> typeProvider) {
+        processIMC();
         return conflictingModules.computeIfAbsent(typeProvider.getModuleData(), moduleType -> {
             Set<ModuleData<?>> conflicting = new ReferenceOpenHashSet<>();
             for (Item item : getSupported(moduleType)) {

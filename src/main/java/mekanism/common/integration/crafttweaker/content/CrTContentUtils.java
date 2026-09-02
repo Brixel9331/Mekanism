@@ -12,8 +12,7 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.common.integration.crafttweaker.CrTConstants;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegisterEvent.RegisterHelper;
+import net.minecraft.core.Registry;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -77,28 +76,26 @@ public class CrTContentUtils {
         }
     }
 
-    public static void registerCrTContent(RegisterEvent event) {
-        event.register(MekanismAPI.GAS_REGISTRY_NAME, helper -> {
-            //We load our content scripts here in the first registry event of ours for our types of content
-            // to make sure that the new registry events have fired and that the registries exist and the bracket handler
-            // validators won't choke
-            try {
-                CraftTweakerAPI.getScriptRunManager().createScriptRun(new ScriptRunConfiguration(
-                      CrTConstants.CONTENT_LOADER,
-                      CrTConstants.CONTENT_LOADER_SOURCE_ID,
-                      ScriptRunConfiguration.RunKind.EXECUTE
-                )).execute();
-            } catch (Throwable e) {
-                CrTConstants.CRT_LOGGER.error("Unable to register chemicals due to an error.", e);
-            }
-            registerQueued(helper, queuedGases, () -> queuedGases = null, "Gas", "gases");
-        });
-        event.register(MekanismAPI.INFUSE_TYPE_REGISTRY_NAME, helper -> registerQueued(helper, queuedInfuseTypes, () -> queuedInfuseTypes = null, "Infuse Type", "infuse types"));
-        event.register(MekanismAPI.PIGMENT_REGISTRY_NAME, helper -> registerQueued(helper, queuedPigments, () -> queuedPigments = null, "Pigment", "pigments"));
-        event.register(MekanismAPI.SLURRY_REGISTRY_NAME, helper -> registerQueued(helper, queuedSlurries, () -> queuedSlurries = null, "Slurry", "slurries"));
+    public static void registerCrTContent() {
+        //We load our content scripts here in the first registry event of ours for our types of content
+        // to make sure that the new registry events have fired and that the registries exist and the bracket handler
+        // validators won't choke
+        try {
+            CraftTweakerAPI.getScriptRunManager().createScriptRun(new ScriptRunConfiguration(
+                  CrTConstants.CONTENT_LOADER,
+                  CrTConstants.CONTENT_LOADER_SOURCE_ID,
+                  ScriptRunConfiguration.RunKind.EXECUTE
+            )).execute();
+        } catch (Throwable e) {
+            CrTConstants.CRT_LOGGER.error("Unable to register chemicals due to an error.", e);
+        }
+        registerQueued(MekanismAPI.gasRegistry(), queuedGases, () -> queuedGases = null, "Gas", "gases");
+        registerQueued(MekanismAPI.infuseTypeRegistry(), queuedInfuseTypes, () -> queuedInfuseTypes = null, "Infuse Type", "infuse types");
+        registerQueued(MekanismAPI.pigmentRegistry(), queuedPigments, () -> queuedPigments = null, "Pigment", "pigments");
+        registerQueued(MekanismAPI.slurryRegistry(), queuedSlurries, () -> queuedSlurries = null, "Slurry", "slurries");
     }
 
-    private static <V> void registerQueued(RegisterHelper<V> helper, Map<ResourceLocation, V> queued, Runnable setNull, String type, String plural) {
+    private static <V> void registerQueued(Registry<V> registry, Map<ResourceLocation, V> queued, Runnable setNull, String type, String plural) {
         if (queued != null) {//Validate it isn't null, it shouldn't be but just in case the event gets fired again or something
             //The reference got copied as needed to our parameter, so we can invalidate the other reference to it safely, so that
             // we properly don't allow more registration to happen once we start registering a specific chemical type
@@ -107,7 +104,7 @@ public class CrTContentUtils {
             CrTConstants.CRT_LOGGER.info("Registering {} custom {}.", count, count == 1 ? type.toLowerCase(Locale.ROOT) : plural);
             for (Map.Entry<ResourceLocation, V> entry : queued.entrySet()) {
                 ResourceLocation registryName = entry.getKey();
-                helper.register(registryName, entry.getValue());
+                Registry.register(registry, registryName, entry.getValue());
                 CrTConstants.CRT_LOGGER.info("Registered {}: '{}'.", type, registryName);
             }
         }

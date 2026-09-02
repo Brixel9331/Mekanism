@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "mekanism",
+  "version": "${version}",
+  "name": "Mekanism",
+  "description": "Machinery, resource processing, energy networks and advanced equipment.",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["mekanism.common.Mekanism"]
+  },
+  "mixins": ["mekanism.mixins.json"],
+  "accessWidener": "mekanism.accesswidener",
+  "license": "MIT",
+  "icon": "logo.png",
+  "contact": {
+    "sources": "https://github.com/Brixel9331/Mekanism"
+  },
+  "depends": {
+    "fabricloader": ">=0.18.2",
+    "fabric-api": ">=0.92.6+1.20.1",
+    "minecraft": "1.20.1",
+    "java": ">=17",
+    "team_reborn_energy": ">=3.0.0",
+    "forgeconfigapiport": ">=8.0.3",
+    "fabric-permissions-api-v0": ">=0.3.1",
+    "porting_lib_chunk_loading": ">=2.3.15"
+  }
+}

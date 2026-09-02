@@ -1,7 +1,8 @@
 package mekanism.common.lib;
 
-import net.minecraftforge.fml.ModContainer;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import net.fabricmc.loader.api.ModContainer;
 
 /**
  * Version v2.0.0. Simple version handling for Mekanism.
@@ -43,15 +44,25 @@ public class Version {
      *
      * @implNote We don't currently include the artifact version's build number as we classify our version by major, minor, build
      */
-    public Version(ArtifactVersion artifactVersion) {
-        this(artifactVersion.getMajorVersion(), artifactVersion.getMinorVersion(), artifactVersion.getIncrementalVersion());
+    public Version(String version) {
+        Matcher matcher = Pattern.compile("(?:^|-)([0-9]+)\\.([0-9]+)\\.([0-9]+)").matcher(version);
+        boolean found = false;
+        while (matcher.find()) {
+            major = Integer.parseInt(matcher.group(1));
+            minor = Integer.parseInt(matcher.group(2));
+            build = Integer.parseInt(matcher.group(3));
+            found = true;
+        }
+        if (!found) {
+            throw new IllegalArgumentException("Invalid Mekanism version: " + version);
+        }
     }
 
     /**
      * Helper to make it so this is the only class with weird errors in IntelliJ (that don't actually exist), instead of having our main class also have "errors"
      */
     public Version(ModContainer container) {
-        this(container.getModInfo().getVersion());
+        this(container.getMetadata().getVersion().getFriendlyString());
     }
 
     /**

@@ -12,6 +12,7 @@ import mekanism.api.providers.IModuleDataProvider;
  */
 public class MekanismIMC {
 
+    private static long revision;
     private static final Map<String, Set<IModuleDataProvider<?>>> MODULE_SUPPORT = new HashMap<>();
 
     private MekanismIMC() {
@@ -125,6 +126,10 @@ public class MekanismIMC {
         sendModuleIMC(ADD_MEKA_SUIT_BOOTS_MODULES, moduleDataProviders);
     }
 
+    public static synchronized long getRevision() {
+        return revision;
+    }
+
     public static synchronized List<IModuleDataProvider<?>> getModulesFor(String method) {
         return List.copyOf(MODULE_SUPPORT.getOrDefault(method, Set.of()));
     }
@@ -134,6 +139,8 @@ public class MekanismIMC {
             throw new IllegalArgumentException("No module data providers given.");
         }
         List<IModuleDataProvider<?>> providers = List.of(moduleDataProviders);
-        MODULE_SUPPORT.computeIfAbsent(method, key -> new LinkedHashSet<>()).addAll(providers);
+        if (MODULE_SUPPORT.computeIfAbsent(method, key -> new LinkedHashSet<>()).addAll(providers)) {
+            revision++;
+        }
     }
 }

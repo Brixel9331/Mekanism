@@ -3,6 +3,7 @@ package mekanism.common;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
+import io.github.fabricators_of_create.porting_lib.chunk.loading.PortingLibChunkManager;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import mekanism.common.item.block.machine.ItemBlockFluidTank.BasicCauldronIntera
 import mekanism.common.item.block.machine.ItemBlockFluidTank.BasicDrainCauldronInteraction;
 import mekanism.common.item.block.machine.ItemBlockFluidTank.FluidTankItemDispenseBehavior;
 import mekanism.common.item.loot.MekanismLootFunctions;
+import mekanism.common.item.predicate.CustomItemPredicate;
 import mekanism.common.item.predicate.FullCanteenItemPredicate;
 import mekanism.common.item.predicate.MaxedModuleContainerItemPredicate;
 import mekanism.common.lib.LivingEntityTickCallback;
@@ -67,8 +69,8 @@ import mekanism.common.lib.inventory.personalstorage.PersonalStorageManager;
 import mekanism.common.lib.multiblock.MultiblockCache;
 import mekanism.common.lib.multiblock.MultiblockManager;
 import mekanism.common.lib.radiation.RadiationManager;
-import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.lib.transmitter.DynamicBufferedNetwork.TransferEvent;
+import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.PacketHandler;
 import mekanism.common.network.to_client.PacketTransmitterUpdate;
 import mekanism.common.recipe.IncompleteRecipeScanner;
@@ -103,10 +105,11 @@ import mekanism.common.tile.machine.TileEntityOredictionificator.ODConfigValueIn
 import mekanism.common.world.GenHandler;
 import mekanism.common.world.RetrogenHandler;
 import mekanism.common.world.modifier.WorldgenModifiers;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import mekanism.common.item.predicate.CustomItemPredicate;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -116,19 +119,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraftforge.common.MinecraftForge;
-import io.github.fabricators_of_create.porting_lib.chunk.loading.PortingLibChunkManager;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-@Mod(Mekanism.MODID)
-public class Mekanism {
+public class Mekanism implements ModInitializer {
 
     public static final String MODID = MekanismAPI.MEKANISM_MODID;
     public static final String MOD_NAME = "Mekanism";
@@ -213,10 +206,6 @@ public class Mekanism {
         RecipeLifecycle.register();
         recipeCacheManager.register();
         IncompleteRecipeScanner.register();
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::imcQueue);
-        modEventBus.addListener(this::imcHandle);
         MekanismItems.ITEMS.register();
         MekanismBlocks.BLOCKS.register();
         MekanismFluids.FLUIDS.register();
@@ -245,10 +234,17 @@ public class Mekanism {
         MekanismRobitSkins.createAndRegisterDatapack();
         MekanismModules.MODULES.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
-        versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
+        versionNumber = new Version(FabricLoader.getInstance().getModContainer(MODID).orElseThrow());
         packetHandler = new PacketHandler();
         //Super early hooks, only reliable thing is for checking dependencies that we declare we are after
-        hooks.hookConstructor(modEventBus);
+        hooks.hookConstructor();
+    }
+
+    @Override
+    public void onInitialize() {
+        imcQueue();
+        commonSetup();
+        imcHandle();
     }
 
     public static synchronized void addModule(IModModule modModule) {
@@ -294,9 +290,8 @@ public class Mekanism {
         PersonalStorageManager.reset();
     }
 
-    private void imcQueue(InterModEnqueueEvent event) {
+    private void imcQueue() {
         //IMC messages we send to other mods
-        hooks.sendIMCMessages(event);
         //IMC messages that we are sending to ourselves
         MekanismIMC.addModulesToAll(MekanismModules.ENERGY_UNIT);
         MekanismIMC.addMekaSuitModules(MekanismModules.COLOR_MODULATION_UNIT, MekanismModules.LASER_DISSIPATION_UNIT, MekanismModules.RADIATION_SHIELDING_UNIT);
@@ -311,41 +306,38 @@ public class Mekanism {
         MekanismIMC.addMekaSuitBootsModules(MekanismModules.HYDRAULIC_PROPULSION_UNIT, MekanismModules.MAGNETIC_ATTRACTION_UNIT, MekanismModules.FROST_WALKER_UNIT);
     }
 
-    private void imcHandle(InterModProcessEvent event) {
+    private void imcHandle() {
         ModuleHelper.get().processIMC();
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
+    private void commonSetup() {
         //Initialization notification
         logger.info("Version {} initializing...", versionNumber);
         hooks.hookCommonSetup();
 
-        event.enqueueWork(() -> {
-            //Ensure our tags are all initialized
-            MekanismTags.init();
-            //Collect annotation scan data
-            MekAnnotationScanner.collectScanData();
-            //Register advancement criteria
-            MekanismCriteriaTriggers.init();
-            //Add chunk loading callbacks
-            PortingLibChunkManager.setForcedChunkLoadingCallback(Mekanism.MODID, ChunkValidationCallback.INSTANCE);
-            //Register dispenser behaviors
-            MekanismFluids.FLUIDS.registerBucketDispenserBehavior();
-            registerFluidTankBehaviors(MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK,
-                  MekanismBlocks.ULTIMATE_FLUID_TANK, MekanismBlocks.CREATIVE_FLUID_TANK);
-            registerDispenseBehavior(new ModuleDispenseBehavior(), MekanismItems.MEKA_TOOL);
-            registerDispenseBehavior(new MekaSuitDispenseBehavior(), MekanismItems.MEKASUIT_HELMET, MekanismItems.MEKASUIT_BODYARMOR, MekanismItems.MEKASUIT_PANTS,
-                  MekanismItems.MEKASUIT_BOOTS);
-            //Register custom item predicates
-            CustomItemPredicate.register(FullCanteenItemPredicate.ID, json -> FullCanteenItemPredicate.INSTANCE);
-            CustomItemPredicate.register(MaxedModuleContainerItemPredicate.ID, MaxedModuleContainerItemPredicate::fromJson);
-            //Add any extra game event frequencies
-            MekanismGameEvents.addFrequencies();
-        });
+        //Ensure our tags are all initialized
+        MekanismTags.init();
+        //Collect annotation scan data
+        MekAnnotationScanner.collectScanData();
+        //Register advancement criteria
+        MekanismCriteriaTriggers.init();
+        //Add chunk loading callbacks
+        PortingLibChunkManager.setForcedChunkLoadingCallback(Mekanism.MODID, ChunkValidationCallback.INSTANCE);
+        //Register dispenser behaviors
+        MekanismFluids.FLUIDS.registerBucketDispenserBehavior();
+        registerFluidTankBehaviors(MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK,
+              MekanismBlocks.ULTIMATE_FLUID_TANK, MekanismBlocks.CREATIVE_FLUID_TANK);
+        registerDispenseBehavior(new ModuleDispenseBehavior(), MekanismItems.MEKA_TOOL);
+        registerDispenseBehavior(new MekaSuitDispenseBehavior(), MekanismItems.MEKASUIT_HELMET, MekanismItems.MEKASUIT_BODYARMOR, MekanismItems.MEKASUIT_PANTS,
+              MekanismItems.MEKASUIT_BOOTS);
+        //Register custom item predicates
+        CustomItemPredicate.register(FullCanteenItemPredicate.ID, json -> FullCanteenItemPredicate.INSTANCE);
+        CustomItemPredicate.register(MaxedModuleContainerItemPredicate.ID, MaxedModuleContainerItemPredicate::fromJson);
+        //Add any extra game event frequencies
+        MekanismGameEvents.addFrequencies();
 
         //Register player tracker
         new CommonPlayerTracker();
-        MinecraftForge.EVENT_BUS.register(playerTickHandler);
 
         //Register with TransmitterNetworkRegistry
         TransmitterNetworkRegistry.initiate();
