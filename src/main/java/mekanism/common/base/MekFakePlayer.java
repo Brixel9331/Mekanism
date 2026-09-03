@@ -7,9 +7,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import mekanism.common.Mekanism;
 import mekanism.common.util.MekanismUtils;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraftforge.common.util.FakePlayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -75,11 +75,13 @@ public class MekFakePlayer extends FakePlayer {
         }
         MekFakePlayer player = actual;
         player.setServerLevel(world);
-        R result = fakePlayerConsumer.apply(player);
-        player.emulatingUUID = null;
-        //don't keep reference to the World, note we set it to the overworld to avoid any potential null pointers
-        player.setServerLevel(world.getServer().overworld());
-        return result;
+        try {
+            return fakePlayerConsumer.apply(player);
+        } finally {
+            player.emulatingUUID = null;
+            //don't keep reference to the World, note we set it to the overworld to avoid any potential null pointers
+            player.setServerLevel(world.getServer().overworld());
+        }
     }
 
     /**
