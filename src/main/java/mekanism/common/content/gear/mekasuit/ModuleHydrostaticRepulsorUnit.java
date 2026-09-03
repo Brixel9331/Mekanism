@@ -7,6 +7,7 @@ import mekanism.api.gear.config.IModuleConfigItem;
 import mekanism.api.gear.config.ModuleConfigItemCreator;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.util.MekanismUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -38,7 +39,7 @@ public class ModuleHydrostaticRepulsorUnit extends EnchantmentBasedModule<Module
     }
 
     public boolean isSwimBoost(IModule<ModuleHydrostaticRepulsorUnit> module, Player player) {
-        return swimBoost.get() && module.getInstalledCount() >= BOOST_STACKS && !player.getMaxHeightFluidType().isAir() &&
+        return swimBoost.get() && module.getInstalledCount() >= BOOST_STACKS && !MekanismUtils.getFluidsIn(player, bounds -> bounds).isEmpty() &&
                module.hasEnoughEnergy(MekanismConfig.gear.mekaSuitEnergyUsageHydrostaticRepulsion);
     }
 }

@@ -21,13 +21,13 @@ import mekanism.common.registries.MekanismItems;
 import mekanism.common.registries.MekanismModules;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
-import mekanism.common.util.MekanismUtils.FluidInDetails;
+import mekanism.common.util.FluidIntersection.FluidInDetails;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.fluids.FluidType;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.material.Fluid;
 
 @ParametersAreNotNullByDefault
 public class ModuleElectrolyticBreathingUnit implements ICustomModule<ModuleElectrolyticBreathingUnit> {
@@ -46,14 +46,14 @@ public class ModuleElectrolyticBreathingUnit implements ICustomModule<ModuleElec
         //Note: Being in water is checked first to ensure that if it is raining and the player is in water
         // they get the full strength production
         float eyeHeight = player.getEyeHeight();
-        Map<FluidType, FluidInDetails> fluidsIn = MekanismUtils.getFluidsIn(player, bb -> {
+        Map<Fluid, FluidInDetails> fluidsIn = MekanismUtils.getFluidsIn(player, bb -> {
             //Grab the center of the BB as that is where the player is for purposes of what it renders it intersects with
             double centerX = (bb.minX + bb.maxX) / 2;
             double centerZ = (bb.minZ + bb.maxZ) / 2;
             //For the y range check a range of where the mask's breathing unit is based on where the eyes are
             return new AABB(centerX, Math.min(bb.minY + eyeHeight - 0.27, bb.maxY), centerZ, centerX, Math.min(bb.minY + eyeHeight - 0.14, bb.maxY), centerZ);
         });
-        if (fluidsIn.entrySet().stream().anyMatch(entry -> entry.getKey() == ForgeMod.WATER_TYPE.get() && entry.getValue().getMaxHeight() >= 0.11)) {
+        if (fluidsIn.entrySet().stream().anyMatch(entry -> entry.getKey().is(FluidTags.WATER) && entry.getValue().getMaxHeight() >= 0.11)) {
             //If the position the bottom of the mask is almost entirely in water set the production rate to our max rate
             // if the mask is only partially in water treat it as not being in it enough to actually function
             productionRate = getMaxRate(module);

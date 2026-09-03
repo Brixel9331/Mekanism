@@ -4,13 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
-import it.unimi.dsi.fastutil.longs.Long2DoubleArrayMap;
-import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,14 +87,13 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.UsernameCache;
-import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
@@ -745,49 +741,13 @@ public final class MekanismUtils {
      * Similar in concept to {@link net.minecraft.world.entity.Entity#updateFluidHeightAndDoFluidPushing()} except calculates if a given portion of the player is in the
      * fluids.
      */
-    public static Map<FluidType, FluidInDetails> getFluidsIn(Player player, UnaryOperator<AABB> modifyBoundingBox) {
-        AABB bb = modifyBoundingBox.apply(player.getBoundingBox().deflate(0.001));
-        int xMin = Mth.floor(bb.minX);
-        int xMax = Mth.ceil(bb.maxX);
-        int yMin = Mth.floor(bb.minY);
-        int yMax = Mth.ceil(bb.maxY);
-        int zMin = Mth.floor(bb.minZ);
-        int zMax = Mth.ceil(bb.maxZ);
-        if (!player.level().hasChunksAt(xMin, yMin, zMin, xMax, yMax, zMax)) {
-            //If the position isn't actually loaded, just return there isn't any fluids
+    public static Map<Fluid, FluidIntersection.FluidInDetails> getFluidsIn(Player player, UnaryOperator<AABB> modifyBoundingBox) {
+        AABB bounds = modifyBoundingBox.apply(player.getBoundingBox().deflate(0.001));
+        if (!player.level().hasChunksAt(Mth.floor(bounds.minX), Mth.floor(bounds.minY), Mth.floor(bounds.minZ),
+              Mth.floor(bounds.maxX), Mth.floor(bounds.maxY), Mth.floor(bounds.maxZ))) {
             return Collections.emptyMap();
         }
-        Map<FluidType, FluidInDetails> fluidsIn = new IdentityHashMap<>();
-        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-        for (int x = xMin; x < xMax; ++x) {
-            for (int y = yMin; y < yMax; ++y) {
-                for (int z = zMin; z < zMax; ++z) {
-                    mutablePos.set(x, y, z);
-                    FluidState fluidState = player.level().getFluidState(mutablePos);
-                    if (!fluidState.isEmpty()) {
-                        double fluidY = y + fluidState.getHeight(player.level(), mutablePos);
-                        if (bb.minY <= fluidY) {
-                            //The fluid intersects the bounding box
-                            FluidInDetails details = fluidsIn.computeIfAbsent(fluidState.getFluidType(), f -> new FluidInDetails());
-                            details.positions.put(mutablePos.immutable(), fluidState);
-                            double actualFluidHeight;
-                            if (fluidY > bb.maxY) {
-                                //Fluid goes past the top of the bounding box, limit it to the top
-                                // We do the max of the bottom of the bounding box and our current block so that
-                                // if we are floating above the bottom we don't take the area below us into account
-                                actualFluidHeight = bb.maxY - Math.max(bb.minY, y);
-                            } else {
-                                // We do the max of the bottom of the bounding box and our current block so that
-                                // if we are floating above the bottom we don't take the area below us into account
-                                actualFluidHeight = fluidY - Math.max(bb.minY, y);
-                            }
-                            details.heights.merge(ChunkPos.asLong(x, z), actualFluidHeight, Double::sum);
-                        }
-                    }
-                }
-            }
-        }
-        return fluidsIn;
+        return FluidIntersection.find(player.level(), bounds);
     }
 
     public static void veinMineArea(IEnergyContainer energyContainer, FloatingLong energyRequired, Level world, BlockPos pos, ServerPlayer player, ItemStack stack, Item usedTool,
@@ -872,20 +832,6 @@ public final class MekanismUtils {
 
         public String getPrefix() {
             return prefix + "/";
-        }
-    }
-
-    public static class FluidInDetails {
-
-        private final Map<BlockPos, FluidState> positions = new HashMap<>();
-        private final Long2DoubleMap heights = new Long2DoubleArrayMap();
-
-        public Map<BlockPos, FluidState> getPositions() {
-            return positions;
-        }
-
-        public double getMaxHeight() {
-            return heights.values().doubleStream().max().orElse(0);
         }
     }
 
