@@ -6,7 +6,8 @@
   "description": "Machinery, resource processing, energy networks and advanced equipment.",
   "environment": "*",
   "entrypoints": {
-    "main": ["mekanism.common.Mekanism"]
+    "main": ["mekanism.common.Mekanism"],
+    "client": ["mekanism.client.MekanismClientInitializer"]
   },
   "mixins": ["mekanism.mixins.json"],
   "accessWidener": "mekanism.accesswidener",

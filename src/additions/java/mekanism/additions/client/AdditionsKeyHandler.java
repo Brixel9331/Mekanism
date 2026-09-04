@@ -14,6 +14,6 @@ public class AdditionsKeyHandler {
           .toggleable(MekanismAdditionsConfig.client.voiceKeyIsToggle).build();
 
     public static void registerKeybindings(RegisterKeyMappingsEvent event) {
-        ClientRegistrationUtil.registerKeyBindings(event, voiceKey);
+        ClientRegistrationUtil.registerKeyBindings(voiceKey);
     }
 }

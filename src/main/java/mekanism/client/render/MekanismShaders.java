@@ -4,16 +4,12 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.io.IOException;
 import java.util.function.Supplier;
-import mekanism.common.Mekanism;
+import mekanism.api.MekanismAPI;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.minecraft.client.renderer.RenderStateShard.ShaderStateShard;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MekanismShaders {
 
     static final ShaderTracker MEKASUIT = new ShaderTracker();
@@ -22,15 +18,18 @@ public class MekanismShaders {
     //Copy of position_color_tex with support for fog
     static final ShaderTracker FLAME = new ShaderTracker();
 
-    @SubscribeEvent
-    public static void shaderRegistry(RegisterShadersEvent event) throws IOException {
-        registerShader(event, Mekanism.rl("rendertype_flame"), DefaultVertexFormat.POSITION_COLOR_TEX, FLAME);
-        registerShader(event, Mekanism.rl("rendertype_mekasuit"), DefaultVertexFormat.NEW_ENTITY, MEKASUIT);
-        registerShader(event, Mekanism.rl("rendertype_sps"), DefaultVertexFormat.POSITION_COLOR_TEX, SPS);
+    public static void register() {
+        CoreShaderRegistrationCallback.EVENT.register(MekanismShaders::shaderRegistry);
     }
 
-    private static void registerShader(RegisterShadersEvent event, ResourceLocation shaderLocation, VertexFormat vertexFormat, ShaderTracker tracker) throws IOException {
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), shaderLocation, vertexFormat), tracker::setInstance);
+    private static void shaderRegistry(CoreShaderRegistrationCallback.RegistrationContext event) throws IOException {
+        registerShader(event, new ResourceLocation(MekanismAPI.MEKANISM_MODID, "rendertype_flame"), DefaultVertexFormat.POSITION_COLOR_TEX, FLAME);
+        registerShader(event, new ResourceLocation(MekanismAPI.MEKANISM_MODID, "rendertype_mekasuit"), DefaultVertexFormat.NEW_ENTITY, MEKASUIT);
+        registerShader(event, new ResourceLocation(MekanismAPI.MEKANISM_MODID, "rendertype_sps"), DefaultVertexFormat.POSITION_COLOR_TEX, SPS);
+    }
+
+    private static void registerShader(CoreShaderRegistrationCallback.RegistrationContext event, ResourceLocation shaderLocation, VertexFormat vertexFormat, ShaderTracker tracker) throws IOException {
+        event.register(shaderLocation, vertexFormat, tracker::setInstance);
     }
 
     static class ShaderTracker implements Supplier<ShaderInstance> {

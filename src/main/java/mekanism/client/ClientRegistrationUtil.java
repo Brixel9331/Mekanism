@@ -14,6 +14,11 @@ import mekanism.common.registration.impl.ContainerTypeRegistryObject;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
 import mekanism.common.tile.prefab.TileEntityElectricMachine;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -34,10 +39,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,16 +73,18 @@ public class ClientRegistrationUtil {
         return -1;
     };
 
+    private static int reloadListenerIndex;
+
     private ClientRegistrationUtil() {
     }
 
     @SafeVarargs
-    public static <T extends BlockEntity> void bindTileEntityRenderer(EntityRenderersEvent.RegisterRenderers event, BlockEntityRendererProvider<T> rendererProvider,
+    public static <T extends BlockEntity> void bindTileEntityRenderer(BlockEntityRendererProvider<T> rendererProvider,
           TileEntityTypeRegistryObject<? extends T>... tileEntityTypeROs) {
         if (tileEntityTypeROs.length == 0) {
             throw new IllegalArgumentException("No renderers provided.");
         } else if (tileEntityTypeROs.length == 1) {
-            event.registerBlockEntityRenderer(tileEntityTypeROs[0].get(), rendererProvider);
+            BlockEntityRendererRegistry.register(tileEntityTypeROs[0].get(), rendererProvider);
         } else {
             BlockEntityRendererProvider<T> provider = new BlockEntityRendererProvider<>() {
                 @Nullable
@@ -104,14 +107,15 @@ public class ClientRegistrationUtil {
                 }
             };
             for (TileEntityTypeRegistryObject<? extends T> tileTypeRO : tileEntityTypeROs) {
-                event.registerBlockEntityRenderer(tileTypeRO.get(), provider);
+                BlockEntityRendererRegistry.register(tileTypeRO.get(), provider);
             }
         }
     }
 
-    public static void registerClientReloadListeners(RegisterClientReloadListenersEvent event, PreparableReloadListener... listeners) {
+    public static void registerClientReloadListeners(PreparableReloadListener... listeners) {
         for (PreparableReloadListener listener : listeners) {
-            event.registerReloadListener(listener);
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new ClientReloadListener(
+                  new ResourceLocation("mekanism", "client_reload_" + reloadListenerIndex++), listener));
         }
     }
 
@@ -143,9 +147,9 @@ public class ClientRegistrationUtil {
         });
     }
 
-    public static void registerKeyBindings(RegisterKeyMappingsEvent event, KeyMapping... keys) {
+    public static void registerKeyBindings(KeyMapping... keys) {
         for (KeyMapping key : keys) {
-            event.register(key);
+            KeyBindingHelper.registerKeyBinding(key);
         }
     }
 
@@ -153,28 +157,25 @@ public class ClientRegistrationUtil {
         ItemProperties.register(itemProvider.asItem(), override, propertyGetter);
     }
 
-    public static void registerItemColorHandler(RegisterColorHandlersEvent.Item event, ItemColor itemColor, IItemProvider... items) {
+    public static void registerItemColorHandler(ItemColor itemColor, IItemProvider... items) {
         for (IItemProvider itemProvider : items) {
-            event.register(itemColor, itemProvider.asItem());
+            ColorProviderRegistry.ITEM.register(itemColor, itemProvider.asItem());
         }
     }
 
-    public static void registerBlockColorHandler(RegisterColorHandlersEvent.Block event, BlockColor blockColor, IBlockProvider... blocks) {
+    public static void registerBlockColorHandler(BlockColor blockColor, IBlockProvider... blocks) {
         for (IBlockProvider blockProvider : blocks) {
-            event.register(blockColor, blockProvider.getBlock());
+            ColorProviderRegistry.BLOCK.register(blockColor, blockProvider.getBlock());
         }
     }
 
-    public static void registerIColoredBlockHandler(RegisterColorHandlersEvent event, IBlockProvider... blocks) {
-        if (event instanceof RegisterColorHandlersEvent.Block blockEvent) {
-            registerBlockColorHandler(blockEvent, COLORED_BLOCK_COLOR, blocks);
-        } else if (event instanceof RegisterColorHandlersEvent.Item itemEvent) {
-            registerItemColorHandler(itemEvent, COLORED_BLOCK_ITEM_COLOR, blocks);
-        }
+    public static void registerIColoredBlockHandler(IBlockProvider... blocks) {
+        registerBlockColorHandler(COLORED_BLOCK_COLOR, blocks);
+        registerItemColorHandler(COLORED_BLOCK_ITEM_COLOR, blocks);
     }
 
-    public static void registerIColoredItemHandler(RegisterColorHandlersEvent.Item event, IItemProvider... items) {
-        registerItemColorHandler(event, COLORED_ITEM_COLOR, items);
+    public static void registerIColoredItemHandler(IItemProvider... items) {
+        registerItemColorHandler(COLORED_ITEM_COLOR, items);
     }
 
 }
