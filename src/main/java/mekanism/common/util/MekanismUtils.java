@@ -50,6 +50,7 @@ import mekanism.common.util.UnitDisplayUtils.EnergyUnit;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
 import mekanism.common.util.text.OwnerDisplay;
 import mekanism.common.util.text.UpgradeDisplay;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -92,9 +93,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.UsernameCache;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.items.IItemHandler;
@@ -390,7 +389,7 @@ public final class MekanismUtils {
     }
 
     public static boolean lighterThanAirGas(FluidStack stack) {
-        return stack.getFluid().is(Tags.Fluids.GASEOUS) && stack.getFluid().getFluidType().getDensity(stack) <= 0;
+        return FluidVariantAttributes.isLighterThanAir(stack.getVariant());
     }
 
     public static int getEnchantmentLevel(ListTag enchantments, Enchantment enchantment) {
@@ -408,7 +407,7 @@ public final class MekanismUtils {
 
     public static boolean isLiquidBlock(Block block) {
         //Treat bubble columns as liquids
-        return block instanceof LiquidBlock || block instanceof BubbleColumnBlock || block instanceof IFluidBlock;
+        return block instanceof LiquidBlock || block instanceof BubbleColumnBlock;
     }
 
     /**

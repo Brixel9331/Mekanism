@@ -9,6 +9,7 @@ import mekanism.common.tile.TileEntityFluidTank;
 import mekanism.common.tile.base.WrenchResult;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.WorldUtils;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -37,7 +38,7 @@ public class BlockFluidTank extends BlockTileModel<TileEntityFluidTank, Machine<
         if (tile != null) {
             FluidStack fluid = tile.fluidTank.getFluid();
             if (!fluid.isEmpty()) {
-                ambientLight = Math.max(ambientLight, fluid.getFluid().getFluidType().getLightLevel(fluid));
+                ambientLight = Math.max(ambientLight, FluidVariantAttributes.getLuminance(fluid.getVariant()));
             }
         }
         return ambientLight;
