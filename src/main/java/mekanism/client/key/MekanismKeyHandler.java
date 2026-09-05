@@ -20,8 +20,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 import top.theillusivec4.curios.api.SlotContext;
 
@@ -66,7 +64,7 @@ public class MekanismKeyHandler {
               MekanismConfig.client.save();
           }).build();
 
-    public static void registerKeybindings(RegisterKeyMappingsEvent event) {
+    public static void registerKeybindings() {
         ClientRegistrationUtil.registerKeyBindings(handModeSwitchKey, headModeSwitchKey, chestModeSwitchKey, legsModeSwitchKey, feetModeSwitchKey,
               detailsKey, descriptionKey, moduleTweakerKey, boostKey, hudKey);
     }

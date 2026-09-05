@@ -22,6 +22,11 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
+    "client.KeyMappingAccessor",
+    "client.KeyMappingMixin",
+    "client.KeyOptionsMixin",
+    "client.KeyBindsScreenMixin",
+    "client.KeyBindsListEntryMixin",
     "client.CreativeModeInventoryScreenMixin",
     "client.MinecraftWorldLifecycleMixin",
     "client.ClientRecipesMixin"
