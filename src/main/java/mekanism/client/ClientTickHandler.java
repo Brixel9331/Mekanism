@@ -12,6 +12,9 @@ import mekanism.api.radial.RadialData;
 import mekanism.client.gui.GuiRadialSelector;
 import mekanism.client.key.MekKeyHandler;
 import mekanism.client.key.MouseScrollCallback;
+import mekanism.client.render.FogRenderCallback;
+import mekanism.client.render.FogRenderCallback.FogDistance;
+import mekanism.client.render.VisionEnhancement;
 import mekanism.client.render.hud.MekanismStatusOverlay;
 import mekanism.client.render.lib.ScrollIncrementer;
 import mekanism.client.sound.GeigerSound;
@@ -38,11 +41,13 @@ import mekanism.common.registries.MekanismModules;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ArmorStandModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -52,10 +57,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Vector3f;
 
 /**
  * Client-side tick handler for Mekanism. Used mainly for the update check upon startup.
@@ -135,6 +139,8 @@ public class ClientTickHandler {
     }
 
     public static void register() {
+        FogRenderCallback.COLOR.register(ClientTickHandler::onFogLighting);
+        FogRenderCallback.DISTANCE.register(ClientTickHandler::onFog);
         HolidayManager.init();
         ClientTickHandler handler = new ClientTickHandler();
         ClientTickEvents.START_CLIENT_TICK.register(client -> handler.tickStart());
@@ -285,47 +291,21 @@ public class ClientTickHandler {
         return false;
     }
 
-    @SubscribeEvent
-    public void onFogLighting(ViewportEvent.ComputeFogColor event) {
+    private static void onFogLighting(Camera camera, float partialTick, Vector3f color) {
         if (visionEnhancement) {
-            float oldRatio = 0.1F;
-            float newRatio = 1 - oldRatio;
-            float red = oldRatio * event.getRed();
-            float green = oldRatio * event.getGreen();
-            float blue = oldRatio * event.getBlue();
-            event.setRed(red + newRatio * 0.4F);
-            event.setGreen(green + newRatio * 0.8F);
-            event.setBlue(blue + newRatio * 0.4F);
+            VisionEnhancement.adjustColor(color);
         }
     }
 
-    @SubscribeEvent
-    public void onFog(ViewportEvent.RenderFog event) {
-        if (visionEnhancement && event.getCamera().getEntity() instanceof Player player) {
+    private static FogDistance onFog(Camera camera, FogMode mode, float partialTick, FogDistance distance) {
+        if (visionEnhancement && camera.getEntity() instanceof Player player) {
             IModule<ModuleVisionEnhancementUnit> module = IModuleHelper.INSTANCE.load(player.getItemBySlot(EquipmentSlot.HEAD), MekanismModules.VISION_ENHANCEMENT_UNIT);
             //Double-check the module is present before doing any calculations. This should always be true here, but better safe than sorry
             if (module != null) {
-                //This near plane is the same as spectators have set for lava and powdered snow
-                event.setNearPlaneDistance(-8.0F);
-                if (event.getFarPlaneDistance() < 20) {
-                    float scalar;
-                    if (event.getType() == FogType.LAVA) {
-                        //Special handling for lava which is usually either at 1 or 3
-                        scalar = 24 * event.getFarPlaneDistance();
-                    } else {
-                        //Shortly before 27 this ends up being 192, but we want to get it beforehand, so we just allow numbers below 20
-                        scalar = 5 + 2.5F * (float) Math.pow(Math.E, 0.16F * event.getFarPlaneDistance());
-                    }
-                    //192 is roughly equivalent to what spectators have lava, powdered snow, and a couple other bounds for fog are,
-                    // so we want to make sure we don't go above that
-                    event.setFarPlaneDistance(Math.min(192, scalar));
-                }
-                //Scale the distance based on the number of installed modules
-                event.scaleFarPlaneDistance(((float) Math.pow(module.getInstalledCount(), 1.25)) / module.getData().getMaxStackSize());
-                //Cancel the event to ensure our changes are applied
-                event.setCanceled(true);
+                return VisionEnhancement.adjustDistance(camera.getFluidInCamera(), distance, module.getInstalledCount(), module.getData().getMaxStackSize());
             }
         }
+        return distance;
     }
 
     @SubscribeEvent

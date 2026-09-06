@@ -24,6 +24,7 @@
   "client": [
     "client.SoundEngineMixin",
     "client.MouseHandlerMixin",
+    "client.FogRendererMixin",
     "client.KeyMappingAccessor",
     "client.KeyMappingMixin",
     "client.KeyOptionsMixin",
