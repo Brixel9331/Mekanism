@@ -11,6 +11,7 @@ import mekanism.api.gear.IModuleHelper;
 import mekanism.api.radial.RadialData;
 import mekanism.client.gui.GuiRadialSelector;
 import mekanism.client.key.MekKeyHandler;
+import mekanism.client.key.MouseScrollCallback;
 import mekanism.client.render.hud.MekanismStatusOverlay;
 import mekanism.client.render.lib.ScrollIncrementer;
 import mekanism.client.sound.GeigerSound;
@@ -36,6 +37,7 @@ import mekanism.common.network.to_server.PacketPortableTeleporterTeleport;
 import mekanism.common.registries.MekanismModules;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ArmorStandModel;
 import net.minecraft.client.model.EntityModel;
@@ -51,12 +53,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FogType;
-import net.minecraftforge.client.event.InputEvent.MouseScrollingEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
@@ -136,11 +134,11 @@ public class ClientTickHandler {
         }
     }
 
-    @SubscribeEvent
-    public void onTick(ClientTickEvent event) {
-        if (event.phase == Phase.START) {
-            tickStart();
-        }
+    public static void register() {
+        HolidayManager.init();
+        ClientTickHandler handler = new ClientTickHandler();
+        ClientTickEvents.START_CLIENT_TICK.register(client -> handler.tickStart());
+        MouseScrollCallback.EVENT.register(handler::onMouseScroll);
     }
 
     public void tickStart() {
@@ -268,22 +266,23 @@ public class ClientTickHandler {
         return false;
     }
 
-    @SubscribeEvent
-    public void onMouseEvent(MouseScrollingEvent event) {
-        if (MekanismConfig.client.allowModeScroll.get() && minecraft.player != null && minecraft.player.isShiftKeyDown()) {
-            handleModeScroll(event, EquipmentSlot.MAINHAND, event.getScrollDelta());
+    private boolean onMouseScroll(Minecraft client, double delta) {
+        if (MekanismConfig.client.allowModeScroll.get() && client.player != null && client.player.isShiftKeyDown()) {
+            return handleModeScroll(EquipmentSlot.MAINHAND, delta);
         }
+        return false;
     }
 
-    private void handleModeScroll(Event event, EquipmentSlot slot, double delta) {
+    private boolean handleModeScroll(EquipmentSlot slot, double delta) {
         if (delta != 0 && IModeItem.isModeItem(minecraft.player, slot)) {
             int shift = scrollIncrementer.scroll(delta);
             if (shift != 0) {
                 MekanismStatusOverlay.INSTANCE.setTimer();
                 Mekanism.packetHandler().sendToServer(new PacketModeChange(slot, shift));
             }
-            event.setCanceled(true);
+            return true;
         }
+        return false;
     }
 
     @SubscribeEvent

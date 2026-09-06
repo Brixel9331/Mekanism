@@ -9,6 +9,7 @@ public final class MekanismClientInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MekanismKeyHandler.registerKeybindings();
+        ClientTickHandler.register();
         ClientRegistration.registerRenderers();
         ClientRegistration.registerLayer();
         ClientRegistration.registerContainers();

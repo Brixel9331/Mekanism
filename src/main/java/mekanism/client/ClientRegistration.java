@@ -150,7 +150,6 @@ import mekanism.client.render.transmitter.RenderThermodynamicConductor;
 import mekanism.client.render.transmitter.RenderUniversalCable;
 import mekanism.client.sound.SoundHandler;
 import mekanism.common.Mekanism;
-import mekanism.common.base.HolidayManager;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.content.gear.shared.ModuleColorModulationUnit;
 import mekanism.common.integration.MekanismHooks;
@@ -234,7 +233,6 @@ public class ClientRegistration {
             // properly initialized and will have the wrong value
             MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, RenderTickHandler::guiOpening);
         }
-        HolidayManager.init();
         IModuleHelper moduleHelper = IModuleHelper.INSTANCE;
         moduleHelper.addMekaSuitModuleModels(Mekanism.rl("models/entity/mekasuit_modules.obj"));
         moduleHelper.addMekaSuitModuleModelSpec("jetpack", MekanismModules.JETPACK_UNIT, EquipmentSlot.CHEST);
