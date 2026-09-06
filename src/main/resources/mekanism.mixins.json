@@ -22,6 +22,7 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
+    "client.SoundEngineMixin",
     "client.MouseHandlerMixin",
     "client.KeyMappingAccessor",
     "client.KeyMappingMixin",

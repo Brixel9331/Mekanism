@@ -31,13 +31,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
-import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * SoundHandler is the central point for sounds on Mek client side. There are roughly three classes of sounds to deal with:
@@ -56,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
  *
  * @apiNote Only used by client
  */
-@Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SoundHandler {
 
     private SoundHandler() {
@@ -70,8 +64,11 @@ public class SoundHandler {
 
     private static final Long2ObjectMap<SoundInstance> soundMap = new Long2ObjectOpenHashMap<>();
     private static boolean IN_MUFFLED_CHECK = false;
-    private static SoundEngine soundEngine;
     private static boolean hadPlayerSounds;
+
+    public static void register() {
+        SoundPlayCallback.EVENT.register(SoundPlayCallback.TRACKING_PHASE, SoundHandler::onTilePlaySound);
+    }
 
     public static void clearPlayerSounds() {
         jetpackSounds.clear();
@@ -149,6 +146,7 @@ public class SoundHandler {
     }
 
     private static void restartSounds(PlayerSound... sounds) {
+        SoundEngine soundEngine = Minecraft.getInstance().getSoundManager().soundEngine;
         for (PlayerSound sound : sounds) {
             if (!sound.isStopped() && soundEngine != null && !soundEngine.instanceToChannel.containsKey(sound)) {
                 //Note: We need to directly check the instanceToChannel, because isActive will give wrong results as it doesn't
@@ -242,46 +240,47 @@ public class SoundHandler {
         return player.position().distanceToSqr(sound.getX(), sound.getY(), sound.getZ()) < scaledDistance * scaledDistance;
     }
 
-    @SubscribeEvent
-    public static void onSoundEngineSetup(SoundEngineLoadEvent event) {
-        //Grab the sound engine, so that we are able to play sounds. We use this event rather than requiring the use of an AT
-        if (soundEngine == null) {
-            //Note: We include a null check as the constructor for SoundEngine is public and calls this event
-            // And we do not want to end up grabbing a modders variant of this
-            soundEngine = event.getEngine();
-        }
-    }
-
-    public static void onTilePlaySound(PlaySoundEvent event) {
+    @Nullable
+    public static SoundInstance onTilePlaySound(SoundEngine engine, SoundInstance original, @Nullable SoundInstance resultSound) {
         // Ignore any sound event which is null or is happening in a muffled check
-        SoundInstance resultSound = event.getSound();
         if (resultSound == null || IN_MUFFLED_CHECK) {
-            return;
+            return resultSound;
         }
 
         // Ignore any sound event outside this mod namespace
-        ResourceLocation soundLoc = event.getOriginalSound().getLocation();
+        ResourceLocation soundLoc = original.getLocation();
         //If it is mekanism or one of the submodules let continue
         if (!soundLoc.getNamespace().startsWith(Mekanism.MODID)) {
-            return;
+            return resultSound;
         }
 
         // If this is a Mek player sound, unwrap any muffling that other mods may have attempted. I haven't
         // sorted out a good way to deal with long-lived, non-repeating, dynamic volume sounds -- something
         // to investigate in the future.
-        if (event.getOriginalSound() instanceof PlayerSound sound) {
-            event.setSound(sound);
-            return;
+        if (original instanceof PlayerSound sound) {
+            return sound;
         }
 
         //Ignore any non-tile Mek sounds
-        if (event.getName().startsWith("tile.")) {
+        if (soundLoc.getPath().startsWith("tile.")) {
             //At this point, we've got a known block Mekanism sound.
             // Update our soundMap so that we can actually have a shot at stopping this sound; note that we also
             // need to "unoffset" the sound position so that we build the correct key for the sound map
             // Aside: I really, really, wish Forge returned the final result sound as part of playSound :/
             BlockPos pos = BlockPos.containing(resultSound.getX() - 0.5, resultSound.getY() - 0.5, resultSound.getZ() - 0.5);
             soundMap.put(pos.asLong(), resultSound);
+        }
+        return resultSound;
+    }
+
+    @Nullable
+    static SoundInstance filterTileSound(SoundEngine engine, SoundInstance sound) {
+        boolean wasChecking = IN_MUFFLED_CHECK;
+        IN_MUFFLED_CHECK = true;
+        try {
+            return SoundPlayCallback.EVENT.invoker().onPlaySound(engine, sound, sound);
+        } finally {
+            IN_MUFFLED_CHECK = wasChecking;
         }
     }
 
@@ -320,12 +319,10 @@ public class SoundHandler {
                 // Run the event bus with the original sound. Note that we must make sure to set the GLOBAL/STATIC
                 // flag that ensures we don't wrap already muffled sounds. This is...NOT ideal and makes some
                 // significant (hopefully well-informed) assumptions about locking/ordering of all these calls.
-                IN_MUFFLED_CHECK = true;
                 //Make sure we set our volume back to what it actually would be for purposes of letting other mods know
                 // what volume to use
                 volume = originalVolume;
-                SoundInstance s = ForgeHooksClient.playSound(soundEngine, this);
-                IN_MUFFLED_CHECK = false;
+                SoundInstance s = filterTileSound(Minecraft.getInstance().getSoundManager().soundEngine, this);
 
                 if (s == this) {
                     // No filtering done, use the original sound's volume
