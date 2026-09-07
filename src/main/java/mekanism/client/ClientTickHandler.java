@@ -14,6 +14,8 @@ import mekanism.client.key.MekKeyHandler;
 import mekanism.client.key.MouseScrollCallback;
 import mekanism.client.render.FogRenderCallback;
 import mekanism.client.render.FogRenderCallback.FogDistance;
+import mekanism.client.render.LivingModelRenderCallback;
+import mekanism.client.render.ModelVisibility;
 import mekanism.client.render.VisionEnhancement;
 import mekanism.client.render.hud.MekanismStatusOverlay;
 import mekanism.client.render.lib.ScrollIncrementer;
@@ -57,8 +59,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
 
 /**
@@ -139,6 +139,7 @@ public class ClientTickHandler {
     }
 
     public static void register() {
+        LivingModelRenderCallback.EVENT.register(ClientTickHandler::hideModelParts);
         FogRenderCallback.COLOR.register(ClientTickHandler::onFogLighting);
         FogRenderCallback.DISTANCE.register(ClientTickHandler::onFog);
         HolidayManager.init();
@@ -308,60 +309,49 @@ public class ClientTickHandler {
         return distance;
     }
 
-    @SubscribeEvent
-    public void renderEntityPre(RenderLivingEvent.Pre<?, ?> evt) {
-        EntityModel<?> model = evt.getRenderer().getModel();
+    private static void hideModelParts(LivingEntity entity, EntityModel<?> model, ModelVisibility visibility) {
         if (model instanceof HumanoidModel<?> humanoidModel) {
             //If the entity has a biped model, then see if it is wearing a meka suit, in which case we want to hide various parts of the model
-            setModelVisibility(evt.getEntity(), humanoidModel, false);
+            setModelVisibility(entity, humanoidModel, visibility);
         }
     }
 
-    @SubscribeEvent
-    public void renderEntityPost(RenderLivingEvent.Post<?, ?> evt) {
-        EntityModel<?> model = evt.getRenderer().getModel();
-        if (model instanceof HumanoidModel<?> humanoidModel) {
-            //Undo model visibility changes we made to ensure that other entities of the same type are properly visible
-            setModelVisibility(evt.getEntity(), humanoidModel, true);
-        }
-    }
-
-    private static void setModelVisibility(LivingEntity entity, HumanoidModel<?> entityModel, boolean showModel) {
+    private static void setModelVisibility(LivingEntity entity, HumanoidModel<?> entityModel, ModelVisibility visibility) {
         if (entity.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof ItemMekaSuitArmor) {
-            entityModel.head.visible = showModel;
-            entityModel.hat.visible = showModel;
+            visibility.hide(entityModel.head);
+            visibility.hide(entityModel.hat);
             if (entityModel instanceof PlayerModel<?> playerModel) {
-                playerModel.ear.visible = showModel;
+                visibility.hide(playerModel.ear);
             }
         }
         ItemStack chest = entity.getItemBySlot(EquipmentSlot.CHEST);
         if (chest.getItem() instanceof ItemMekaSuitArmor) {
-            entityModel.body.visible = showModel;
+            visibility.hide(entityModel.body);
             if (!(entity instanceof ArmorStand)) {
                 //Don't adjust arms for armor stands as the model will end up changing them anyway and then we may incorrectly activate them
-                entityModel.leftArm.visible = showModel;
-                entityModel.rightArm.visible = showModel;
+                visibility.hide(entityModel.leftArm);
+                visibility.hide(entityModel.rightArm);
             }
             if (entityModel instanceof PlayerModel<?> playerModel) {
-                playerModel.cloak.visible = showModel;
-                playerModel.jacket.visible = showModel;
-                playerModel.leftSleeve.visible = showModel;
-                playerModel.rightSleeve.visible = showModel;
+                visibility.hide(playerModel.cloak);
+                visibility.hide(playerModel.jacket);
+                visibility.hide(playerModel.leftSleeve);
+                visibility.hide(playerModel.rightSleeve);
             } else if (entityModel instanceof ArmorStandModel armorStandModel) {
-                armorStandModel.rightBodyStick.visible = showModel;
-                armorStandModel.leftBodyStick.visible = showModel;
-                armorStandModel.shoulderStick.visible = showModel;
+                visibility.hide(armorStandModel.rightBodyStick);
+                visibility.hide(armorStandModel.leftBodyStick);
+                visibility.hide(armorStandModel.shoulderStick);
             }
         } else if (chest.getItem() instanceof ItemHDPEElytra && entityModel instanceof PlayerModel<?> playerModel) {
             //Hide the player's cape if they have an HDPE elytra as it will be part of the elytra's layer and shouldn't be rendered
-            playerModel.cloak.visible = showModel;
+            visibility.hide(playerModel.cloak);
         }
         if (entity.getItemBySlot(EquipmentSlot.LEGS).getItem() instanceof ItemMekaSuitArmor) {
-            entityModel.leftLeg.visible = showModel;
-            entityModel.rightLeg.visible = showModel;
+            visibility.hide(entityModel.leftLeg);
+            visibility.hide(entityModel.rightLeg);
             if (entityModel instanceof PlayerModel<?> playerModel) {
-                playerModel.leftPants.visible = showModel;
-                playerModel.rightPants.visible = showModel;
+                visibility.hide(playerModel.leftPants);
+                visibility.hide(playerModel.rightPants);
             }
         }
     }
