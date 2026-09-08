@@ -8,13 +8,25 @@ import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.util.MekanismUtils;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.ForgeHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
 public class FuelInventorySlot extends BasicInventorySlot {
+
+    public static FuelInventorySlot at(@Nullable IContentsListener listener, int x, int y) {
+        return forFuel(FuelInventorySlot::getFuelValue, listener, x, y);
+    }
+
+    public static int getFuelValue(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        Integer burnTime = FuelRegistry.INSTANCE.get(stack.getItem());
+        return burnTime == null ? 0 : Math.max(0, burnTime);
+    }
 
     public static FuelInventorySlot forFuel(ToIntFunction<@NotNull ItemStack> fuelValue, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(fuelValue, "Fuel value calculator cannot be null");
@@ -31,15 +43,16 @@ public class FuelInventorySlot extends BasicInventorySlot {
         if (isEmpty()) {
             return 0;
         }
-        int burnTime = ForgeHooks.getBurnTime(current, null) / 2;
+        int burnTime = getFuelValue(current) / 2;
         if (burnTime > 0) {
-            if (current.hasCraftingRemainingItem()) {
+            ItemStack remainder = current.getRecipeRemainder();
+            if (!remainder.isEmpty()) {
                 if (current.getCount() > 1) {
                     //If we have a container but have more than a single stack of it somehow just exit
                     return 0;
                 }
                 //If the item has a container, then replace it with the container
-                setStack(current.getCraftingRemainingItem());
+                setStack(remainder);
             } else {
                 //Otherwise, shrink the size of the stack by one
                 MekanismUtils.logMismatchedStackSize(shrinkStack(1, Action.EXECUTE), 1);
