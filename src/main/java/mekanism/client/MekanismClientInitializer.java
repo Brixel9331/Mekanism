@@ -18,6 +18,7 @@ public final class MekanismClientInitializer implements ClientModInitializer {
         ClientRegistration.registerParticleFactories();
         ClientRegistration.registerBlockColorHandlers();
         ClientRegistration.registerItemColorHandlers();
+        ClientRegistration.registerItemDecorations();
         ClientRegistration.registerClientReloadListeners();
         MekanismShaders.register();
     }

@@ -25,6 +25,7 @@
     "client.SoundEngineMixin",
     "client.MouseHandlerMixin",
     "client.FogRendererMixin",
+    "client.GuiGraphicsMixin",
     "client.LivingEntityRendererMixin",
     "client.KeyMappingAccessor",
     "client.KeyMappingMixin",

@@ -8,14 +8,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.IItemDecorator;
-import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 
-public class TransmitterTypeDecorator implements IItemDecorator {
+public class TransmitterTypeDecorator implements ItemDecoration {
 
-    public static void registerDecorators(RegisterItemDecorationsEvent event, IBlockProvider... blocks) {
+    public static void registerDecorators(IBlockProvider... blocks) {
         for (IBlockProvider block : blocks) {
-            event.register(block, new TransmitterTypeDecorator(block));
+            ItemDecorationRegistry.register(block, new TransmitterTypeDecorator(block));
         }
     }
 

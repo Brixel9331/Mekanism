@@ -18,9 +18,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.IItemDecorator;
 
-public class ChemicalFluidBarDecorator implements IItemDecorator {
+public class ChemicalFluidBarDecorator implements ItemDecoration {
 
     private final Capability<? extends IChemicalHandler<?, ?>>[] chemicalCaps;
     private final boolean showFluid;
