@@ -3,6 +3,7 @@ package mekanism.common.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.config.value.CachedBooleanValue;
 import mekanism.common.config.value.CachedConfigValue;
@@ -18,7 +19,6 @@ import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tier.FluidTankTier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.config.ModConfig.Type;
 
 public class GeneralConfig extends BaseMekanismConfig {
@@ -260,7 +260,7 @@ public class GeneralConfig extends BaseMekanismConfig {
         pumpWaterSources = CachedBooleanValue.wrap(this, builder.comment("If enabled makes Water and Heavy Water blocks be removed from the world on pump.")
               .define("pumpWaterSources", false));
         pumpHeavyWaterAmount = CachedIntValue.wrap(this, builder.comment("mB of Heavy Water that is extracted per block of Water by the Electric Pump with a Filter Upgrade.")
-              .defineInRange("pumpHeavyWaterAmount", FluidType.BUCKET_VOLUME / 100, 1, FluidType.BUCKET_VOLUME));
+              .defineInRange("pumpHeavyWaterAmount", FluidAmounts.MILLI_BUCKETS_PER_BUCKET / 100, 1, FluidAmounts.MILLI_BUCKETS_PER_BUCKET));
         maxPlenisherNodes = CachedIntValue.wrap(this, builder.comment("Fluidic Plenisher stops after this many blocks.")
               .defineInRange("maxPlenisherNodes", 4_000, 1, 1_000_000));
         builder.pop();
@@ -293,13 +293,13 @@ public class GeneralConfig extends BaseMekanismConfig {
         builder.comment("Boiler Settings").push(BOILER_CATEGORY);
         //Note: We use maxVolume as it still is a large number, and we have no reason to go higher even if some things we technically could
         boilerWaterPerTank = CachedIntValue.wrap(this, builder.comment("Amount of fluid (mB) that each block of the boiler's water portion contributes to the volume. Max = volume * waterPerTank")
-              .defineInRange("waterPerTank", 16 * FluidType.BUCKET_VOLUME, 1, Integer.MAX_VALUE / maxVolume));
+              .defineInRange("waterPerTank", 16 * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Integer.MAX_VALUE / maxVolume));
         boilerSteamPerTank = CachedLongValue.wrap(this, builder.comment("Amount of steam (mB) that each block of the boiler's steam portion contributes to the volume. Max = volume * steamPerTank")
-              .defineInRange("steamPerTank", 160L * FluidType.BUCKET_VOLUME, 10, Long.MAX_VALUE / maxVolume));
+              .defineInRange("steamPerTank", 160L * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 10, Long.MAX_VALUE / maxVolume));
         boilerHeatedCoolantPerTank = CachedLongValue.wrap(this, builder.comment("Amount of steam (mB) that each block of the boiler's heated coolant portion contributes to the volume. Max = volume * heatedCoolantPerTank")
-              .defineInRange("heatedCoolantPerTank", 256L * FluidType.BUCKET_VOLUME, 1, Long.MAX_VALUE / maxVolume));
+              .defineInRange("heatedCoolantPerTank", 256L * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Long.MAX_VALUE / maxVolume));
         boilerCooledCoolantPerTank = CachedLongValue.wrap(this, builder.comment("Amount of steam (mB) that each block of the boiler's cooled coolant portion contributes to the volume. Max = volume * cooledCoolantPerTank")
-              .defineInRange("cooledCoolantPerTank", 256L * FluidType.BUCKET_VOLUME, 1, Long.MAX_VALUE / maxVolume));
+              .defineInRange("cooledCoolantPerTank", 256L * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Long.MAX_VALUE / maxVolume));
         builder.pop();
 
         builder.comment("Thermal Evaporation Plant Settings").push(EVAPORATION_CATEGORY);
@@ -312,16 +312,16 @@ public class GeneralConfig extends BaseMekanismConfig {
         evaporationHeatCapacity = CachedDoubleValue.wrap(this, builder.comment("Heat capacity of Thermal Evaporation Tower layers (increases amount of energy needed to increase temperature).")
               .defineInRange("heatCapacity", 100D, 1, 1_000_000));
         evaporationFluidPerTank = CachedIntValue.wrap(this, builder.comment("Amount of fluid (mB) that each block of the evaporation plant contributes to the input tank capacity. Max = volume * fluidPerTank")
-              .defineInRange("fluidPerTank", 64 * FluidType.BUCKET_VOLUME, 1, Integer.MAX_VALUE / (EvaporationMultiblockData.MAX_HEIGHT * 4)));
+              .defineInRange("fluidPerTank", 64 * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Integer.MAX_VALUE / (EvaporationMultiblockData.MAX_HEIGHT * 4)));
         evaporationOutputTankCapacity = CachedIntValue.wrap(this, builder.comment("Amount of output fluid (mB) that the evaporation plant can store.")
-              .defineInRange("outputTankCapacity", 10 * FluidType.BUCKET_VOLUME, 1, Integer.MAX_VALUE));
+              .defineInRange("outputTankCapacity", 10 * FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Integer.MAX_VALUE));
         builder.pop();
 
         builder.comment("SPS Settings").push(SPS_CATEGORY);
         spsInputPerAntimatter = CachedIntValue.wrap(this, builder.comment("How much input gas (polonium) in mB must be processed to make 1 mB of antimatter. Input tank capacity is 2x this value.")
               .defineInRange("inputPerAntimatter", 1_000, 1, Integer.MAX_VALUE));
         spsOutputTankCapacity = CachedLongValue.wrap(this, builder.comment("Amount of output gas (mB, antimatter) that the SPS can store.")
-              .defineInRange("outputTankCapacity", FluidType.BUCKET_VOLUME, 1, Long.MAX_VALUE));
+              .defineInRange("outputTankCapacity", FluidAmounts.MILLI_BUCKETS_PER_BUCKET, 1, Long.MAX_VALUE));
         spsEnergyPerInput = CachedFloatingLongValue.define(this, builder, "Energy needed to process 1 mB of input (inputPerAntimatter * energyPerInput = energy to produce 1 mB of antimatter).",
               "energyPerInput", FloatingLong.createConst(1_000_000));
         builder.pop();

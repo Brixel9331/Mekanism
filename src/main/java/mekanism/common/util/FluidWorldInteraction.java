@@ -1,5 +1,6 @@
 package mekanism.common.util;
 
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.fluid.FluidStack;
 import mekanism.common.registration.impl.FluidDeferredRegister.MekanismFluidType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -11,12 +12,16 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,9 +30,30 @@ public final class FluidWorldInteraction {
     private FluidWorldInteraction() {
     }
 
+    public static boolean canPlace(FluidStack stack) {
+        return !stack.isEmpty() && !stack.getFluid().defaultFluidState().createLegacyBlock().isAir();
+    }
+
+    public static FluidStack pickupSource(Level world, BlockPos pos, BlockState state) {
+        FluidState fluidState = state.getFluidState();
+        if (world.isClientSide() || fluidState.isEmpty() || !fluidState.isSource() || !(state.getBlock() instanceof BucketPickup pickup)) {
+            return FluidStack.EMPTY;
+        }
+        ItemStack container = pickup.pickupBlock(world, pos, state);
+        if (container.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        FluidState remaining = world.getBlockState(pos).getFluidState();
+        if (remaining.isSource() && remaining.getType().isSame(fluidState.getType())) {
+            return FluidStack.EMPTY;
+        }
+        Fluid fluid = container.getItem() instanceof BucketItem bucket ? bucket.content : fluidState.getType();
+        return new FluidStack(fluid, FluidAmounts.MILLI_BUCKETS_PER_BUCKET);
+    }
+
     public static boolean tryPlaceContainedLiquid(@Nullable Player player, Level world, BlockPos pos, @NotNull FluidStack fluidStack, @Nullable Direction side) {
         Fluid fluid = fluidStack.getFluid();
-        if (fluidStack.isEmpty() || fluid.defaultFluidState().createLegacyBlock().isAir()) {
+        if (!canPlace(fluidStack)) {
             //If there is no fluid, or it cannot be placed in the world just
             return false;
         }

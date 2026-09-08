@@ -13,6 +13,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.Upgrade;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.Mekanism;
@@ -45,6 +46,7 @@ import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.FluidUtils;
+import mekanism.common.util.FluidWorldInteraction;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.UpgradeUtils;
@@ -58,8 +60,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.state.BlockState;
@@ -67,8 +67,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.IFluidBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -175,7 +173,7 @@ public class TileEntityElectricPump extends TileEntityMekanism implements IConfi
     }
 
     public int estimateIncrementAmount() {
-        return fluidTank.getFluid().getFluid() == MekanismFluids.HEAVY_WATER.getFluid() ? MekanismConfig.general.pumpHeavyWaterAmount.get() : FluidType.BUCKET_VOLUME;
+        return fluidTank.getFluid().getFluid() == MekanismFluids.HEAVY_WATER.getFluid() ? MekanismConfig.general.pumpHeavyWaterAmount.get() : FluidAmounts.MILLI_BUCKETS_PER_BUCKET;
     }
 
     private boolean suck() {
@@ -217,13 +215,7 @@ public class TileEntityElectricPump extends TileEntityMekanism implements IConfi
                 //Just in case someone does weird things and has a fluid state that is empty and a source
                 // only allow collecting from non-empty sources
                 Block block = blockState.getBlock();
-                if (block instanceof IFluidBlock fluidBlock) {
-                    if (validFluid(fluidBlock.drain(level, pos, FluidAction.SIMULATE))) {
-                        //Actually drain it
-                        suck(fluidBlock.drain(level, pos, FluidAction.EXECUTE), pos, addRecurring);
-                        return true;
-                    }
-                } else if (block instanceof BucketPickup bucketPickup) {
+                if (block instanceof BucketPickup) {
                     Fluid sourceFluid = fluidState.getType();
                     FluidStack fluidStack = getOutput(sourceFluid, hasFilter);
                     if (validFluid(fluidStack)) {
@@ -231,13 +223,12 @@ public class TileEntityElectricPump extends TileEntityMekanism implements IConfi
                         if (sourceFluid != Fluids.WATER || MekanismConfig.general.pumpWaterSources.get()) {
                             //Note we only attempt taking if it is not water, or we want to pump water sources
                             // otherwise we assume the type from the fluid state is correct
-                            ItemStack pickedUpStack = bucketPickup.pickupBlock(level, pos, blockState);
-                            if (pickedUpStack.isEmpty()) {
+                            FluidStack pickedUpFluid = FluidWorldInteraction.pickupSource(level, pos, blockState);
+                            if (pickedUpFluid.isEmpty()) {
                                 //Couldn't actually pick it up, exit
                                 return false;
-                            } else if (pickedUpStack.getItem() instanceof BucketItem bucket) {
-                                //This isn't the best validation check given it may not return a bucket, but it is good enough for now
-                                sourceFluid = bucket.getFluid();
+                            } else {
+                                sourceFluid = pickedUpFluid.getFluid();
                                 //Update the fluid stack in case something somehow changed about the type
                                 // making sure that we replace to heavy water if we got heavy water
                                 fluidStack = getOutput(sourceFluid, hasFilter);
@@ -262,7 +253,7 @@ public class TileEntityElectricPump extends TileEntityMekanism implements IConfi
         if (hasFilter && sourceFluid == Fluids.WATER) {
             return MekanismFluids.HEAVY_WATER.getFluidStack(MekanismConfig.general.pumpHeavyWaterAmount.get());
         }
-        return new FluidStack(sourceFluid, FluidType.BUCKET_VOLUME);
+        return new FluidStack(sourceFluid, FluidAmounts.MILLI_BUCKETS_PER_BUCKET);
     }
 
     private void suck(@NotNull FluidStack fluidStack, BlockPos pos, boolean addRecurring) {

@@ -12,6 +12,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.Upgrade;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.MekanismLang;
@@ -39,6 +40,7 @@ import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.util.FluidWorldInteraction;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UpgradeUtils;
 import mekanism.common.util.WorldUtils;
@@ -56,7 +58,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,7 +121,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
     }
 
     private boolean isValidFluid(@NotNull FluidStack stack) {
-        return stack.getFluid().getFluidType().canBePlacedInLevel(getLevel(), worldPosition.below(), stack);
+        return FluidWorldInteraction.canPlace(stack);
     }
 
     @Override
@@ -144,7 +145,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
                             WorldUtils.tryPlaceContainedLiquid(null, level, below, fluidTank.getFluid(), null)) {
                             level.gameEvent(null, GameEvent.FLUID_PLACE, below);
                             clientEnergyUsed = energyContainer.extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
-                            fluidTank.extract(FluidType.BUCKET_VOLUME, Action.EXECUTE, AutomationType.INTERNAL);
+                            fluidTank.extract(FluidAmounts.MILLI_BUCKETS_PER_BUCKET, Action.EXECUTE, AutomationType.INTERNAL);
                         }
                     } else {
                         doPlenish();
@@ -156,7 +157,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
     }
 
     private boolean canExtractBucket() {
-        return fluidTank.extract(FluidType.BUCKET_VOLUME, Action.SIMULATE, AutomationType.INTERNAL).getAmount() == FluidType.BUCKET_VOLUME;
+        return fluidTank.extract(FluidAmounts.MILLI_BUCKETS_PER_BUCKET, Action.SIMULATE, AutomationType.INTERNAL).getAmount() == FluidAmounts.MILLI_BUCKETS_PER_BUCKET;
     }
 
     private void doPlenish() {
@@ -183,7 +184,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
                 if (canReplace(nodePos, true, false) && canExtractBucket() &&
                     WorldUtils.tryPlaceContainedLiquid(null, level, nodePos, fluidTank.getFluid(), null)) {
                     level.gameEvent(null, GameEvent.FLUID_PLACE, nodePos);
-                    fluidTank.extract(FluidType.BUCKET_VOLUME, Action.EXECUTE, AutomationType.INTERNAL);
+                    fluidTank.extract(FluidAmounts.MILLI_BUCKETS_PER_BUCKET, Action.EXECUTE, AutomationType.INTERNAL);
                 }
                 for (Direction dir : dirs) {
                     BlockPos sidePos = nodePos.relative(dir);
