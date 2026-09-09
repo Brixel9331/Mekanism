@@ -3,14 +3,12 @@ package mekanism.common.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -36,7 +34,6 @@ import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.blocktype.FactoryType;
 import mekanism.common.item.ItemConfigurator;
 import mekanism.common.item.ItemConfigurator.ConfiguratorMode;
-import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.lib.frequency.FrequencyType;
@@ -50,7 +47,9 @@ import mekanism.common.util.UnitDisplayUtils.EnergyUnit;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
 import mekanism.common.util.text.OwnerDisplay;
 import mekanism.common.util.text.UpgradeDisplay;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -93,9 +92,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.UsernameCache;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -110,8 +106,6 @@ public final class MekanismUtils {
     public static final float ONE_OVER_ROOT_TWO = (float) (1 / Math.sqrt(2));
     public static final Supplier<IllegalStateException> MISSING_CAP_ERROR = () -> new IllegalStateException("Capability is somehow not present after isPresent checks");
     private static final ItemStack MILK = new ItemStack(Items.MILK_BUCKET);
-
-    private static final List<UUID> warnedFails = new ArrayList<>();
 
     //TODO: Evaluate adding an extra optional param to shrink and grow stack that allows for logging if it is mismatched. Defaults to false
     // Deciding on how to implement it into the API will need more thought as we want to keep overriding implementations as simple as
@@ -138,7 +132,7 @@ public final class MekanismUtils {
 
     @Nullable
     public static Player tryGetClientPlayer() {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             return MekanismClient.tryGetClientPlayer();
         }
         //Note: Ideally we would have some way to get which player is in question on the server
@@ -562,21 +556,7 @@ public final class MekanismUtils {
 
     @NotNull
     public static String getLastKnownUsername(@Nullable UUID uuid) {
-        if (uuid == null) {
-            return "<???>";
-        }
-        String ret = UsernameCache.getLastKnownUsername(uuid);
-        if (ret == null && !warnedFails.contains(uuid) && EffectiveSide.get().isServer()) { // see if MC/Yggdrasil knows about it?!
-            Optional<GameProfile> gp = ServerLifecycle.getCurrentServer().getProfileCache().get(uuid);
-            if (gp.isPresent()) {
-                ret = gp.get().getName();
-            }
-        }
-        if (ret == null && !warnedFails.contains(uuid)) {
-            Mekanism.logger.warn("Failed to retrieve username for UUID {}, you might want to add it to the JSON cache", uuid);
-            warnedFails.add(uuid);
-        }
-        return ret == null ? "<" + uuid + ">" : ret;
+        return UsernameLookup.getLastKnownUsername(uuid);
     }
 
     /**

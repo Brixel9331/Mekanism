@@ -6,10 +6,12 @@ import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.MekanismClient;
 import mekanism.common.MekanismLang;
+import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.util.MekanismUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +76,8 @@ public class OwnerDisplay implements IHasTextComponent {
         //Allows for the name to be overridden by a passed value
         if (ownerName != null) {
             return ownerName;
-        } else if (player != null && !player.level().isClientSide || player == null && EffectiveSide.get().isServer()) {
+        } else if (player != null && !player.level().isClientSide || player == null &&
+                   (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER || ServerLifecycle.isServerThread())) {
             return MekanismUtils.getLastKnownUsername(ownerUUID);
         }
         String name = MekanismClient.clientUUIDMap.get(ownerUUID);

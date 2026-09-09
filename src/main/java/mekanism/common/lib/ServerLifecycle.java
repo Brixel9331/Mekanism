@@ -28,4 +28,9 @@ public final class ServerLifecycle {
     public static MinecraftServer getCurrentServer() {
         return currentServer;
     }
+
+    public static boolean isServerThread() {
+        MinecraftServer server = currentServer;
+        return server != null && server.isSameThread();
+    }
 }
