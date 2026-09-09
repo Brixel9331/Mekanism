@@ -31,6 +31,7 @@ import mekanism.client.gui.GuiModificationStation;
 import mekanism.client.gui.GuiModuleTweaker;
 import mekanism.client.gui.GuiPersonalStorageTile;
 import mekanism.client.gui.GuiQuantumEntangloporter;
+import mekanism.client.gui.GuiRadialSelector;
 import mekanism.client.gui.GuiSPS;
 import mekanism.client.gui.GuiSecurityDesk;
 import mekanism.client.gui.GuiTeleporter;
@@ -112,6 +113,7 @@ import mekanism.client.render.armor.ScubaMaskArmor;
 import mekanism.client.render.armor.ScubaTankArmor;
 import mekanism.client.render.entity.RenderFlame;
 import mekanism.client.render.entity.RenderRobit;
+import mekanism.client.render.hud.HudRenderCallback;
 import mekanism.client.render.hud.MekaSuitEnergyLevel;
 import mekanism.client.render.hud.MekanismHUD;
 import mekanism.client.render.hud.MekanismStatusOverlay;
@@ -200,8 +202,6 @@ import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
 import net.minecraftforge.client.event.ModelEvent.ModifyBakingResult;
 import net.minecraftforge.client.event.ModelEvent.RegisterAdditional;
 import net.minecraftforge.client.event.ModelEvent.RegisterGeometryLoaders;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.client.model.SeparateTransformsModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -284,14 +284,14 @@ public class ClientRegistration {
         addLitModel(MekanismItems.MEKA_TOOL);
     }
 
-    @SubscribeEvent
-    public static void registerOverlays(RegisterGuiOverlaysEvent event) {
-        //Note: We don't need to include our modid in the id as the active context is grabbed for making an RL inside the event
-        event.registerBelowAll("radiation_overlay", RadiationOverlay.INSTANCE);
-        event.registerAbove(VanillaGuiOverlay.ARMOR_LEVEL.id(), "energy_level", MekaSuitEnergyLevel.INSTANCE);
+    public static void registerOverlays() {
+        HudRenderCallback.BACKGROUND.register(RadiationOverlay.INSTANCE);
+        HudRenderCallback.STATUS_BARS.register(MekaSuitEnergyLevel.INSTANCE);
         //Render status overlay after item name rather than action bar (record_overlay) so that things like the sleep fade will render in front of our overlay
-        event.registerAbove(VanillaGuiOverlay.ITEM_NAME.id(), "status_overlay", MekanismStatusOverlay.INSTANCE);
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "hud", MekanismHUD.INSTANCE);
+        HudRenderCallback.SELECTED_ITEM.register(MekanismStatusOverlay.INSTANCE);
+        HudRenderCallback.HOTBAR.register(MekanismHUD.INSTANCE);
+        //Hide the crosshair if we have a radial menu open and are drawing the back button
+        HudRenderCallback.CROSSHAIR.register(client -> !(client.screen instanceof GuiRadialSelector screen && screen.shouldHideCrosshair()));
     }
 
     public static void registerRenderers() {

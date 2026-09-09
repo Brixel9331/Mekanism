@@ -1,5 +1,7 @@
 package mekanism.common.integration.curios;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import mekanism.client.render.MekanismCurioRenderer;
@@ -38,6 +40,16 @@ public class CuriosIntegration {
 
     public static Optional<? extends IItemHandler> getCuriosInventory(LivingEntity entity) {
         return CuriosApi.getCuriosHelper().getEquippedCurios(entity).resolve();
+    }
+
+    public static List<ItemStack> getEquippedItems(LivingEntity entity) {
+        List<ItemStack> items = new ArrayList<>();
+        getCuriosInventory(entity).ifPresent(inventory -> {
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
+                items.add(inventory.getStackInSlot(slot));
+            }
+        });
+        return items;
     }
 
     public static Optional<SlotResult> findFirstCurioAsResult(@NotNull LivingEntity entity, Predicate<ItemStack> filter) {

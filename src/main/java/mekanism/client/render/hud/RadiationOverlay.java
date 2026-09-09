@@ -7,12 +7,12 @@ import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class RadiationOverlay implements IGuiOverlay {
+public class RadiationOverlay implements HudRenderCallback {
 
     public static final RadiationOverlay INSTANCE = new RadiationOverlay();
 
@@ -27,8 +27,8 @@ public class RadiationOverlay implements IGuiOverlay {
     }
 
     @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTicks, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public void render(Gui gui, GuiGraphics guiGraphics, float partialTicks, int screenWidth, int screenHeight, HudLayout layout) {
+        Player player = Minecraft.getInstance().player;
         if (player != null && IRadiationManager.INSTANCE.isRadiationEnabled() && MekanismUtils.isPlayingMode(player)) {
             CapabilityUtils.getCapability(player, Capabilities.RADIATION_ENTITY).ifPresent(c -> {
                 double radiation = c.getRadiation();

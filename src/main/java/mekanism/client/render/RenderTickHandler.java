@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import mekanism.api.RelativeSide;
 import mekanism.client.gui.GuiMekanism;
-import mekanism.client.gui.GuiRadialSelector;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.client.render.armor.ISpecialGear;
@@ -79,12 +78,10 @@ import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderArmEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.client.model.data.ModelData;
 import mekanism.common.lib.Lazy;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -210,14 +207,6 @@ public class RenderTickHandler {
             matrix.translate(-camVec.x, -camVec.y, -camVec.z);
             renderer.render(camera, minecraft.renderBuffers().bufferSource(), matrix, event.getRenderTick(), event.getPartialTick());
             matrix.popPose();
-        }
-    }
-
-    @SubscribeEvent
-    public void renderCrosshair(RenderGuiOverlayEvent.Pre event) {
-        if (event.getOverlay() == VanillaGuiOverlay.CROSSHAIR.type() && minecraft.screen instanceof GuiRadialSelector screen && screen.shouldHideCrosshair()) {
-            //Hide the crosshair if we have a radial menu open and are drawing the back button
-            event.setCanceled(true);
         }
     }
 

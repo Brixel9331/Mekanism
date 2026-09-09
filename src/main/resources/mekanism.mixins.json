@@ -26,6 +26,7 @@
     "client.MouseHandlerMixin",
     "client.FogRendererMixin",
     "client.GuiGraphicsMixin",
+    "client.GuiMixin",
     "client.LivingEntityRendererMixin",
     "client.KeyMappingAccessor",
     "client.KeyMappingMixin",

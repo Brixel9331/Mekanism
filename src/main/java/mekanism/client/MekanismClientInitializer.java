@@ -19,6 +19,7 @@ public final class MekanismClientInitializer implements ClientModInitializer {
         ClientRegistration.registerBlockColorHandlers();
         ClientRegistration.registerItemColorHandlers();
         ClientRegistration.registerItemDecorations();
+        ClientRegistration.registerOverlays();
         ClientRegistration.registerClientReloadListeners();
         MekanismShaders.register();
     }
