@@ -27,6 +27,8 @@ import mekanism.common.inventory.slot.CraftingWindowInventorySlot;
 import mekanism.common.inventory.slot.CraftingWindowOutputInventorySlot;
 import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.recipe.MekanismRecipeType;
+import mekanism.common.recipe.RecipeMatcher;
+import mekanism.common.recipe.WrappedShapedRecipe;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -42,11 +44,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.crafting.IShapedRecipe;
-import net.minecraftforge.common.util.RecipeMatcher;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -212,13 +212,11 @@ public class QIOCraftingWindow implements IContentsListener {
         return true;
     }
 
-    private void craftingStarted(@NotNull Player player) {
+    private void craftingStarted() {
         isCrafting = true;
-        ForgeHooks.setCraftingPlayer(player);
     }
 
     private void craftingFinished(@NotNull Level world) {
-        ForgeHooks.setCraftingPlayer(null);
         isCrafting = false;
         if (changedWhileCrafting) {
             //If our inputs changed while crafting then update the output slot
@@ -319,7 +317,7 @@ public class QIOCraftingWindow implements IContentsListener {
         }
         QIOFrequency frequency = holder.getFrequency();
         //Mark that we are crafting so changes to the slots below don't force a bunch of recalculations to take place
-        craftingStarted(player);
+        craftingStarted();
         //Figure out the base of the result stack after crafting (onCreated can adjust it slightly)
         ItemStack result = outputSlot.getStack().copy();
         Item resultItem = result.getItem();
@@ -471,7 +469,7 @@ public class QIOCraftingWindow implements IContentsListener {
         }
         QIOFrequency frequency = holder.getFrequency();
         //Mark that we are crafting so changes to the slots below don't force a bunch of recalculations to take place
-        craftingStarted(player);
+        craftingStarted();
         //Craft the result
         result.onCraftedBy(world, player, amountCrafted);
         //Note: We don't fire a crafting event as we don't want to allow for people to modify the output
@@ -896,18 +894,20 @@ public class QIOCraftingWindow implements IContentsListener {
                     }
                     return ItemStack.EMPTY;
                 };
-                if (lastRecipe instanceof IShapedRecipe<?> shapedRecipe) {
+                if (lastRecipe instanceof ShapedRecipe shapedRecipe) {
                     //It is a shaped recipe, make use of this information to attempt to find the proper match
                     mapShapedRecipe(shapedRecipe, ingredients, itemGetter);
+                } else if (lastRecipe instanceof WrappedShapedRecipe wrappedRecipe) {
+                    mapShapedRecipe(wrappedRecipe.getInternal(), ingredients, itemGetter);
                 } else {
                     mapShapelessRecipe(ingredients, itemGetter);
                 }
             }
         }
 
-        private void mapShapedRecipe(IShapedRecipe<?> shapedRecipe, NonNullList<Ingredient> ingredients, IntFunction<ItemStack> itemGetter) {
-            int recipeWidth = shapedRecipe.getRecipeWidth();
-            int recipeHeight = shapedRecipe.getRecipeHeight();
+        private void mapShapedRecipe(ShapedRecipe shapedRecipe, NonNullList<Ingredient> ingredients, IntFunction<ItemStack> itemGetter) {
+            int recipeWidth = shapedRecipe.getWidth();
+            int recipeHeight = shapedRecipe.getHeight();
             for (int columnStart = 0; columnStart <= 3 - recipeWidth; columnStart++) {
                 for (int rowStart = 0; rowStart <= 3 - recipeHeight; rowStart++) {
                     //Note: Even though some shaped recipe implementations might not support a mirrored recipe as a match
