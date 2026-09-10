@@ -30,7 +30,8 @@ public class GhostIngredientHandler<GUI extends GuiMekanism<?>> implements IGhos
         int depth = 0;
         Int2ObjectLinkedOpenHashMap<List<TargetInfo<INGREDIENT>>> depthBasedTargets = new Int2ObjectLinkedOpenHashMap<>();
         Int2ObjectMap<List<Rect2i>> layerIntersections = new Int2ObjectOpenHashMap<>();
-        List<TargetInfo<INGREDIENT>> ghostTargets = getTargets(gui.children(), ingredient);
+        Object ghostIngredient = JeiFluidStack.forGhostIngredient(ingredient.getIngredient());
+        List<TargetInfo<INGREDIENT>> ghostTargets = getTargets(gui.children(), ghostIngredient);
         if (!ghostTargets.isEmpty()) {
             //If we found any targets increment the layer count and add them to our depth based target list
             depthBasedTargets.put(depth, ghostTargets);
@@ -47,7 +48,7 @@ public class GhostIngredientHandler<GUI extends GuiMekanism<?>> implements IGhos
                 areas.addAll(GuiElementHandler.getAreasFor(window.getX(), window.getY(), window.getWidth(), window.getHeight(), window.children()));
                 layerIntersections.put(depth, areas);
             }
-            ghostTargets = getTargets(window.children(), ingredient);
+            ghostTargets = getTargets(window.children(), ghostIngredient);
             if (!ghostTargets.isEmpty()) {
                 //If we found any targets increment the layer count and add them to our depth based target list
                 depthBasedTargets.put(depth, ghostTargets);
@@ -77,7 +78,7 @@ public class GhostIngredientHandler<GUI extends GuiMekanism<?>> implements IGhos
         return targets;
     }
 
-    private <INGREDIENT> List<TargetInfo<INGREDIENT>> getTargets(List<? extends GuiEventListener> children, ITypedIngredient<INGREDIENT> ingredient) {
+    private <INGREDIENT> List<TargetInfo<INGREDIENT>> getTargets(List<? extends GuiEventListener> children, Object ingredient) {
         List<TargetInfo<INGREDIENT>> ghostTargets = new ArrayList<>();
         for (GuiEventListener child : children) {
             if (child instanceof AbstractWidget widget) {
@@ -90,7 +91,7 @@ public class GhostIngredientHandler<GUI extends GuiMekanism<?>> implements IGhos
                     //Then go ahead and check if our element is a ghost target and if it is, and it supports the ingredient add it
                     if (widget instanceof IJEIGhostTarget ghostTarget) {
                         IGhostIngredientConsumer ghostHandler = ghostTarget.getGhostHandler();
-                        if (ghostHandler != null && ghostHandler.supportsIngredient(ingredient.getIngredient())) {
+                        if (ghostHandler != null && ghostHandler.supportsIngredient(ingredient)) {
                             ghostTargets.add(new TargetInfo<>(ghostTarget, ghostHandler, widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight()));
                         }
                     }
@@ -284,7 +285,7 @@ public class GhostIngredientHandler<GUI extends GuiMekanism<?>> implements IGhos
 
                 @Override
                 public void accept(INGREDIENT ingredient) {
-                    ghostHandler.accept(ingredient);
+                    ghostHandler.accept(JeiFluidStack.forGhostIngredient(ingredient));
                 }
             }).collect(Collectors.toList());
         }

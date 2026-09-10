@@ -27,6 +27,7 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.IEmptySlurryProvider;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.recipes.chemical.ItemStackToChemicalRecipe;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.MekanismClient;
@@ -46,7 +47,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,7 +85,7 @@ public abstract class ChemicalStackHelper<CHEMICAL extends Chemical<CHEMICAL>, S
 
     @Override
     public STACK normalizeIngredient(STACK ingredient) {
-        return ChemicalUtil.copyWithAmount(ingredient, FluidType.BUCKET_VOLUME);
+        return ChemicalUtil.copyWithAmount(ingredient, FluidAmounts.MILLI_BUCKETS_PER_BUCKET);
     }
 
     @Override

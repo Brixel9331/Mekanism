@@ -96,6 +96,7 @@ public class GuiElementHandler implements IGuiContainerHandler<GuiMekanism<?>> {
             // we only check the children that are part of that window
             if (child instanceof IJEIIngredientHelper helper && child.isMouseOver(mouseX, mouseY)) {
                 return helper.getIngredient(mouseX, mouseY)
+                      .map(JeiFluidStack::forIngredientLookup)
                       .flatMap(ingredientManager::createTypedIngredient)
                       .map(typedIngredient -> {
                           record ClickableIngredient<T>(ITypedIngredient<T> getTypedIngredient, Rect2i getArea) implements IClickableIngredient<T> {

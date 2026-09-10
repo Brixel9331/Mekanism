@@ -20,6 +20,7 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.energy.IStrictEnergyHandler;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidHandlerItem;
 import mekanism.api.math.FloatingLong;
@@ -74,7 +75,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IStackHelper;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -92,7 +93,6 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
@@ -238,7 +238,7 @@ public class MekanismJEI implements IModPlugin {
           Registry<CHEMICAL> forgeRegistry, IIngredientType<STACK> ingredientType, ChemicalStackHelper<CHEMICAL, STACK> stackHelper) {
         List<STACK> types = forgeRegistry.stream()
               .filter(chemical -> !chemical.isEmptyType() && !chemical.isHidden())
-              .map(chemical -> ChemicalUtil.<CHEMICAL, STACK>withAmount(chemical, FluidType.BUCKET_VOLUME))
+              .map(chemical -> ChemicalUtil.<CHEMICAL, STACK>withAmount(chemical, FluidAmounts.MILLI_BUCKETS_PER_BUCKET))
               .toList();
         stackHelper.setColorHelper(registry.getColorHelper());
         registry.register(ingredientType, types, stackHelper, new ChemicalStackRenderer<>());
@@ -335,7 +335,7 @@ public class MekanismJEI implements IModPlugin {
         RecipeRegistryHelper.register(registry, MekanismJEIRecipeType.INFUSION_CONVERSION, MekanismRecipeType.INFUSION_CONVERSION);
         RecipeRegistryHelper.addAnvilRecipes(registry, MekanismItems.HDPE_REINFORCED_ELYTRA, item -> new ItemStack[]{MekanismItems.HDPE_SHEET.getItemStack()});
         //Note: Use a "full" bucket's worth of heavy water, so that JEI renders it as desired in the info page
-        registry.addIngredientInfo(MekanismFluids.HEAVY_WATER.getFluidStack(FluidType.BUCKET_VOLUME), ForgeTypes.FLUID_STACK,
+        registry.addIngredientInfo(JeiFluidStack.from(MekanismFluids.HEAVY_WATER.getFluidStack(FluidAmounts.MILLI_BUCKETS_PER_BUCKET)), FabricTypes.FLUID_STACK,
               MekanismLang.JEI_INFO_HEAVY_WATER.translate(MekanismConfig.general.pumpHeavyWaterAmount.get()));
         registry.addIngredientInfo(MekanismAPI.moduleRegistry().stream().map(data -> data.getItemProvider().getItemStack()).toList(),
               VanillaTypes.ITEM_STACK, MekanismLang.JEI_INFO_MODULE_INSTALLATION.translate());
