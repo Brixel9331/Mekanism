@@ -35,6 +35,7 @@
     "client.KeyBindsListEntryMixin",
     "client.CreativeModeInventoryScreenMixin",
     "client.MinecraftWorldLifecycleMixin",
+    "client.MinecraftScreenMixin",
     "client.ClientRecipesMixin"
   ],
   "injectors": {

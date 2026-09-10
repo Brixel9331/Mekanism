@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
 import mekanism.api.RelativeSide;
+import mekanism.client.ScreenChangeCallback;
 import mekanism.client.gui.GuiMekanism;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
@@ -29,6 +30,7 @@ import mekanism.common.block.BlockBounding;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeCustomSelectionBox;
 import mekanism.common.content.gear.IBlastingItem;
+import mekanism.common.integration.MekanismHooks;
 import mekanism.common.item.ItemConfigurator;
 import mekanism.common.item.ItemConfigurator.ConfiguratorMode;
 import mekanism.common.item.gear.ItemFlamethrower;
@@ -45,8 +47,10 @@ import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.WorldUtils;
 import mezz.jei.api.runtime.IRecipesGui;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -80,7 +84,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.client.model.data.ModelData;
 import mekanism.common.lib.Lazy;
@@ -117,12 +120,18 @@ public class RenderTickHandler {
         boltRenderer.update(renderer, bolt, MekanismRenderer.getPartialTick());
     }
 
+    public static void registerScreenEvents() {
+        if (FabricLoader.getInstance().isModLoaded(MekanismHooks.JEI_MOD_ID)) {
+            ScreenChangeCallback.EVENT.register(RenderTickHandler::guiOpening);
+        }
+    }
+
     //Note: This listener is only registered if JEI is loaded
-    public static void guiOpening(ScreenEvent.Opening event) {
-        if (event.getCurrentScreen() instanceof GuiMekanism<?> screen) {
+    private static void guiOpening(Minecraft client, Screen previous, Screen next) {
+        if (previous instanceof GuiMekanism<?> screen) {
             //If JEI is loaded and our current screen is a mekanism gui,
             // check if the new screen is a JEI recipe screen
-            if (event.getNewScreen() instanceof IRecipesGui) {
+            if (next instanceof IRecipesGui) {
                 //If it is mark on our current screen that we are switching to JEI
                 screen.switchingToJEI = true;
             }
