@@ -14,9 +14,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.SimpleContainer;
@@ -46,18 +46,16 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class EntityFlame extends Projectile implements IEntityAdditionalSpawnData {
+public class EntityFlame extends Projectile {
 
     public static final int LIFESPAN = 80;
     private static final int DAMAGE = 10;
 
-    private FlamethrowerMode mode = FlamethrowerMode.COMBAT;
+    private static final EntityDataAccessor<Integer> MODE = SynchedEntityData.defineId(EntityFlame.class, EntityDataSerializers.INT);
 
     public EntityFlame(EntityType<EntityFlame> type, Level world) {
         super(type, world);
@@ -79,7 +77,7 @@ public class EntityFlame extends Projectile implements IEntityAdditionalSpawnDat
         flame.setPos(mergedVec.x, mergedVec.y, mergedVec.z);
         flame.setOwner(player);
         ItemStack selected = player.getInventory().getSelected();
-        flame.mode = ((ItemFlamethrower) selected.getItem()).getMode(selected);
+        flame.setMode(((ItemFlamethrower) selected.getItem()).getMode(selected));
         flame.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 0.5F, 1);
         //Attempt to ray trace the area between the player and where the flame would actually start
         // if it hits a block instead just have the flame hit the block directly to avoid being able
@@ -141,7 +139,7 @@ public class EntityFlame extends Projectile implements IEntityAdditionalSpawnDat
             }
         }
         if (!entity.fireImmune()) {
-            if (entity instanceof ItemEntity item && mode == FlamethrowerMode.HEAT) {
+            if (entity instanceof ItemEntity item && getMode() == FlamethrowerMode.HEAT) {
                 if (entity.tickCount > 100 && !smeltItem(item)) {
                     burn(entity);
                 }
@@ -160,6 +158,7 @@ public class EntityFlame extends Projectile implements IEntityAdditionalSpawnDat
         BlockState hitState = level().getBlockState(hitPos);
         boolean hitFluid = !hitState.getFluidState().isEmpty();
         if (!level().isClientSide && MekanismConfig.general.aestheticWorldDamage.get() && !hitFluid) {
+            FlamethrowerMode mode = getMode();
             if (mode == FlamethrowerMode.HEAT) {
                 Entity owner = getOwner();
                 if (owner instanceof Player player) {
@@ -274,33 +273,26 @@ public class EntityFlame extends Projectile implements IEntityAdditionalSpawnDat
 
     @Override
     protected void defineSynchedData() {
+        entityData.define(MODE, FlamethrowerMode.COMBAT.ordinal());
+    }
+
+    private FlamethrowerMode getMode() {
+        return FlamethrowerMode.byIndexStatic(entityData.get(MODE));
+    }
+
+    private void setMode(FlamethrowerMode mode) {
+        entityData.set(MODE, mode.ordinal());
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag nbtTags) {
         super.readAdditionalSaveData(nbtTags);
-        NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.MODE, FlamethrowerMode::byIndexStatic, mode -> this.mode = mode);
+        NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.MODE, FlamethrowerMode::byIndexStatic, this::setMode);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag nbtTags) {
         super.addAdditionalSaveData(nbtTags);
-        NBTUtils.writeEnum(nbtTags, NBTConstants.MODE, mode);
-    }
-
-    @NotNull
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-    @Override
-    public void writeSpawnData(FriendlyByteBuf dataStream) {
-        dataStream.writeEnum(mode);
-    }
-
-    @Override
-    public void readSpawnData(FriendlyByteBuf dataStream) {
-        mode = dataStream.readEnum(FlamethrowerMode.class);
+        NBTUtils.writeEnum(nbtTags, NBTConstants.MODE, getMode());
     }
 }
