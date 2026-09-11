@@ -27,6 +27,7 @@ import mekanism.common.network.to_client.PacketLaserHitBlock;
 import mekanism.common.particle.LaserParticleData;
 import mekanism.common.registries.MekanismDamageTypes;
 import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.util.BlockInteraction;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.WorldUtils;
@@ -58,10 +59,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 
 //TODO - V11: Make the laser "shrink" the further distance it goes, If above a certain energy level and in water makes it make a bubble stream
@@ -299,8 +298,7 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
                             if (MekanismConfig.general.aestheticWorldDamage.get()) {
                                 MekFakePlayer.withFakePlayer((ServerLevel) level, to.x(), to.y(), to.z(), dummy -> {
                                     dummy.setEmulatingUUID(getOwnerUUID());//pretend to be the owner
-                                    BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, hitPos, hitState, dummy);
-                                    if (!MinecraftForge.EVENT_BUS.post(event)) {
+                                    if (BlockInteraction.canBreak(level, dummy, hitPos, hitState)) {
                                         if (hitState.getBlock() instanceof TntBlock && hitState.isFlammable(level, hitPos, result.getDirection())) {
                                             //Convert TNT that can be lit on fire into a tnt entity
                                             //Note: We don't mark the fake player as the igniter as then when the tnt explodes if it hits a player

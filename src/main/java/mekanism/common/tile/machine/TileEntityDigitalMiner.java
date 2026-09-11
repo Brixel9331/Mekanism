@@ -75,6 +75,7 @@ import mekanism.common.tile.interfaces.IHasVisualization;
 import mekanism.common.tile.interfaces.ISustainedData;
 import mekanism.common.tile.interfaces.ITileFilterHolder;
 import mekanism.common.tile.transmitter.TileEntityLogisticalTransporterBase;
+import mekanism.common.util.BlockInteraction;
 import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
@@ -106,8 +107,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -568,7 +567,7 @@ public class TileEntityDigitalMiner extends TileEntityMekanism implements ISusta
     }
 
     private boolean canMine(BlockState state, BlockPos pos) {
-        return withFakePlayer(dummy -> !MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, dummy)));
+        return withFakePlayer(dummy -> BlockInteraction.canBreak(level, dummy, pos, state));
     }
 
     private <R> R withFakePlayer(Function<MekFakePlayer, R> fakePlayerConsumer) {

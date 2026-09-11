@@ -8,6 +8,7 @@ import mekanism.common.item.gear.ItemFlamethrower.FlamethrowerMode;
 import mekanism.common.lib.math.Pos3D;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.registries.MekanismEntityTypes;
+import mekanism.common.util.BlockInteraction;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,11 +45,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -234,7 +233,7 @@ public class EntityFlame extends Projectile implements IEntityAdditionalSpawnDat
         }
         if (recipe.isPresent()) {
             if (!level().isClientSide) {
-                if (MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level(), blockPos, hitState, shooter))) {
+                if (!BlockInteraction.canBreak(level(), shooter, blockPos, hitState)) {
                     //We can't break the block exit
                     return;
                 }
