@@ -43,6 +43,7 @@ import mekanism.common.content.gear.mekatool.ModuleTeleportationUnit;
 import mekanism.common.content.gear.mekatool.ModuleVeinMiningUnit;
 import mekanism.common.content.gear.shared.ModuleEnergyUnit;
 import mekanism.common.item.ItemEnergized;
+import mekanism.common.item.interfaces.IBlockStartBreakItem;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.radial.IGenericRadialModeItem;
 import mekanism.common.lib.radial.data.NestingRadialData;
@@ -85,7 +86,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem, IBlastingItem, IGenericRadialModeItem {
+public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem, IBlastingItem, IGenericRadialModeItem, IBlockStartBreakItem {
 
     private static final ResourceLocation RADIAL_ID = Mekanism.rl("meka_tool");
 
@@ -270,7 +271,7 @@ public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem,
     @Override
     public boolean onBlockStartBreak(ItemStack stack, BlockPos pos, Player player) {
         if (player.level().isClientSide || player.isCreative()) {
-            return super.onBlockStartBreak(stack, pos, player);
+            return false;
         }
         IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
         if (energyContainer != null) {
@@ -296,7 +297,7 @@ public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem,
                 }
             }
         }
-        return super.onBlockStartBreak(stack, pos, player);
+        return false;
     }
 
     private FloatingLong getDestroyEnergy(boolean silk) {

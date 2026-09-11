@@ -33,6 +33,7 @@ import mekanism.common.content.gear.mekatool.ModuleExcavationEscalationUnit.Exca
 import mekanism.common.content.gear.mekatool.ModuleVeinMiningUnit;
 import mekanism.common.item.ItemEnergized;
 import mekanism.common.item.gear.ItemAtomicDisassembler.DisassemblerMode;
+import mekanism.common.item.interfaces.IBlockStartBreakItem;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
@@ -63,7 +64,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemAtomicDisassembler extends ItemEnergized implements IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher {
+public class ItemAtomicDisassembler extends ItemEnergized implements IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher, IBlockStartBreakItem {
 
     //All basic dig actions except shears
     public static final Set<ToolAction> ALWAYS_SUPPORTED_ACTIONS = Set.of(ToolAction.AXE_DIG, ToolAction.HOE_DIG, ToolAction.SHOVEL_DIG, ToolAction.PICKAXE_DIG,
@@ -162,7 +163,7 @@ public class ItemAtomicDisassembler extends ItemEnergized implements IItemHUDPro
     @Override
     public boolean onBlockStartBreak(ItemStack stack, BlockPos pos, Player player) {
         if (player.level().isClientSide || player.isCreative()) {
-            return super.onBlockStartBreak(stack, pos, player);
+            return false;
         }
         IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
         if (energyContainer != null && getMode(stack) == DisassemblerMode.VEIN) {
@@ -179,7 +180,7 @@ public class ItemAtomicDisassembler extends ItemEnergized implements IItemHUDPro
                 }
             }
         }
-        return super.onBlockStartBreak(stack, pos, player);
+        return false;
     }
 
     private FloatingLong getDestroyEnergy(ItemStack itemStack, float hardness) {

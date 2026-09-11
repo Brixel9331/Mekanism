@@ -13,6 +13,7 @@
     "LivingDamageMixin",
     "ChunkTicketMixin",
     "BlockBreakSpeedMixin",
+    "ServerPlayerGameModeMixin",
     "ItemPredicateMixin",
     "PlayerTickMixin",
     "BiomeSelectionContextAccessor",

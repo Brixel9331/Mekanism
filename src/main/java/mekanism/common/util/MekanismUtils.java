@@ -91,8 +91,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -757,25 +755,8 @@ public final class MekanismUtils {
                 // block hardness values in a modded context
                 continue;
             }
-            int exp = ForgeHooks.onBlockBreakEvent(world, player.gameMode.getGameModeForPlayer(), player, foundPos);
-            if (exp == -1) {
-                //If we can't actually break the block continue (this allows mods to stop us from vein mining into protected land)
-                continue;
-            }
-            //Otherwise, break the block
-            Block block = targetState.getBlock();
-            //Get the tile now so that we have it for when we try to harvest the block
-            BlockEntity tileEntity = WorldUtils.getTileEntity(world, foundPos);
-            //Remove the block
-            if (targetState.onDestroyedByPlayer(world, foundPos, player, true, targetState.getFluidState())) {
-                block.destroy(world, foundPos, targetState);
-                //Harvest the block allowing it to handle block drops, incrementing block mined count, and adding exhaustion
-                block.playerDestroy(world, player, foundPos, targetState, tileEntity, stack);
+            if (BlockHarvesting.tryHarvest((ServerLevel) world, player, foundPos, targetState, stack)) {
                 player.awardStat(Stats.ITEM_USED.get(usedTool));
-                if (exp > 0) {
-                    //If we have xp drop it
-                    block.popExperience((ServerLevel) world, foundPos, exp);
-                }
                 //Mark that we used that portion of the energy
                 energyUsed = energyUsed.plusEqual(destroyEnergy);
             }
