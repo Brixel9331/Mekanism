@@ -10,7 +10,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.functions.ConstantPredicates;
-import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.inventory.ITransactionalInventorySlot;
 import mekanism.api.inventory.ItemHandlerHelper;
 import mekanism.common.inventory.container.slot.ContainerSlotType;
 import mekanism.common.inventory.container.slot.InventoryContainerSlot;
@@ -18,6 +18,8 @@ import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.inventory.warning.ISupportsWarning;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.RegistryUtils;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class BasicInventorySlot implements IInventorySlot {
+public class BasicInventorySlot implements ITransactionalInventorySlot {
 
     //TODO: Should we make some sort of "ITickableSlot" or something that lets us tick a bunch of slots at once instead of having to manually call the relevant methods
     public static final Predicate<@NotNull ItemStack> alwaysTrue = ConstantPredicates.alwaysTrue();
@@ -77,6 +79,31 @@ public class BasicInventorySlot implements IInventorySlot {
     private SlotOverlay slotOverlay;
     @Nullable
     private Consumer<ISupportsWarning<?>> warningAdder;
+    private boolean transactionalChange;
+    private boolean transactionDirty;
+    private final SnapshotParticipant<InventorySnapshot> snapshots = new SnapshotParticipant<>() {
+        @Override
+        protected InventorySnapshot createSnapshot() {
+            return new InventorySnapshot(current.copy(), transactionDirty);
+        }
+
+        @Override
+        protected void readSnapshot(InventorySnapshot snapshot) {
+            current = snapshot.stack().copy();
+            transactionDirty = snapshot.dirty();
+        }
+
+        @Override
+        protected void onFinalCommit() {
+            if (transactionDirty) {
+                transactionDirty = false;
+                onContentsChanged();
+            }
+        }
+    };
+
+    private record InventorySnapshot(ItemStack stack, boolean dirty) {
+    }
 
     protected BasicInventorySlot(Predicate<@NotNull ItemStack> canExtract, Predicate<@NotNull ItemStack> canInsert, Predicate<@NotNull ItemStack> validator,
           @Nullable IContentsListener listener, int x, int y) {
@@ -128,7 +155,7 @@ public class BasicInventorySlot implements IInventorySlot {
             // As setStack is more meant to be used as an internal method
             throw new RuntimeException("Invalid stack for slot: " + RegistryUtils.getName(stack.getItem()) + " " + stack.getCount() + " " + stack.getTag());
         }
-        onContentsChanged();
+        notifyContentsChanged();
     }
 
     @Override
@@ -150,7 +177,7 @@ public class BasicInventorySlot implements IInventorySlot {
                 if (sameType) {
                     //We can just grow our stack by the amount we want to increase it
                     current.grow(toAdd);
-                    onContentsChanged();
+                    notifyContentsChanged();
                 } else {
                     //If we are not the same type then we have to copy the stack and set it
                     // Just set it unchecked as we have already validated it
@@ -183,7 +210,7 @@ public class BasicInventorySlot implements IInventorySlot {
         if (action.execute()) {
             //If shrink gets the size to zero it will update the empty state so that isEmpty() returns true.
             current.shrink(amount);
-            onContentsChanged();
+            notifyContentsChanged();
         }
         return toReturn;
     }
@@ -209,6 +236,38 @@ public class BasicInventorySlot implements IInventorySlot {
     public void onContentsChanged() {
         if (listener != null) {
             listener.onContentsChanged();
+        }
+    }
+
+    private void notifyContentsChanged() {
+        if (transactionalChange) {
+            transactionDirty = true;
+        } else {
+            onContentsChanged();
+        }
+    }
+
+    @Override
+    public ItemStack insertItem(ItemStack stack, TransactionContext transaction) {
+        snapshots.updateSnapshots(transaction);
+        boolean previous = transactionalChange;
+        transactionalChange = true;
+        try {
+            return insertItem(stack, Action.EXECUTE, AutomationType.EXTERNAL);
+        } finally {
+            transactionalChange = previous;
+        }
+    }
+
+    @Override
+    public ItemStack extractItem(int amount, TransactionContext transaction) {
+        snapshots.updateSnapshots(transaction);
+        boolean previous = transactionalChange;
+        transactionalChange = true;
+        try {
+            return extractItem(amount, Action.EXECUTE, AutomationType.EXTERNAL);
+        } finally {
+            transactionalChange = previous;
         }
     }
 
@@ -268,7 +327,7 @@ public class BasicInventorySlot implements IInventorySlot {
             return amount;
         }
         current.setCount(amount);
-        onContentsChanged();
+        notifyContentsChanged();
         return amount;
     }
 
