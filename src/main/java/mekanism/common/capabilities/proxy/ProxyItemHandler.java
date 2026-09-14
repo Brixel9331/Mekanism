@@ -3,6 +3,8 @@ package mekanism.common.capabilities.proxy;
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.inventory.IExtendedItemHandler;
+import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.inventory.IMekanismInventory;
 import mekanism.api.inventory.ISidedItemHandler;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.core.Direction;
@@ -17,6 +19,11 @@ public class ProxyItemHandler extends ProxyHandler implements IExtendedItemHandl
     public ProxyItemHandler(ISidedItemHandler inventory, @Nullable Direction side, @Nullable IHolder holder) {
         super(side, holder);
         this.inventory = inventory;
+    }
+
+    @Nullable
+    public IInventorySlot getInventorySlot(int slot) {
+        return inventory instanceof IMekanismInventory handler ? handler.getInventorySlot(slot, side) : null;
     }
 
     @Override
