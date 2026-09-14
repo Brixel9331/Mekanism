@@ -9,6 +9,7 @@ import mekanism.common.lib.math.Pos3D;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.util.BlockInteraction;
+import mekanism.common.util.FlameWorldInteraction;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +24,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -34,19 +34,13 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -165,19 +159,7 @@ public class EntityFlame extends Projectile {
                     smeltBlock(player, hitState, hitPos, hitSide);
                 }
             } else if (mode == FlamethrowerMode.INFERNO) {
-                Entity owner = getOwner();
-                BlockPos sidePos = hitPos.relative(hitSide);
-                if (CampfireBlock.canLight(hitState)) {
-                    tryPlace(owner, hitPos, hitSide, hitState.setValue(BlockStateProperties.LIT, true));
-                } else if (BaseFireBlock.canBePlacedAt(level(), sidePos, hitSide)) {
-                    tryPlace(owner, sidePos, hitSide, BaseFireBlock.getState(level(), sidePos));
-                } else if (hitState.isFlammable(level(), hitPos, hitSide)) {
-                    //TODO: Is there some event we should/can be firing here?
-                    hitState.onCaughtFire(level(), hitPos, hitSide, owner instanceof LivingEntity livingEntity ? livingEntity : null);
-                    if (hitState.getBlock() instanceof TntBlock) {
-                        level().removeBlock(hitPos, false);
-                    }
-                }
+                FlameWorldInteraction.ignite(level(), getOwner(), hitPos, hitSide);
             }
         }
         if (hitFluid) {
@@ -185,18 +167,6 @@ public class EntityFlame extends Projectile {
             playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
         }
         discard();
-    }
-
-    private boolean tryPlace(@Nullable Entity shooter, BlockPos pos, Direction hitSide, BlockState newState) {
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(level().dimension(), level(), pos);
-        level().setBlockAndUpdate(pos, newState);
-        if (ForgeEventFactory.onBlockPlace(shooter, blockSnapshot, hitSide)) {
-            level().restoringBlockSnapshots = true;
-            blockSnapshot.restore(true, false);
-            level().restoringBlockSnapshots = false;
-            return false;
-        }
-        return true;
     }
 
     private boolean smeltItem(ItemEntity item) {
@@ -232,13 +202,16 @@ public class EntityFlame extends Projectile {
         }
         if (recipe.isPresent()) {
             if (!level().isClientSide) {
-                if (!BlockInteraction.canBreak(level(), shooter, blockPos, hitState)) {
+                if (!level().mayInteract(shooter, blockPos) || !BlockInteraction.canBreak(level(), shooter, blockPos, hitState)) {
                     //We can't break the block exit
                     return;
                 }
                 ItemStack result = recipe.get().getResultItem(level().registryAccess());
-                if (!(result.getItem() instanceof BlockItem) || !tryPlace(shooter, blockPos, hitSide, Block.byItem(result.getItem()).defaultBlockState())) {
-                    level().removeBlock(blockPos, false);
+                if (!(result.getItem() instanceof BlockItem)
+                      || !BlockInteraction.tryPlace(level(), shooter, blockPos, hitSide, Block.byItem(result.getItem()).defaultBlockState())) {
+                    if (!level().removeBlock(blockPos, false)) {
+                        return;
+                    }
                     ItemEntity item = new ItemEntity(level(), blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, result.copy());
                     item.setDeltaMovement(0, 0, 0);
                     level().addFreshEntity(item);

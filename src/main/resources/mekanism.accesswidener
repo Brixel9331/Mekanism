@@ -68,6 +68,7 @@ accessible field net/minecraft/world/level/Explosion blockInteraction Lnet/minec
 accessible field net/minecraft/world/level/Explosion radius F
 accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;)F
 accessible field net/minecraft/world/level/block/entity/BlockEntity blockState Lnet/minecraft/world/level/block/state/BlockState;
+accessible method net/minecraft/world/level/block/TntBlock explode (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V
 accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase destroySpeed F
 accessible field net/minecraft/world/level/block/state/BlockBehaviour$Properties lightEmission Ljava/util/function/ToIntFunction;
 accessible field net/minecraft/world/level/chunk/ChunkGenerator featuresPerStep Ljava/util/function/Supplier;
