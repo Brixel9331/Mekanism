@@ -23,6 +23,8 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
+    "client.GameRendererMixin",
+    "client.PlayerRendererMixin",
     "client.SoundEngineMixin",
     "client.MouseHandlerMixin",
     "client.FogRendererMixin",
