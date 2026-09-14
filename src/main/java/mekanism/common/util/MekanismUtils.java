@@ -75,7 +75,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ChunkPos;
@@ -103,7 +102,6 @@ public final class MekanismUtils {
 
     public static final float ONE_OVER_ROOT_TWO = (float) (1 / Math.sqrt(2));
     public static final Supplier<IllegalStateException> MISSING_CAP_ERROR = () -> new IllegalStateException("Capability is somehow not present after isPresent checks");
-    private static final ItemStack MILK = new ItemStack(Items.MILK_BUCKET);
 
     //TODO: Evaluate adding an extra optional param to shrink and grow stack that allows for logging if it is mismatched. Defaults to false
     // Deciding on how to implement it into the API will need more thought as we want to keep overriding implementations as simple as
@@ -146,16 +144,12 @@ public final class MekanismUtils {
     @NotNull
     public static String getModId(@NotNull ItemStack stack) {
         Item item = stack.getItem();
-        String modid = item.getCreatorModId(stack);
-        if (modid == null) {
-            ResourceLocation registryName = RegistryUtils.getName(item);
-            if (registryName == null) {
-                Mekanism.logger.error("Unexpected null registry name for item of class type: {}", item.getClass().getSimpleName());
-                return "";
-            }
-            return registryName.getNamespace();
+        ResourceLocation registryName = RegistryUtils.getName(item);
+        if (registryName == null) {
+            Mekanism.logger.error("Unexpected null registry name for item of class type: {}", item.getClass().getSimpleName());
+            return "";
         }
-        return modid;
+        return registryName.getNamespace();
     }
 
     public static ItemStack getItemInHand(LivingEntity entity, HumanoidArm side) {
@@ -414,7 +408,11 @@ public final class MekanismUtils {
     }
 
     public static BlockHitResult rayTrace(Player player, ClipContext.Fluid fluidMode) {
-        return rayTrace(player, player.getBlockReach(), fluidMode);
+        return rayTrace(player, getBlockReach(player), fluidMode);
+    }
+
+    public static double getBlockReach(Player player) {
+        return player.isCreative() ? 5 : 4.5;
     }
 
     public static BlockHitResult rayTrace(Player player, double reach) {
@@ -573,7 +571,7 @@ public final class MekanismUtils {
 
     public static boolean shouldSpeedUpEffect(MobEffectInstance effectInstance) {
         //Only allow speeding up effects that can be sped up by milk. Also validate it isn't blacklisted by the modpack
-        return effectInstance.isCurativeItem(MILK) && !MekanismTags.MobEffects.SPEED_UP_BLACKLIST_LOOKUP.contains(effectInstance.getEffect());
+        return !MekanismTags.MobEffects.SPEED_UP_BLACKLIST_LOOKUP.contains(effectInstance.getEffect());
     }
 
     /**
