@@ -26,8 +26,8 @@ import mekanism.common.network.to_client.PacketLaserHitBlock;
 import mekanism.common.particle.LaserParticleData;
 import mekanism.common.registries.MekanismDamageTypes;
 import mekanism.common.tile.base.TileEntityMekanism;
-import mekanism.common.util.BlockInteraction;
 import mekanism.common.util.CapabilityUtils;
+import mekanism.common.util.LaserBlockInteraction;
 import mekanism.common.util.LaserShieldInteraction;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.WorldUtils;
@@ -47,10 +47,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
@@ -283,17 +280,11 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
                             if (MekanismConfig.general.aestheticWorldDamage.get()) {
                                 MekFakePlayer.withFakePlayer((ServerLevel) level, to.x(), to.y(), to.z(), dummy -> {
                                     dummy.setEmulatingUUID(getOwnerUUID());//pretend to be the owner
-                                    if (BlockInteraction.canBreak(level, dummy, hitPos, hitState)) {
-                                        if (hitState.getBlock() instanceof TntBlock && hitState.isFlammable(level, hitPos, result.getDirection())) {
-                                            //Convert TNT that can be lit on fire into a tnt entity
-                                            //Note: We don't mark the fake player as the igniter as then when the tnt explodes if it hits a player
-                                            // there will be a crash as our fake player's level will be null
-                                            hitState.onCaughtFire(level, hitPos, result.getDirection(), null);
-                                            level.removeBlock(hitPos, false);
-                                        } else {
-                                            //Use the disassembler as the item to break the block with as that is marked as being the correct tool for drops
-                                            handleBreakBlock(hitState, hitPos, dummy, ItemAtomicDisassembler.fullyChargedStack());
-                                        }
+                                    if (LaserBlockInteraction.canIgnite(hitState)) {
+                                        LaserBlockInteraction.ignite((ServerLevel) level, dummy, hitPos, hitState);
+                                    } else {
+                                        //Use the disassembler as the item to break the block with as that is marked as being the correct tool for drops
+                                        handleBreakBlock(hitState, hitPos, dummy, ItemAtomicDisassembler.fullyChargedStack());
                                     }
                                     return null;
                                 });
@@ -339,15 +330,7 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
     }
 
     protected void handleBreakBlock(BlockState state, BlockPos hitPos, Player player, ItemStack tool) {
-        Block.dropResources(state, level, hitPos, WorldUtils.getTileEntity(level, hitPos), player, tool, false);
-        breakBlock(state, hitPos);
-    }
-
-    protected final void breakBlock(BlockState state, BlockPos hitPos) {
-        level.removeBlock(hitPos, false);
-        //TODO: We may want to evaluate at some point doing this with our fake player so that it is fired as the "cause"?
-        level.gameEvent(GameEvent.BLOCK_DESTROY, hitPos, GameEvent.Context.of(null, state));
-        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, hitPos, Block.getId(state));
+        LaserBlockInteraction.harvest((ServerLevel) level, player, hitPos, state, tool, stack -> Block.popResource(level, hitPos, stack));
     }
 
     protected FloatingLong toFire() {

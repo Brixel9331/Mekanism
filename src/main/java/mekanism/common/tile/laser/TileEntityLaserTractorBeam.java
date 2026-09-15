@@ -18,7 +18,7 @@ import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.lib.DropCapture;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.util.InventoryUtils;
-import mekanism.common.util.WorldUtils;
+import mekanism.common.util.LaserBlockInteraction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -57,12 +57,14 @@ public class TileEntityLaserTractorBeam extends TileEntityLaserReceptor {
 
     @Override
     protected void handleBreakBlock(BlockState state, BlockPos hitPos, Player player, ItemStack tool) {
-        List<ItemStack> drops = new ArrayList<>(Block.getDrops(state, (ServerLevel) level, hitPos, WorldUtils.getTileEntity(level, hitPos), player, tool));
+        List<ItemStack> drops = new ArrayList<>();
         //Collect any extra drops that might have happened due to say breaking the top part of a door or flower and try to add them
         //Note: Technically we should just always return true rather than relying on the return result of the add method,
         // but as array lists always will return true as they are modified we don't have to worry about that
         try (DropCapture.Scope ignored = DropCapture.collect(drops::add)) {
-            breakBlock(state, hitPos);
+            if (!LaserBlockInteraction.harvest((ServerLevel) level, player, hitPos, state, tool, drops::add)) {
+                return;
+            }
         }
         if (!drops.isEmpty()) {
             Lazy<Direction> direction = Lazy.of(this::getDirection);
