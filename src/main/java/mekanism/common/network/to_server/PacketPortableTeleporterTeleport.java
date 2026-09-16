@@ -53,39 +53,41 @@ public class PacketPortableTeleporterTeleport implements IMekanismPacket {
                 Level teleWorld = player.server.getLevel(coords.dimension);
                 TileEntityTeleporter teleporter = WorldUtils.getTileEntity(TileEntityTeleporter.class, teleWorld, coords.getPos());
                 if (teleporter != null) {
+                    IEnergyContainer energyContainer = null;
+                    FloatingLong energyCost = FloatingLong.ZERO;
                     if (!player.isCreative()) {
-                        FloatingLong energyCost = TileEntityTeleporter.calculateEnergyCost(player, teleWorld, coords);
-                        IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
+                        energyCost = TileEntityTeleporter.calculateEnergyCost(player, teleWorld, coords);
+                        energyContainer = StorageUtils.getEnergyContainer(stack, 0);
                         if (energyContainer == null || energyContainer.extract(energyCost, Action.SIMULATE, AutomationType.MANUAL).smallerThan(energyCost)) {
                             return;
                         }
+                    }
+                    double oldX = player.getX();
+                    double oldY = player.getY();
+                    double oldZ = player.getZ();
+                    Level oldWorld = player.level();
+                    BlockPos oldPos = player.blockPosition();
+                    BlockPos teleporterTargetPos = teleporter.getTeleporterTargetPos();
+                    player.closeContainer();
+                    if (player.isPassenger()) {
+                        player.stopRiding();
+                    }
+                    if (TileEntityTeleporter.teleportEntityTo(player, teleWorld, teleporterTargetPos) == null) {
+                        return;
+                    }
+                    if (energyContainer != null) {
                         energyContainer.extract(energyCost, Action.EXECUTE, AutomationType.MANUAL);
                     }
-                    //TODO: Figure out what this try catch is meant to be catching as I don't see much of a reason for it to exist
-                    try {
-                        teleporter.didTeleport.add(player.getUUID());
-                        teleporter.teleDelay = 5;
-                        player.connection.aboveGroundTickCount = 0;
-                        player.closeContainer();
-                        Mekanism.packetHandler().sendToAllTracking(new PacketPortalFX(player.blockPosition()), player.level(), coords.getPos());
-                        if (player.isPassenger()) {
-                            player.stopRiding();
-                        }
-                        double oldX = player.getX();
-                        double oldY = player.getY();
-                        double oldZ = player.getZ();
-                        Level oldWorld = player.level();
-                        BlockPos teleporterTargetPos = teleporter.getTeleporterTargetPos();
-                        TileEntityTeleporter.teleportEntityTo(player, teleWorld, teleporterTargetPos);
-                        TileEntityTeleporter.alignPlayer(player, teleporterTargetPos, teleporter);
-                        if (player.level() != oldWorld || player.distanceToSqr(oldX, oldY, oldZ) >= 25) {
-                            //If the player teleported over 5 blocks, play the sound at both the destination and the source
-                            oldWorld.playSound(null, oldX, oldY, oldZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                        }
-                        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                        teleporter.sendTeleportParticles();
-                    } catch (Exception ignored) {
+                    teleporter.markTeleported(player);
+                    player.connection.aboveGroundTickCount = 0;
+                    Mekanism.packetHandler().sendToAllTracking(new PacketPortalFX(oldPos), oldWorld, oldPos);
+                    TileEntityTeleporter.alignPlayer(player, teleporterTargetPos, teleporter);
+                    if (player.level() != oldWorld || player.distanceToSqr(oldX, oldY, oldZ) >= 25) {
+                        //If the player teleported over 5 blocks, play the sound at both the destination and the source
+                        oldWorld.playSound(null, oldX, oldY, oldZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
                     }
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    teleporter.sendTeleportParticles();
                 }
             }
         }

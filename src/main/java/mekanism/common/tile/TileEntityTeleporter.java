@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.Coord4D;
@@ -47,34 +46,29 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.TileComponentChunkLoader;
+import mekanism.common.util.EntityTeleportation;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.WorldUtils;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundMoveVehiclePacket;
-import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.entity.PartEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -292,8 +286,6 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
             Set<Coord4D> activeCoords = frequency.getActiveCoords();
             BlockPos teleporterTargetPos = teleporter.getTeleporterTargetPos();
             for (Entity entity : teleportInfo.toTeleport) {
-                markTeleported(teleporter, entity, sameDimension);
-                teleporter.teleDelay = 5;
                 //Calculate energy cost before teleporting the entity, as after teleporting it
                 // the cost will be negligible due to being on top of the destination
                 FloatingLong energyCost = calculateEnergyCost(entity, teleWorld, teleportInfo.closest);
@@ -301,6 +293,10 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
                 double oldY = entity.getY();
                 double oldZ = entity.getZ();
                 Entity teleportedEntity = teleportEntityTo(entity, teleWorld, teleporterTargetPos);
+                if (teleportedEntity == null) {
+                    continue;
+                }
+                teleporter.markTeleported(teleportedEntity);
                 if (teleportedEntity instanceof ServerPlayer player) {
                     alignPlayer(player, teleporterTargetPos, teleporter);
                     MekanismCriteriaTriggers.TELEPORT.trigger(player);
@@ -313,115 +309,28 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
                     }
                 }
                 energyContainer.extract(energyCost, Action.EXECUTE, AutomationType.INTERNAL);
-                if (teleportedEntity != null) {
-                    if (level != teleportedEntity.level() || teleportedEntity.distanceToSqr(oldX, oldY, oldZ) >= 25) {
-                        //If the entity teleported over 5 blocks, play the sound at both the destination and the source
-                        level.playSound(null, oldX, oldY, oldZ, SoundEvents.ENDERMAN_TELEPORT, entity.getSoundSource(), 1.0F, 1.0F);
-                    }
-                    teleportedEntity.level().playSound(null, teleportedEntity.getX(), teleportedEntity.getY(), teleportedEntity.getZ(),
-                          SoundEvents.ENDERMAN_TELEPORT, teleportedEntity.getSoundSource(), 1.0F, 1.0F);
+                if (level != teleportedEntity.level() || teleportedEntity.distanceToSqr(oldX, oldY, oldZ) >= 25) {
+                    //If the entity teleported over 5 blocks, play the sound at both the destination and the source
+                    level.playSound(null, oldX, oldY, oldZ, SoundEvents.ENDERMAN_TELEPORT, entity.getSoundSource(), 1.0F, 1.0F);
                 }
+                teleportedEntity.level().playSound(null, teleportedEntity.getX(), teleportedEntity.getY(), teleportedEntity.getZ(),
+                      SoundEvents.ENDERMAN_TELEPORT, teleportedEntity.getSoundSource(), 1.0F, 1.0F);
             }
         }
     }
 
-    private void markTeleported(TileEntityTeleporter teleporter, Entity entity, boolean sameDimension) {
-        if (sameDimension || entity.canChangeDimensions()) {
-            //Only mark the entity as teleported if it will teleport, it is in the same dimension or is able to change dimensions
-            // This is mainly important for the passengers as we teleport all entities and passengers up to one that can't change dimensions
-            teleporter.didTeleport.add(entity.getUUID());
-            for (Entity passenger : entity.getPassengers()) {
-                markTeleported(teleporter, passenger, sameDimension);
-            }
+    public void markTeleported(Entity entity) {
+        didTeleport.add(entity.getUUID());
+        teleDelay = 5;
+        for (Entity passenger : entity.getPassengers()) {
+            markTeleported(passenger);
         }
     }
 
     @Nullable
     public static Entity teleportEntityTo(Entity entity, Level targetWorld, BlockPos target) {
-        if (entity.level().dimension() == targetWorld.dimension()) {
-            entity.teleportTo(target.getX() + 0.5, target.getY(), target.getZ() + 0.5);
-            if (!entity.getPassengers().isEmpty()) {
-                //Force re-apply any passengers so that players don't get "stuck" outside what they may be riding
-                ((ServerChunkCache) entity.level().getChunkSource()).broadcast(entity, new ClientboundSetPassengersPacket(entity));
-                Entity controller = entity.getControllingPassenger();
-                if (controller != entity && controller instanceof ServerPlayer player && !(controller instanceof FakePlayer)) {
-                    if (player.connection != null) {
-                        //Force sync the fact that the vehicle moved to the client that is controlling it
-                        // so that it makes sure to use the correct positions when sending move packets
-                        // back to the server instead of running into moved wrongly issues
-                        player.connection.send(new ClientboundMoveVehiclePacket(entity));
-                    }
-                }
-            }
-            return entity;
-        }
-        Vec3 destination = new Vec3(target.getX() + 0.5, target.getY(), target.getZ() + 0.5);
-        //Note: We grab the passengers here instead of in placeEntity as changeDimension starts by removing any passengers
-        List<Entity> passengers = entity.getPassengers();
-        return entity.changeDimension((ServerLevel) targetWorld, new ITeleporter() {
-            @Override
-            public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                Entity repositionedEntity = repositionEntity.apply(false);
-                if (repositionedEntity != null) {
-                    //Teleport all passengers to the other dimension and then make them start riding the entity again
-                    for (Entity passenger : passengers) {
-                        teleportPassenger(destWorld, destination, repositionedEntity, passenger);
-                    }
-                }
-                return repositionedEntity;
-            }
-
-            @Override
-            public PortalInfo getPortalInfo(Entity entity, ServerLevel destWorld, Function<ServerLevel, PortalInfo> defaultPortalInfo) {
-                return new PortalInfo(destination, entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
-            }
-
-            @Override
-            public boolean playTeleportSound(ServerPlayer player, ServerLevel sourceWorld, ServerLevel destWorld) {
-                return false;
-            }
-        });
-    }
-
-    private static void teleportPassenger(ServerLevel destWorld, Vec3 destination, Entity repositionedEntity, Entity passenger) {
-        if (!passenger.canChangeDimensions()) {
-            //If the passenger can't change dimensions just let it peacefully stay after dismounting rather than trying to teleport it
-            return;
-        }
-        //Note: We grab the passengers here instead of in placeEntity as changeDimension starts by removing any passengers
-        List<Entity> passengers = passenger.getPassengers();
-        passenger.changeDimension(destWorld, new ITeleporter() {
-            @Override
-            public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                boolean invulnerable = entity.isInvulnerable();
-                //Make the entity invulnerable so that when we teleport it, it doesn't take damage
-                // we revert this state to the previous state after teleporting
-                entity.setInvulnerable(true);
-                Entity repositionedPassenger = repositionEntity.apply(false);
-                if (repositionedPassenger != null) {
-                    //Force our passenger to start riding the new entity again
-                    repositionedPassenger.startRiding(repositionedEntity, true);
-                    //Teleport "nested" passengers
-                    for (Entity passenger : passengers) {
-                        teleportPassenger(destWorld, destination, repositionedPassenger, passenger);
-                    }
-                    repositionedPassenger.setInvulnerable(invulnerable);
-                }
-                entity.setInvulnerable(invulnerable);
-                return repositionedPassenger;
-            }
-
-            @Override
-            public PortalInfo getPortalInfo(Entity entity, ServerLevel destWorld, Function<ServerLevel, PortalInfo> defaultPortalInfo) {
-                //This is needed to ensure the passenger starts getting tracked after teleporting
-                return new PortalInfo(destination, entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
-            }
-
-            @Override
-            public boolean playTeleportSound(ServerPlayer player, ServerLevel sourceWorld, ServerLevel destWorld) {
-                return false;
-            }
-        });
+        return targetWorld instanceof ServerLevel destination ?
+              EntityTeleportation.teleport(entity, destination, new Vec3(target.getX() + 0.5, target.getY(), target.getZ() + 0.5)) : null;
     }
 
     private List<Entity> getToTeleport(boolean sameDimension) {
@@ -429,8 +338,8 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
         // entities that cannot change dimensions if we are teleporting to another dimension, or entities that recently teleported
         //Note: Passengers get handled separately
         return level == null || teleportBounds == null ? Collections.emptyList() : level.getEntitiesOfClass(Entity.class, teleportBounds,
-              entity -> !entity.isSpectator() && !entity.isPassenger() && !(entity instanceof PartEntity) &&
-                        (sameDimension || entity.canChangeDimensions()) && !didTeleport.contains(entity.getUUID()));
+              entity -> !entity.isSpectator() && !entity.isPassenger() && !(entity instanceof EnderDragonPart) &&
+                        (sameDimension || EntityTeleportation.canChangeDimensions(entity)) && !didTeleport.contains(entity.getUUID()));
     }
 
     /**
@@ -488,7 +397,7 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
 
     private static void fillIndirectPassengers(Entity base, boolean sameDimension, Set<Entity> passengers) {
         for (Entity entity : base.getPassengers()) {
-            if (sameDimension || entity.canChangeDimensions()) {
+            if (sameDimension || EntityTeleportation.canChangeDimensions(entity)) {
                 passengers.add(entity);
                 fillIndirectPassengers(entity, sameDimension, passengers);
             }

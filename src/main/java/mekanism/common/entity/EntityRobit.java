@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.Coord4D;
@@ -79,6 +78,7 @@ import mekanism.common.tile.TileEntityChargepad;
 import mekanism.common.tile.interfaces.ISustainedInventory;
 import mekanism.common.tile.prefab.TileEntityRecipeMachine;
 import mekanism.common.util.CapabilityUtils;
+import mekanism.common.util.EntityTeleportation;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.SecurityUtils;
@@ -121,13 +121,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.ITeleporter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -370,30 +368,10 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
             return;
         }
         setFollowing(false);
-        if (level().dimension() == homeLocation.dimension) {
-            setDeltaMovement(0, 0, 0);
-            teleportTo(homeLocation.getX() + 0.5, homeLocation.getY() + 0.3, homeLocation.getZ() + 0.5);
-        } else {
-            ServerLevel newWorld = ((ServerLevel) this.level()).getServer().getLevel(homeLocation.dimension);
-            if (newWorld != null) {
-                Vec3 destination = new Vec3(homeLocation.getX() + 0.5, homeLocation.getY() + 0.3, homeLocation.getZ() + 0.5);
-                changeDimension(newWorld, new ITeleporter() {
-                    @Override
-                    public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                        return repositionEntity.apply(false);
-                    }
-
-                    @Override
-                    public PortalInfo getPortalInfo(Entity entity, ServerLevel destWorld, Function<ServerLevel, PortalInfo> defaultPortalInfo) {
-                        return new PortalInfo(destination, Vec3.ZERO, entity.getYRot(), entity.getXRot());
-                    }
-
-                    @Override
-                    public boolean playTeleportSound(ServerPlayer player, ServerLevel sourceWorld, ServerLevel destWorld) {
-                        return false;
-                    }
-                });
-            }
+        ServerLevel destination = ((ServerLevel) level()).getServer().getLevel(homeLocation.dimension);
+        if (destination != null) {
+            EntityTeleportation.teleport(this, destination,
+                  new Vec3(homeLocation.getX() + 0.5, homeLocation.getY() + 0.3, homeLocation.getZ() + 0.5), Vec3.ZERO);
         }
     }
 
