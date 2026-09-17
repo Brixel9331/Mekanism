@@ -6,7 +6,9 @@ import mekanism.api.AutomationType;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.fluid.ITransactionalFluidTank;
 import mekanism.common.capabilities.merged.MergedTank;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,8 +18,13 @@ import org.jetbrains.annotations.NotNull;
 @NothingNullByDefault
 public class FluidTankWrapper implements IExtendedFluidTank {
 
+    public static FluidTankWrapper create(MergedTank mergedTank, IExtendedFluidTank internal, BooleanSupplier insertCheck) {
+        return internal instanceof ITransactionalFluidTank transactional ? new Transactional(mergedTank, transactional, insertCheck)
+              : new FluidTankWrapper(mergedTank, internal, insertCheck);
+    }
+
     private final IExtendedFluidTank internal;
-    private final BooleanSupplier insertCheck;
+    protected final BooleanSupplier insertCheck;
     private final MergedTank mergedTank;
 
     public FluidTankWrapper(MergedTank mergedTank, IExtendedFluidTank internal, BooleanSupplier insertCheck) {
@@ -121,5 +128,30 @@ public class FluidTankWrapper implements IExtendedFluidTank {
     @Override
     public boolean isFluidValid(FluidStack stack) {
         return internal.isFluidValid(stack);
+    }
+
+    private static final class Transactional extends FluidTankWrapper implements ITransactionalFluidTank {
+
+        private final ITransactionalFluidTank transactional;
+
+        private Transactional(MergedTank mergedTank, ITransactionalFluidTank internal, BooleanSupplier insertCheck) {
+            super(mergedTank, internal, insertCheck);
+            transactional = internal;
+        }
+
+        @Override
+        public boolean hasUncommittedChanges() {
+            return transactional.hasUncommittedChanges();
+        }
+
+        @Override
+        public FluidStack insert(FluidStack stack, TransactionContext transaction, AutomationType automationType) {
+            return insertCheck.getAsBoolean() ? transactional.insert(stack, transaction, automationType) : stack;
+        }
+
+        @Override
+        public FluidStack extract(int amount, TransactionContext transaction, AutomationType automationType) {
+            return transactional.extract(amount, transaction, automationType);
+        }
     }
 }

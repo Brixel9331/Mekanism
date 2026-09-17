@@ -134,6 +134,11 @@ public class BasicFluidTank extends SnapshotParticipant<BasicFluidTank.FluidSnap
     }
 
     @Override
+    public boolean hasUncommittedChanges() {
+        return pendingChange;
+    }
+
+    @Override
     public FluidStack insert(FluidStack stack, TransactionContext transaction, AutomationType automationType) {
         updateSnapshots(transaction);
         TransactionContext previous = currentTransaction;

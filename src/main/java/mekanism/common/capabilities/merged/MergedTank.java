@@ -11,6 +11,7 @@ import mekanism.api.chemical.merged.MergedChemicalTank;
 import mekanism.api.chemical.pigment.IPigmentTank;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.fluid.ITransactionalFluidTank;
 import mekanism.common.capabilities.fluid.FluidTankWrapper;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -30,8 +31,8 @@ public class MergedTank extends MergedChemicalTank {
     private final IExtendedFluidTank fluidTank;
 
     private MergedTank(IExtendedFluidTank fluidTank, IChemicalTank<?, ?>... chemicalTanks) {
-        super(fluidTank::isEmpty, chemicalTanks);
-        this.fluidTank = new FluidTankWrapper(this, fluidTank, () -> Arrays.stream(chemicalTanks).allMatch(IChemicalTank::isEmpty));
+        super(() -> fluidTank.isEmpty() && (!(fluidTank instanceof ITransactionalFluidTank transactional) || !transactional.hasUncommittedChanges()), chemicalTanks);
+        this.fluidTank = FluidTankWrapper.create(this, fluidTank, () -> Arrays.stream(chemicalTanks).allMatch(IChemicalTank::isEmpty));
     }
 
     public CurrentType getCurrentType() {
