@@ -19,6 +19,7 @@ import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.radiation.capability.IRadiationEntity;
 import mekanism.api.radiation.capability.IRadiationShielding;
 import mekanism.common.integration.fluid.fabric.FabricFluidHandler;
+import mekanism.common.integration.fluid.fabric.FabricFluidHandlerStorage;
 import mekanism.common.integration.fluid.fabric.FabricItemFluidHandler;
 import mekanism.common.integration.item.fabric.FabricItemHandler;
 import mekanism.common.integration.item.fabric.FabricItemStorage;
@@ -76,5 +77,6 @@ public class Capabilities {
             return storage == null ? null : new FabricItemHandler(storage);
         });
         ItemStorage.SIDED.registerFallback((level, pos, state, tile, side) -> FabricItemStorage.create(tile, side));
+        FluidStorage.SIDED.registerFallback((level, pos, state, tile, side) -> FabricFluidHandlerStorage.create(tile, side));
     }
 }

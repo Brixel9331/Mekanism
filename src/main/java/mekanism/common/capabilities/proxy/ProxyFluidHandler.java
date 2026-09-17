@@ -3,20 +3,35 @@ package mekanism.common.capabilities.proxy;
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.FluidStack;
-import mekanism.api.fluid.IExtendedFluidHandler;
+import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.fluid.ISidedFluidHandler;
+import mekanism.api.fluid.ITransactionalFluidHandler;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class ProxyFluidHandler extends ProxyHandler implements IExtendedFluidHandler {
+public class ProxyFluidHandler extends ProxyHandler implements ITransactionalFluidHandler {
 
     private final ISidedFluidHandler fluidHandler;
 
     public ProxyFluidHandler(ISidedFluidHandler fluidHandler, @Nullable Direction side, @Nullable IHolder holder) {
         super(side, holder);
         this.fluidHandler = fluidHandler;
+    }
+
+    @Nullable
+    @Override
+    public IExtendedFluidTank getFluidTank(int tank) {
+        return fluidHandler instanceof IMekanismFluidHandler handler ? handler.getFluidTank(tank, side) : null;
+    }
+
+    @Override
+    public void onFluidInserted(FluidStack stack) {
+        if (fluidHandler instanceof IMekanismFluidHandler handler) {
+            handler.onFluidInserted(stack, side);
+        }
     }
 
     @Override

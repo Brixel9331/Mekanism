@@ -9,7 +9,21 @@ import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public interface IMekanismFluidHandler extends ISidedFluidHandler, IContentsListener {
+public interface IMekanismFluidHandler extends ISidedFluidHandler, ITransactionalFluidHandler, IContentsListener {
+
+    @Nullable
+    @Override
+    default IExtendedFluidTank getFluidTank(int tank) {
+        return getFluidTank(tank, getFluidSideFor());
+    }
+
+    @Override
+    default void onFluidInserted(FluidStack stack) {
+        onFluidInserted(stack, getFluidSideFor());
+    }
+
+    default void onFluidInserted(FluidStack stack, @Nullable Direction side) {
+    }
 
     /**
      * Used to check if an instance of {@link IMekanismFluidHandler} actually has the ability to handle fluid.

@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class TileEntityDynamicValve extends TileEntityDynamicTank {
 
@@ -74,9 +75,16 @@ public class TileEntityDynamicValve extends TileEntityDynamicTank {
     public FluidStack insertFluid(@NotNull FluidStack stack, Direction side, @NotNull Action action) {
         FluidStack ret = super.insertFluid(stack, side, action);
         if (action.execute() && ret.getAmount() < stack.getAmount()) {
-            getMultiblock().triggerValveTransfer(this);
+            onFluidInserted(new FluidStack(stack, stack.getAmount() - ret.getAmount()), side);
         }
         return ret;
+    }
+
+    @Override
+    public void onFluidInserted(FluidStack stack, @Nullable Direction side) {
+        if (!isRemoved()) {
+            getMultiblock().triggerValveTransfer(this);
+        }
     }
 
     @Override

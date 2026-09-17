@@ -108,9 +108,16 @@ public class TileEntityBoilerValve extends TileEntityBoilerCasing implements IMu
     public FluidStack insertFluid(@NotNull FluidStack stack, Direction side, @NotNull Action action) {
         FluidStack ret = super.insertFluid(stack, side, action);
         if (ret.getAmount() < stack.getAmount() && action.execute()) {
-            getMultiblock().triggerValveTransfer(this);
+            onFluidInserted(new FluidStack(stack, stack.getAmount() - ret.getAmount()), side);
         }
         return ret;
+    }
+
+    @Override
+    public void onFluidInserted(FluidStack stack, @Nullable Direction side) {
+        if (!isRemoved()) {
+            getMultiblock().triggerValveTransfer(this);
+        }
     }
 
     @Override
