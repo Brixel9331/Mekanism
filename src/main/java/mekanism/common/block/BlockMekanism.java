@@ -20,6 +20,7 @@ import mekanism.common.block.attribute.AttributeHasBounding;
 import mekanism.common.block.attribute.AttributeMultiblock;
 import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.attribute.Attributes.AttributeComparator;
+import mekanism.common.block.interfaces.IExplosionBlock;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
@@ -76,7 +77,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockMekanism extends Block {
+public abstract class BlockMekanism extends Block implements IExplosionBlock {
 
     protected BlockMekanism(BlockBehaviour.Properties properties) {
         super(BlockStateHelper.applyLightLevelAdjustments(properties));
@@ -325,7 +326,7 @@ public abstract class BlockMekanism extends Block {
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+    public void beforeBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
         if (!world.isClientSide) {
             AttributeMultiblock multiblockAttribute = Attribute.get(state, AttributeMultiblock.class);
             if (multiblockAttribute != null && explosion instanceof MeltdownExplosion meltdown) {
@@ -335,7 +336,6 @@ public abstract class BlockMekanism extends Block {
                 }
             }
         }
-        super.onBlockExploded(state, world, pos, explosion);
     }
 
     @Override

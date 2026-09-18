@@ -3,6 +3,7 @@ package mekanism.common.block;
 import java.util.function.Consumer;
 import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
+import mekanism.common.block.interfaces.IExplosionBlock;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
@@ -10,6 +11,7 @@ import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.registries.MekanismTileEntityTypes;
 import mekanism.common.resource.BlockResourceInfo;
 import mekanism.common.tile.TileEntityBoundingBlock;
+import mekanism.common.util.ExplosionBlockInteraction;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
@@ -46,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 //TODO: Extend MekanismBlock. Not done yet as checking is needed to ensure how drops happen still happens correctly and things in the super class don't mess this up
-public class BlockBounding extends Block implements IHasTileEntity<TileEntityBoundingBlock>, IStateFluidLoggable {
+public class BlockBounding extends Block implements IHasTileEntity<TileEntityBoundingBlock>, IStateFluidLoggable, IExplosionBlock {
 
     @Nullable
     public static BlockPos getMainBlockPos(BlockGetter world, BlockPos thisPos) {
@@ -150,7 +152,7 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+    public void beforeBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos != null) {
             BlockState mainState = world.getBlockState(mainPos);
@@ -161,16 +163,15 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
                           .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(mainPos))
                           .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
                           .withOptionalParameter(LootContextParams.BLOCK_ENTITY, mainState.hasBlockEntity() ? WorldUtils.getTileEntity(serverLevel, mainPos) : null)
-                          .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getExploder());
+                          .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getDirectSourceEntity());
                     if (explosion.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {
                         lootContextBuilder.withParameter(LootContextParams.EXPLOSION_RADIUS, explosion.radius);
                     }
                     mainState.getDrops(lootContextBuilder).forEach(stack -> Block.popResource(serverLevel, mainPos, stack));
                 }
-                mainState.onBlockExploded(world, mainPos, explosion);
+                ExplosionBlockInteraction.explodeBlock(mainState, world, mainPos, explosion);
             }
         }
-        super.onBlockExploded(state, world, pos, explosion);
     }
 
     @Override
@@ -249,9 +250,9 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
     public float getExplosionResistance(BlockState state, BlockGetter world, BlockPos pos, Explosion explosion) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos == null) {
-            return super.getExplosionResistance(state, world, pos, explosion);
+            return getExplosionResistance();
         }
-        return world.getBlockState(mainPos).getExplosionResistance(world, mainPos, explosion);
+        return ExplosionBlockInteraction.getResistance(world.getBlockState(mainPos), world, mainPos, explosion);
     }
 
     @NotNull

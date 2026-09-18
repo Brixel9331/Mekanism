@@ -12,6 +12,8 @@
     "LivingEntityTickMixin",
     "LivingEntityJumpMixin",
     "LivingDamageMixin",
+    "ExplosionDamageCalculatorMixin",
+    "ExplosionMixin",
     "ChunkTicketMixin",
     "BlockBreakSpeedMixin",
     "ServerPlayerGameModeMixin",
