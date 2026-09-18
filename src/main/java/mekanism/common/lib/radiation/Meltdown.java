@@ -2,16 +2,19 @@ package mekanism.common.lib.radiation;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import mekanism.api.NBTConstants;
-import mekanism.common.util.WorldUtils;
+import mekanism.common.util.ExplosionBlockInteraction;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +28,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
 
 public class Meltdown {
 
@@ -75,6 +77,9 @@ public class Meltdown {
     }
 
     public boolean update(Level world) {
+        if (!(world instanceof ServerLevel serverWorld) || !isLoaded(world, minPos) || !isLoaded(world, maxPos)) {
+            return true;
+        }
         ticksExisted++;
 
         if (world.random.nextInt() % 10 == 0 && world.random.nextDouble() < magnitude * chance) {
@@ -83,23 +88,25 @@ public class Meltdown {
             int z = Mth.nextInt(world.random, minPos.getZ(), maxPos.getZ());
             Explosion.BlockInteraction mode = world.getGameRules().getBoolean(GameRules.RULE_BLOCK_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY
                                                                                                                          : Explosion.BlockInteraction.DESTROY;
-            createExplosion(world, x, y, z, radius, true, mode);
+            createExplosion(serverWorld, x, y, z, radius, true, mode);
         }
-
-        if (!WorldUtils.isBlockLoaded(world, minPos) || !WorldUtils.isBlockLoaded(world, maxPos)) {
-            return true;
-        }
-
         return ticksExisted >= DURATION;
+    }
+
+    private static boolean isLoaded(Level world, BlockPos pos) {
+        return world.isInWorldBounds(pos) && world.hasChunkAt(pos);
     }
 
     /**
      * Creates an explosion and ensures all blocks that are inside our meltdown radius actually get destroyed
      */
-    private void createExplosion(Level world, double x, double y, double z, float radius, boolean causesFire, Explosion.BlockInteraction mode) {
-        Explosion explosion = new MeltdownExplosion(world, x, y, z, radius, causesFire, mode, multiblockID);
+    private void createExplosion(ServerLevel world, double x, double y, double z, float radius, boolean causesFire, Explosion.BlockInteraction mode) {
+        MeltdownExplosion explosion = new MeltdownExplosion(world, x, y, z, radius, causesFire, mode, multiblockID);
+        if (!MeltdownExplosionCallback.EVENT.invoker().canExplode(world, explosion)) {
+            return;
+        }
         //Calculate which block positions should get broken based on the logic that would happen in Explosion#explode
-        ObjectArrayList<BlockPos> toBlow = new ObjectArrayList<>();
+        ObjectOpenHashSet<BlockPos> forcedBlocks = new ObjectOpenHashSet<>();
         for (int j = 0; j < 16; ++j) {
             for (int k = 0; k < 16; ++k) {
                 for (int l = 0; l < 16; ++l) {
@@ -121,13 +128,13 @@ public class Meltdown {
                             BlockState blockstate = world.getBlockState(pos);
                             FluidState fluidstate = blockstate.getFluidState();
                             if (!blockstate.isAir() || !fluidstate.isEmpty()) {
-                                f -= (Math.max(blockstate.getExplosionResistance(world, pos, explosion),
-                                      fluidstate.getExplosionResistance(world, pos, explosion)) + 0.3F) * 0.3F;
+                                f -= (Math.max(ExplosionBlockInteraction.getResistance(blockstate, world, pos, explosion),
+                                      fluidstate.getExplosionResistance()) + 0.3F) * 0.3F;
                             }
                             if (f > 0.0F && minPos.getX() <= d4 && minPos.getY() <= d6 && minPos.getZ() <= d8 && d4 <= maxPos.getX() && d6 <= maxPos.getY() &&
                                 d8 <= maxPos.getZ()) {
                                 //Only add it as a spot to break if it is inside the bounds of the reactor
-                                toBlow.add(pos);
+                                forcedBlocks.add(pos);
                             }
                             d4 += d0 * 0.3;
                             d6 += d1 * 0.3;
@@ -138,22 +145,21 @@ public class Meltdown {
             }
         }
         //Try to make the explosion actually happen
-        if (!ForgeEventFactory.onExplosionStart(world, explosion)) {
-            explosion.explode();
-            explosion.finalizeExplosion(true);
-        }
+        explosion.explode();
+        explosion.finalizeExplosion(false);
         //Next go through the different locations that were inside our reactor that should have exploded and make sure
         // that if they didn't explode that we manually run the logic to make them "explode" so that the reactor stops
         //Note: Shuffle so that the drops don't end up all in one corner of an explosion
+        ObjectArrayList<BlockPos> toBlow = new ObjectArrayList<>(forcedBlocks);
         Util.shuffle(toBlow, world.random);
         List<Pair<ItemStack, BlockPos>> drops = new ArrayList<>();
         for (BlockPos toExplode : toBlow) {
             BlockState state = world.getBlockState(toExplode);
             //If the block didn't already get broken when running the normal explosion
             if (!state.isAir()) {
-                if (state.canDropFromExplosion(world, toExplode, explosion) && world instanceof ServerLevel level) {
+                if (state.getBlock().dropFromExplosion(explosion)) {
                     BlockEntity tileentity = state.hasBlockEntity() ? world.getBlockEntity(toExplode) : null;
-                    LootParams.Builder lootContextBuilder = new LootParams.Builder(level)
+                    LootParams.Builder lootContextBuilder = new LootParams.Builder(world)
                           .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(toExplode))
                           .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
                           .withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity)
@@ -161,14 +167,19 @@ public class Meltdown {
                     if (mode == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {
                         lootContextBuilder.withParameter(LootContextParams.EXPLOSION_RADIUS, radius);
                     }
-                    state.spawnAfterBreak(level, toExplode, ItemStack.EMPTY, false);
+                    state.spawnAfterBreak(world, toExplode, ItemStack.EMPTY, false);
                     state.getDrops(lootContextBuilder).forEach(stack -> addBlockDrops(drops, stack, toExplode));
                 }
-                state.onBlockExploded(world, toExplode, explosion);
+                ExplosionBlockInteraction.explodeBlock(state, world, toExplode, explosion);
             }
         }
         for (Pair<ItemStack, BlockPos> pair : drops) {
             Block.popResource(world, pair.getSecond(), pair.getFirst());
+        }
+        for (ServerPlayer player : world.players()) {
+            if (player.distanceToSqr(x, y, z) < 4_096) {
+                player.connection.send(new ClientboundExplodePacket(x, y, z, radius, List.of(), explosion.getHitPlayers().get(player)));
+            }
         }
     }
 
