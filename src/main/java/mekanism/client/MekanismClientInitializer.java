@@ -12,7 +12,7 @@ public final class MekanismClientInitializer implements ClientModInitializer {
     public void onInitializeClient() {
         MekanismKeyHandler.registerKeybindings();
         ClientTickHandler.register();
-        RenderTickHandler.registerScreenEvents();
+        RenderTickHandler.register();
         SoundHandler.register();
         ClientRegistration.registerRenderers();
         ClientRegistration.registerLayer();

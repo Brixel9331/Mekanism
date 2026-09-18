@@ -106,7 +106,6 @@ import mekanism.client.particle.RadiationParticle;
 import mekanism.client.particle.ScubaBubbleParticle;
 import mekanism.client.render.FluidRenderRegistration;
 import mekanism.client.render.MekanismRenderer;
-import mekanism.client.render.RenderTickHandler;
 import mekanism.client.render.armor.FreeRunnerArmor;
 import mekanism.client.render.armor.JetpackArmor;
 import mekanism.client.render.armor.ScubaMaskArmor;
@@ -220,7 +219,6 @@ public class ClientRegistration {
     @SubscribeEvent
     public static void init(FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
-        MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
         IModuleHelper moduleHelper = IModuleHelper.INSTANCE;
         moduleHelper.addMekaSuitModuleModels(Mekanism.rl("models/entity/mekasuit_modules.obj"));
         moduleHelper.addMekaSuitModuleModelSpec("jetpack", MekanismModules.JETPACK_UNIT, EquipmentSlot.CHEST);

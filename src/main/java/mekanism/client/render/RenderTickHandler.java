@@ -3,20 +3,17 @@ package mekanism.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.Consumer;
 import mekanism.api.RelativeSide;
 import mekanism.client.ScreenChangeCallback;
 import mekanism.client.gui.GuiMekanism;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
-import mekanism.client.render.armor.ISpecialGear;
 import mekanism.client.render.armor.MekaSuitArmor;
 import mekanism.client.render.hud.RadiationOverlay;
 import mekanism.client.render.lib.Quad;
@@ -47,14 +44,14 @@ import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.WorldUtils;
 import mezz.jei.api.runtime.IRecipesGui;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext.BlockOutlineContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.model.HumanoidModel.ArmPose;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -72,7 +69,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -80,17 +76,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.event.RenderArmEvent;
-import net.minecraftforge.client.event.RenderHighlightEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.client.model.data.ModelData;
-import mekanism.common.lib.Lazy;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.RenderTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -101,14 +86,16 @@ public class RenderTickHandler {
 
     private static final Map<BlockState, List<Vertex[]>> cachedWireFrames = new HashMap<>();
     private static final Map<Direction, Map<TransmissionType, Model3D>> cachedOverlays = new EnumMap<>(Direction.class);
-    private static final Map<RenderType, List<LazyRender>> transparentRenderers = new HashMap<>();
+    private static final DelayedRenderQueue transparentRenderers = new DelayedRenderQueue();
     private static final BoltRenderer boltRenderer = new BoltRenderer();
 
+    private final FirstPersonArmPose<AbstractClientPlayer> armPose = new FirstPersonArmPose<>();
     private boolean outliningArea = false;
 
     public static void clearQueued() {
         RadiationOverlay.INSTANCE.resetRadiation();
         transparentRenderers.clear();
+        boltRenderer.clear();
     }
 
     public static void resetCached() {
@@ -118,6 +105,16 @@ public class RenderTickHandler {
 
     public static void renderBolt(Object renderer, BoltEffect bolt) {
         boltRenderer.update(renderer, bolt, MekanismRenderer.getPartialTick());
+    }
+
+    public static void register() {
+        RenderTickHandler handler = new RenderTickHandler();
+        WorldRenderEvents.START.register(context -> transparentRenderers.clear());
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(handler::renderWorld);
+        WorldRenderEvents.BLOCK_OUTLINE.register(handler::onBlockHover);
+        RenderFrameCallback.END.register(handler::tickEnd);
+        RenderArmCallback.EVENT.register(handler::renderArm);
+        registerScreenEvents();
     }
 
     public static void registerScreenEvents() {
@@ -139,114 +136,47 @@ public class RenderTickHandler {
     }
 
     public static void addTransparentRenderer(RenderType renderType, LazyRender render) {
-        transparentRenderers.computeIfAbsent(renderType, r -> new ArrayList<>()).add(render);
+        transparentRenderers.add(renderType, render);
     }
 
-    @SubscribeEvent
-    public void renderWorld(RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            //Only do matrix transforms and mess with buffers if we actually have any renders to render
-            renderStage(event, !transparentRenderers.isEmpty(), (camera, renderer, poseStack, renderTick, partialTick) -> {
-                ProfilerFiller profiler = minecraft.getProfiler();
-                profiler.push(ProfilerConstants.DELAYED);
-                record TransparentRenderInfo(RenderType renderType, List<LazyRender> renders, double closest) {
+    public void renderWorld(WorldRenderContext context) {
+        MultiBufferSource.BufferSource buffers = minecraft.renderBuffers().bufferSource();
+        transparentRenderers.render(context.camera(), buffers, context.matrixStack(), context.worldRenderer().ticks, context.tickDelta(), context.profiler());
+        if (boltRenderer.hasBoltsToRender()) {
+            renderStage(context, buffers, (camera, renderer, pose, renderTick, partialTick) -> {
+                try {
+                    boltRenderer.render(partialTick, pose, renderer);
+                } finally {
+                    renderer.endBatch(MekanismRenderType.MEK_LIGHTNING);
                 }
-                Consumer<TransparentRenderInfo> renderInfoConsumer = info -> {
-                    //Batch all renders for a single render type into a single buffer addition
-                    VertexConsumer buffer = renderer.getBuffer(info.renderType);
-                    for (LazyRender transparentRender : info.renders) {
-                        String profilerSection = transparentRender.getProfilerSection();
-                        if (profilerSection != null) {
-                            profiler.push(profilerSection);
-                        }
-                        //Note: We don't bother sorting renders in a specific render type as we assume the render type has sortOnUpload as true
-                        transparentRender.render(camera, buffer, poseStack, renderTick, partialTick, profiler);
-                        if (profilerSection != null) {
-                            profiler.pop();
-                        }
-                    }
-                    renderer.endBatch(info.renderType);
-                };
-                if (transparentRenderers.size() == 1) {
-                    //If we only have one render type we don't need to bother calculating any distances
-                    for (Map.Entry<RenderType, List<LazyRender>> entry : transparentRenderers.entrySet()) {
-                        renderInfoConsumer.accept(new TransparentRenderInfo(entry.getKey(), entry.getValue(), 0));
-                    }
-                } else {
-                    transparentRenderers.entrySet().stream()
-                          .map(entry -> {
-                              List<LazyRender> renders = entry.getValue();
-                              double closest = Double.MAX_VALUE;
-                              for (LazyRender render : renders) {
-                                  Vec3 renderPos = render.getCenterPos(partialTick);
-                                  if (renderPos != null) {
-                                      //Note: We can just use the distance sqr as we use it for both things, so they compare the same anyway
-                                      double distanceSqr = camera.getPosition().distanceToSqr(renderPos);
-                                      if (distanceSqr < closest) {
-                                          closest = distanceSqr;
-                                      }
-                                  }
-                              }
-                              //Note: we remap it in order to keep track of the closest distance so that we only have to calculate it once
-                              return new TransparentRenderInfo(entry.getKey(), renders, closest);
-                          })
-                          //Sort in the order of furthest to closest (reverse of by closest)
-                          .sorted(Comparator.comparingDouble(info -> -info.closest))
-                          .forEachOrdered(renderInfoConsumer);
-                }
-                transparentRenderers.clear();
-                profiler.pop();
-            });
-        } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES && boltRenderer.hasBoltsToRender()) {
-            //Only do matrix transforms and mess with buffers if we actually have any bolts to render
-            renderStage(event, boltRenderer.hasBoltsToRender(), (camera, renderer, poseStack, renderTick, partialTick) -> {
-                boltRenderer.render(partialTick, poseStack, renderer);
-                renderer.endBatch(MekanismRenderType.MEK_LIGHTNING);
             });
         }
     }
 
-    private void renderStage(RenderLevelStageEvent event, boolean shouldRender, StageRenderer renderer) {
-        if (shouldRender) {
-            Camera camera = event.getCamera();
-            PoseStack matrix = event.getPoseStack();
-            matrix.pushPose();
-            // here we translate based on the inverse position of the client viewing camera to get back to 0, 0, 0
-            Vec3 camVec = camera.getPosition();
-            matrix.translate(-camVec.x, -camVec.y, -camVec.z);
-            renderer.render(camera, minecraft.renderBuffers().bufferSource(), matrix, event.getRenderTick(), event.getPartialTick());
-            matrix.popPose();
+    private void renderStage(WorldRenderContext context, MultiBufferSource.BufferSource buffers, StageRenderer renderer) {
+        Camera camera = context.camera();
+        PoseStack matrix = context.matrixStack();
+        try (PoseStackScope ignored = new PoseStackScope(matrix)) {
+            Vec3 position = camera.getPosition();
+            matrix.translate(-position.x, -position.y, -position.z);
+            renderer.render(camera, buffers, matrix, context.worldRenderer().ticks, context.tickDelta());
         }
     }
 
-    @SubscribeEvent
-    public void renderArm(RenderArmEvent event) {
-        AbstractClientPlayer player = event.getPlayer();
+    public boolean renderArm(PlayerRenderer renderer, AbstractClientPlayer player, HumanoidArm arm, PoseStack pose, MultiBufferSource buffers, int light) {
         ItemStack chestStack = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (chestStack.getItem() instanceof ItemMekaSuitArmor armorItem) {
-            MekaSuitArmor armor = (MekaSuitArmor) ((ISpecialGear) IClientItemExtensions.of(armorItem)).getGearModel(ArmorItem.Type.CHESTPLATE);
-            PlayerRenderer renderer = (PlayerRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(player);
-            PlayerModel<AbstractClientPlayer> model = renderer.getModel();
-            model.setAllVisible(true);
-            //Note: We just want it to act as empty even if there is a map as it looks a lot better
-            boolean rightHand = event.getArm() == HumanoidArm.RIGHT;
-            if (rightHand) {
-                model.rightArmPose = ArmPose.EMPTY;
-            } else {
-                model.leftArmPose = ArmPose.EMPTY;
+        if (chestStack.getItem() instanceof ItemMekaSuitArmor) {
+            try (PoseStackScope ignored = new PoseStackScope(pose)) {
+                MekaSuitArmor.BODYARMOR.renderArm(armPose.prepare(renderer.getModel(), player, arm), pose, buffers, light, OverlayTexture.NO_OVERLAY, player,
+                      chestStack, arm == HumanoidArm.RIGHT);
             }
-            model.attackTime = 0.0F;
-            model.crouching = false;
-            model.swimAmount = 0.0F;
-            model.setupAnim(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
-            armor.renderArm(model, event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), OverlayTexture.NO_OVERLAY, player, chestStack, rightHand);
-            event.setCanceled(true);
+            return true;
         }
+        return false;
     }
 
-    @SubscribeEvent
-    public void tickEnd(RenderTickEvent event) {
-        if (event.phase == Phase.END) {
+    public void tickEnd(Minecraft client, float partialTick) {
+        if (!client.noRender) {
             Level world;
             Player player = minecraft.player;
             //Note: We check that the game mode is not null as if it is that means the world is unloading, and we don't actually want to be rendering
@@ -265,9 +195,9 @@ public class RenderTickHandler {
                             xRot = 20;
                             playerPos = playerPos.translate(0, 0.125, 0);
                         } else {
-                            float f = p.getSwimAmount(event.renderTickTime);
+                            float f = p.getSwimAmount(partialTick);
                             if (p.isFallFlying()) {
-                                float f1 = (float) p.getFallFlyingTicks() + event.renderTickTime;
+                                float f1 = (float) p.getFallFlyingTicks() + partialTick;
                                 float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);
                                 xRot = f2 * (-90.0F - p.getXRot());
                             } else {
@@ -308,7 +238,7 @@ public class RenderTickHandler {
                                 boolean rightHanded = p.getMainArm() == HumanoidArm.RIGHT;
                                 if (player == p && minecraft.options.getCameraType().isFirstPerson()) {
                                     flameVec = new Pos3D(1, 1, 1)
-                                          .multiply(p.getViewVector(event.renderTickTime))
+                                          .multiply(p.getViewVector(partialTick))
                                           .yRot(rightHanded ? 15 : -15)
                                           .translate(0, p.getEyeHeight() - 0.1, 0);
                                 } else {
@@ -334,143 +264,144 @@ public class RenderTickHandler {
         }
     }
 
-    @SubscribeEvent
-    @SuppressWarnings("UnstableApiUsage")
-    public void onBlockHover(RenderHighlightEvent.Block event) {
+    public boolean onBlockHover(WorldRenderContext context, BlockOutlineContext outline) {
         Player player = minecraft.player;
-        if (player == null) {
-            return;
+        if (player == null || !(minecraft.hitResult instanceof BlockHitResult rayTraceResult)) {
+            return true;
         }
-        BlockHitResult rayTraceResult = event.getTarget();
         if (rayTraceResult.getType() != Type.MISS) {
             Level world = player.level();
-            BlockPos pos = rayTraceResult.getBlockPos();
-            MultiBufferSource renderer = event.getMultiBufferSource();
-            Camera info = event.getCamera();
-            PoseStack matrix = event.getPoseStack();
-            ProfilerFiller profiler = world.getProfiler();
-            BlockState blockState = world.getBlockState(pos);
+            BlockPos pos = outline.blockPos();
+            MultiBufferSource renderer = Objects.requireNonNull(context.consumers());
+            Camera info = context.camera();
+            PoseStack matrix = context.matrixStack();
+            ProfilerFiller profiler = context.profiler();
+            BlockState blockState = outline.blockState();
 
             profiler.push(ProfilerConstants.AREA_MINE_OUTLINE);
-            // Draw outlines for area mining blocks
-            if (!outliningArea) {
-                ItemStack stack = player.getMainHandItem();
-                if (!stack.isEmpty() && stack.getItem() instanceof IBlastingItem tool) {
-                    Map<BlockPos, BlockState> blocks = tool.getBlastedBlocks(world, player, stack, pos, blockState);
-                    if (!blocks.isEmpty()) {
-                        outliningArea = true;
-                        Vec3 renderView = info.getPosition();
-                        LevelRenderer levelRenderer = event.getLevelRenderer();
-                        Lazy<VertexConsumer> lineConsumer = Lazy.of(() -> renderer.getBuffer(RenderType.lines()));
-                        for (Entry<BlockPos, BlockState> block : blocks.entrySet()) {
-                            BlockPos blastingTarget = block.getKey();
-                            if (!pos.equals(blastingTarget) && !ForgeHooksClient.onDrawHighlight(levelRenderer, info, rayTraceResult, event.getPartialTick(), matrix, renderer)) {
-                                levelRenderer.renderHitOutline(matrix, lineConsumer.get(), player, renderView.x, renderView.y, renderView.z, blastingTarget, block.getValue());
+            try {
+                // Draw outlines for area mining blocks
+                if (!outliningArea) {
+                    ItemStack stack = player.getMainHandItem();
+                    if (!stack.isEmpty() && stack.getItem() instanceof IBlastingItem tool) {
+                        Map<BlockPos, BlockState> blocks = tool.getBlastedBlocks(world, player, stack, pos, blockState);
+                        if (!blocks.isEmpty()) {
+                            outliningArea = true;
+                            try {
+                                for (Entry<BlockPos, BlockState> block : blocks.entrySet()) {
+                                    BlockPos blastingTarget = block.getKey();
+                                    if (!pos.equals(blastingTarget) && world.getWorldBorder().isWithinBounds(blastingTarget)) {
+                                        WorldBlockOutline.render(context, blastingTarget, block.getValue(), player, rayTraceResult);
+                                    }
+                                }
+                            } finally {
+                                outliningArea = false;
                             }
                         }
-                        outliningArea = false;
                     }
                 }
+            } finally {
+                profiler.pop();
             }
-            profiler.pop();
 
             boolean shouldCancel = false;
             profiler.push(ProfilerConstants.MEKANISM_OUTLINE);
-            if (!blockState.isAir() && world.getWorldBorder().isWithinBounds(pos)) {
-                BlockPos actualPos = pos;
-                BlockState actualState = blockState;
-                if (blockState.getBlock() instanceof BlockBounding) {
-                    TileEntityBoundingBlock tile = WorldUtils.getTileEntity(TileEntityBoundingBlock.class, world, pos);
-                    if (tile != null && tile.hasReceivedCoords()) {
-                        actualPos = tile.getMainPos();
-                        actualState = world.getBlockState(actualPos);
-                    }
-                }
-                AttributeCustomSelectionBox customSelectionBox = Attribute.get(actualState, AttributeCustomSelectionBox.class);
-                if (customSelectionBox != null) {
-                    WireFrameRenderer renderWireFrame = null;
-                    if (customSelectionBox.isJavaModel()) {
-                        //If we use a TER to render the wire frame, grab the tile
-                        BlockEntity tile = WorldUtils.getTileEntity(world, actualPos);
-                        if (tile != null) {
-                            BlockEntityRenderer<BlockEntity> tileRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher().getRenderer(tile);
-                            if (tileRenderer instanceof IWireFrameRenderer wireFrameRenderer && wireFrameRenderer.hasSelectionBox(actualState)) {
-                                renderWireFrame = (buffer, matrixStack, state, red, green, blue, alpha) -> {
-                                    if (wireFrameRenderer.isCombined()) {
-                                        renderQuadsWireFrame(state, buffer, matrixStack.last().pose(), world.random, red, green, blue, alpha);
-                                    }
-                                    wireFrameRenderer.renderWireFrame(tile, event.getPartialTick(), matrixStack, buffer, red, green, blue, alpha);
-                                };
-                            }
+            try {
+                if (!blockState.isAir() && world.getWorldBorder().isWithinBounds(pos)) {
+                    BlockPos actualPos = pos;
+                    BlockState actualState = blockState;
+                    if (blockState.getBlock() instanceof BlockBounding) {
+                        TileEntityBoundingBlock tile = WorldUtils.getTileEntity(TileEntityBoundingBlock.class, world, pos);
+                        if (tile != null && tile.hasReceivedCoords()) {
+                            actualPos = tile.getMainPos();
+                            actualState = world.getBlockState(actualPos);
                         }
-                    } else {
-                        //Otherwise, skip getting the tile and just grab the model
-                        renderWireFrame = (buffer, matrixStack, state, red, green, blue, alpha) ->
-                              renderQuadsWireFrame(state, buffer, matrixStack.last().pose(), world.random, red, green, blue, alpha);
                     }
-                    if (renderWireFrame != null) {
-                        matrix.pushPose();
-                        Vec3 viewPosition = info.getPosition();
-                        matrix.translate(actualPos.getX() - viewPosition.x, actualPos.getY() - viewPosition.y, actualPos.getZ() - viewPosition.z);
-                        //0.4 Alpha
-                        renderWireFrame.render(renderer.getBuffer(RenderType.lines()), matrix, actualState, 0, 0, 0, 0x66);
-                        matrix.popPose();
-                        shouldCancel = true;
+                    AttributeCustomSelectionBox customSelectionBox = Attribute.get(actualState, AttributeCustomSelectionBox.class);
+                    if (customSelectionBox != null) {
+                        WireFrameRenderer renderWireFrame = null;
+                        if (customSelectionBox.isJavaModel()) {
+                            //If we use a TER to render the wire frame, grab the tile
+                            BlockEntity tile = WorldUtils.getTileEntity(world, actualPos);
+                            if (tile != null) {
+                                BlockEntityRenderer<BlockEntity> tileRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher().getRenderer(tile);
+                                if (tileRenderer instanceof IWireFrameRenderer wireFrameRenderer && wireFrameRenderer.hasSelectionBox(actualState)) {
+                                    renderWireFrame = (buffer, matrixStack, state, red, green, blue, alpha) -> {
+                                        if (wireFrameRenderer.isCombined()) {
+                                            renderQuadsWireFrame(state, buffer, matrixStack.last().pose(), world.random, red, green, blue, alpha);
+                                        }
+                                        wireFrameRenderer.renderWireFrame(tile, context.tickDelta(), matrixStack, buffer, red, green, blue, alpha);
+                                    };
+                                }
+                            }
+                        } else {
+                            //Otherwise, skip getting the tile and just grab the model
+                            renderWireFrame = (buffer, matrixStack, state, red, green, blue, alpha) ->
+                                  renderQuadsWireFrame(state, buffer, matrixStack.last().pose(), world.random, red, green, blue, alpha);
+                        }
+                        if (renderWireFrame != null) {
+                            try (PoseStackScope ignored = new PoseStackScope(matrix)) {
+                                Vec3 viewPosition = info.getPosition();
+                                matrix.translate(actualPos.getX() - viewPosition.x, actualPos.getY() - viewPosition.y, actualPos.getZ() - viewPosition.z);
+                                //0.4 Alpha
+                                renderWireFrame.render(renderer.getBuffer(RenderType.lines()), matrix, actualState, 0, 0, 0, 0x66);
+                            }
+                            shouldCancel = true;
+                        }
                     }
                 }
+            } finally {
+                profiler.pop();
             }
-            profiler.pop();
 
             ItemStack stack = player.getMainHandItem();
             if (stack.isEmpty() || !(stack.getItem() instanceof ItemConfigurator)) {
                 //If we are not holding a configurator, look if we are in the offhand
                 stack = player.getOffhandItem();
                 if (stack.isEmpty() || !(stack.getItem() instanceof ItemConfigurator)) {
-                    if (shouldCancel) {
-                        event.setCanceled(true);
-                    }
-                    return;
+                    return !shouldCancel;
                 }
             }
             profiler.push(ProfilerConstants.CONFIGURABLE_MACHINE);
-            ConfiguratorMode state = ((ItemConfigurator) stack.getItem()).getMode(stack);
-            if (state.isConfigurating()) {
-                TransmissionType type = Objects.requireNonNull(state.getTransmission(), "Configurating state requires transmission type");
-                BlockEntity tile = WorldUtils.getTileEntity(world, pos);
-                if (tile instanceof ISideConfiguration configurable) {
-                    TileComponentConfig config = configurable.getConfig();
-                    if (config.supports(type)) {
-                        Direction face = rayTraceResult.getDirection();
-                        DataType dataType = config.getDataType(type, RelativeSide.fromDirections(configurable.getDirection(), face));
-                        if (dataType != null) {
-                            Vec3 viewPosition = info.getPosition();
-                            matrix.pushPose();
-                            matrix.translate(pos.getX() - viewPosition.x, pos.getY() - viewPosition.y, pos.getZ() - viewPosition.z);
-                            MekanismRenderer.renderObject(getOverlayModel(face, type), matrix, renderer.getBuffer(Sheets.translucentCullBlockSheet()),
-                                  MekanismRenderer.getColorARGB(dataType.getColor(), 0.6F), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, FaceDisplay.FRONT,
-                                  info);
-                            matrix.popPose();
+            try {
+                ConfiguratorMode state = ((ItemConfigurator) stack.getItem()).getMode(stack);
+                if (state.isConfigurating()) {
+                    TransmissionType type = Objects.requireNonNull(state.getTransmission(), "Configurating state requires transmission type");
+                    BlockEntity tile = WorldUtils.getTileEntity(world, pos);
+                    if (tile instanceof ISideConfiguration configurable) {
+                        TileComponentConfig config = configurable.getConfig();
+                        if (config.supports(type)) {
+                            Direction face = rayTraceResult.getDirection();
+                            DataType dataType = config.getDataType(type, RelativeSide.fromDirections(configurable.getDirection(), face));
+                            if (dataType != null) {
+                                try (PoseStackScope ignored = new PoseStackScope(matrix)) {
+                                    Vec3 viewPosition = info.getPosition();
+                                    matrix.translate(pos.getX() - viewPosition.x, pos.getY() - viewPosition.y, pos.getZ() - viewPosition.z);
+                                    MekanismRenderer.renderObject(getOverlayModel(face, type), matrix, renderer.getBuffer(Sheets.translucentCullBlockSheet()),
+                                          MekanismRenderer.getColorARGB(dataType.getColor(), 0.6F), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, FaceDisplay.FRONT,
+                                          info);
+                                }
+                            }
                         }
                     }
                 }
+            } finally {
+                profiler.pop();
             }
-            profiler.pop();
-            if (shouldCancel) {
-                event.setCanceled(true);
-            }
+            return !shouldCancel;
         }
+        return true;
     }
 
     private void renderQuadsWireFrame(BlockState state, VertexConsumer buffer, Matrix4f matrix, RandomSource rand, int red, int green, int blue, int alpha) {
         List<Vertex[]> allVertices = cachedWireFrames.computeIfAbsent(state, s -> {
             BakedModel bakedModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(s);
             //TODO: Eventually we may want to add support for Model data and maybe render type
-            ModelData modelData = ModelData.EMPTY;
             List<Vertex[]> vertices = new ArrayList<>();
             for (Direction direction : EnumUtils.DIRECTIONS) {
-                QuadUtils.unpack(bakedModel.getQuads(s, direction, rand, modelData, null)).stream().map(Quad::getVertices).forEach(vertices::add);
+                QuadUtils.unpack(bakedModel.getQuads(s, direction, rand)).stream().map(Quad::getVertices).forEach(vertices::add);
             }
-            QuadUtils.unpack(bakedModel.getQuads(s, null, rand, modelData, null)).stream().map(Quad::getVertices).forEach(vertices::add);
+            QuadUtils.unpack(bakedModel.getQuads(s, null, rand)).stream().map(Quad::getVertices).forEach(vertices::add);
             return vertices;
         });
         renderVertexWireFrame(allVertices, buffer, matrix, red, green, blue, alpha);
@@ -525,19 +456,7 @@ public class RenderTickHandler {
     }
 
     @FunctionalInterface
-    public interface LazyRender {
-
-        void render(Camera camera, VertexConsumer buffer, PoseStack poseStack, int renderTick, float partialTick, ProfilerFiller profiler);
-
-        @Nullable
-        default Vec3 getCenterPos(float partialTick) {
-            return null;
-        }
-
-        @Nullable
-        default String getProfilerSection() {
-            return null;
-        }
+    public interface LazyRender extends DelayedRenderQueue.RenderTask {
     }
 
     @FunctionalInterface
