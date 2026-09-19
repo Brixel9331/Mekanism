@@ -247,6 +247,8 @@ public interface QuadTransformation {
                 v.pos(round(quaternion.rotate(v.getPos().subtract(0.5, 0.5, 0.5)).add(0.5, 0.5, 0.5)));
                 v.normal(round(quaternion.rotate(v.getNormalD()).normalize()));
             });
+            Vec3 normal = quaternion.rotate(Vec3.atLowerCornerOf(quad.getSide().getNormal()));
+            quad.setSide(Direction.getNearest((float) normal.x, (float) normal.y, (float) normal.z));
             return true;
         }
 

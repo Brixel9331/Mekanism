@@ -1,21 +1,15 @@
 package mekanism.client.render.lib;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-import java.util.Arrays;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import java.util.function.Consumer;
-import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.lib.Color;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
 import org.joml.Vector3f;
 
 public class Quad {
@@ -46,8 +40,11 @@ public class Quad {
         sprite = quad.getSprite();
         tintIndex = quad.getTintIndex();
         shade = quad.isShade();
-        hasAmbientOcclusion = quad.hasAmbientOcclusion();
-        new BakedQuadUnpacker().putBulkData(new PoseStack().last(), quad, 1, 1, 1, 1, 0, OverlayTexture.NO_OVERLAY, true);
+        hasAmbientOcclusion = !(quad instanceof ModelQuad modelQuad) || modelQuad.hasAmbientOcclusion();
+        int stride = DefaultVertexFormat.BLOCK.getIntegerSize();
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = Vertex.fromVanilla(quad.getVertices(), i * stride, side);
+        }
     }
 
     public TextureAtlasSprite getTexture() {
@@ -109,16 +106,12 @@ public class Quad {
     }
 
     public BakedQuad bake() {
-        QuadBakingVertexConsumer.Buffered quadBaker = new QuadBakingVertexConsumer.Buffered();
-        quadBaker.setSprite(sprite);
-        quadBaker.setDirection(side);
-        quadBaker.setTintIndex(tintIndex);
-        quadBaker.setShade(shade);
-        quadBaker.setHasAmbientOcclusion(hasAmbientOcclusion);
-        for (Vertex vertex : vertices) {
-            vertex.write(quadBaker);
+        int stride = DefaultVertexFormat.BLOCK.getIntegerSize();
+        int[] data = new int[vertices.length * stride];
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i].writeVanilla(data, i * stride);
         }
-        return quadBaker.getQuad();
+        return new ModelQuad(data, tintIndex, side, sprite, shade, hasAmbientOcclusion);
     }
 
     public Quad copy() {
@@ -135,73 +128,6 @@ public class Quad {
             flipped[i] = vertices[i].flip();
         }
         return new Quad(sprite, side.getOpposite(), flipped, tintIndex, shade, hasAmbientOcclusion);
-    }
-
-    @NothingNullByDefault
-    private class BakedQuadUnpacker implements VertexConsumer {
-
-        private Vertex vertex = new Vertex();
-        private int vertexIndex = 0;
-
-        @Override
-        public VertexConsumer vertex(double x, double y, double z) {
-            vertex.pos(new Vec3(x, y, z));
-            return this;
-        }
-
-        @Override
-        public VertexConsumer color(int red, int green, int blue, int alpha) {
-            vertex.color(red, green, blue, alpha);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer uv(float u, float v) {
-            vertex.texRaw(u, v);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer overlayCoords(int u, int v) {
-            vertex.overlay(u, v);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer uv2(int u, int v) {
-            vertex.lightRaw(u, v);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer normal(float x, float y, float z) {
-            vertex.normal(x, y, z);
-            return this;
-        }
-
-        @Override
-        public void endVertex() {
-            if (vertexIndex != vertices.length) {
-                vertices[vertexIndex++] = vertex;
-                vertex = new Vertex();
-            }
-        }
-
-        @Override
-        public void defaultColor(int red, int green, int blue, int alpha) {
-            //We don't support having a default color
-        }
-
-        @Override
-        public void unsetDefaultColor() {
-            //We don't support having a default color
-        }
-
-        @Override
-        public VertexConsumer misc(VertexFormatElement element, int... rawData) {
-            vertex.misc(element, Arrays.copyOf(rawData, rawData.length));
-            return this;
-        }
     }
 
     public static class Builder {

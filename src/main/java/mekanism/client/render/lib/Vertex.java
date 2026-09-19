@@ -1,19 +1,14 @@
 package mekanism.client.render.lib;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import mekanism.common.lib.Color;
+import net.minecraft.core.Direction;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 public class Vertex {
-
-    private final Map<VertexFormatElement, int[]> miscData;
 
     private Vec3 pos;
     private Vector3f normal;
@@ -29,7 +24,6 @@ public class Vertex {
     private int lightU, lightV;
 
     public Vertex() {
-        this.miscData = new HashMap<>();
     }
 
     public Vertex(Vec3 pos, Vector3f normal, Color color, float texU, float texV, int overlayU, int overlayV, int lightU, int lightV) {
@@ -37,11 +31,6 @@ public class Vertex {
     }
 
     public Vertex(Vec3 pos, Vector3f normal, int red, int green, int blue, int alpha, float texU, float texV, int overlayU, int overlayV, int lightU, int lightV) {
-        this(pos, normal, red, green, blue, alpha, texU, texV, overlayU, overlayV, lightU, lightV, new HashMap<>());
-    }
-
-    public Vertex(Vec3 pos, Vector3f normal, int red, int green, int blue, int alpha, float texU, float texV, int overlayU, int overlayV, int lightU, int lightV,
-          Map<VertexFormatElement, int[]> miscData) {
         this.pos = pos;
         this.normal = normal;
         this.red = red;
@@ -54,7 +43,32 @@ public class Vertex {
         this.overlayV = overlayV;
         this.lightU = lightU;
         this.lightV = lightV;
-        this.miscData = miscData;
+    }
+
+    public static Vertex fromVanilla(int[] data, int offset, Direction face) {
+        int color = data[offset + 3];
+        int light = data[offset + 6];
+        int packedNormal = data[offset + 7];
+        Vector3f normal = packedNormal == 0 ? face.step() : new Vector3f((byte) packedNormal / 127F,
+              (byte) (packedNormal >> 8) / 127F, (byte) (packedNormal >> 16) / 127F);
+        return new Vertex(new Vec3(Float.intBitsToFloat(data[offset]), Float.intBitsToFloat(data[offset + 1]), Float.intBitsToFloat(data[offset + 2])),
+              normal, color & 255, color >> 8 & 255, color >> 16 & 255, color >>> 24, Float.intBitsToFloat(data[offset + 4]),
+              Float.intBitsToFloat(data[offset + 5]), OverlayTexture.NO_WHITE_U, OverlayTexture.WHITE_OVERLAY_V, light & 65535, light >>> 16);
+    }
+
+    public void writeVanilla(int[] data, int offset) {
+        data[offset] = Float.floatToRawIntBits((float) pos.x);
+        data[offset + 1] = Float.floatToRawIntBits((float) pos.y);
+        data[offset + 2] = Float.floatToRawIntBits((float) pos.z);
+        data[offset + 3] = (red & 255) | (green & 255) << 8 | (blue & 255) << 16 | (alpha & 255) << 24;
+        data[offset + 4] = Float.floatToRawIntBits(texU);
+        data[offset + 5] = Float.floatToRawIntBits(texV);
+        data[offset + 6] = (lightU & 65535) | (lightV & 65535) << 16;
+        data[offset + 7] = packNormal(normal.x()) | packNormal(normal.y()) << 8 | packNormal(normal.z()) << 16;
+    }
+
+    private static int packNormal(float component) {
+        return (byte) Math.round(Math.max(-1, Math.min(1, component)) * 127) & 255;
     }
 
     public static Vertex create(Vec3 pos, Vector3f normal, Color color, TextureAtlasSprite sprite, float texU, float texV, int overlayU, int overlayV, int lightU,
@@ -162,11 +176,6 @@ public class Vertex {
         return lightRaw(u << 4, v << 4);
     }
 
-    public Vertex misc(VertexFormatElement element, int... data) {
-        miscData.put(element, data);
-        return this;
-    }
-
     public Vertex flip() {
         return flip(true);
     }
@@ -176,15 +185,7 @@ public class Vertex {
     }
 
     public Vertex copy(boolean deepCopy) {
-        if (deepCopy) {
-            //Deep copy the misc data
-            Map<VertexFormatElement, int[]> miscCopy = new HashMap<>();
-            for (Map.Entry<VertexFormatElement, int[]> entry : miscData.entrySet()) {
-                miscCopy.put(entry.getKey(), Arrays.copyOf(entry.getValue(), entry.getValue().length));
-            }
-            return new Vertex(pos, new Vector3f(normal), red, green, blue, alpha, texU, texV, overlayU, overlayV, lightU, lightV, miscCopy);
-        }
-        return new Vertex(pos, normal, red, green, blue, alpha, texU, texV, overlayU, overlayV, lightU, lightV, miscData);
+        return new Vertex(pos, deepCopy ? new Vector3f(normal) : normal, red, green, blue, alpha, texU, texV, overlayU, overlayV, lightU, lightV);
     }
 
     public void write(VertexConsumer consumer) {
@@ -194,9 +195,6 @@ public class Vertex {
         consumer.overlayCoords(overlayU, overlayV);
         consumer.uv2(lightU, lightV);
         consumer.normal(normal.x(), normal.y(), normal.z());
-        for (Map.Entry<VertexFormatElement, int[]> entry : miscData.entrySet()) {
-            consumer.misc(entry.getKey(), entry.getValue());
-        }
         consumer.endVertex();
     }
 }
