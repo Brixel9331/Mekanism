@@ -58,6 +58,7 @@ import mekanism.common.item.loot.MekanismLootFunctions;
 import mekanism.common.item.predicate.CustomItemPredicate;
 import mekanism.common.item.predicate.FullCanteenItemPredicate;
 import mekanism.common.item.predicate.MaxedModuleContainerItemPredicate;
+import mekanism.common.lib.BlockEntityLoadQueue;
 import mekanism.common.lib.LivingEntityTickCallback;
 import mekanism.common.lib.MekAnnotationScanner;
 import mekanism.common.lib.ServerLifecycle;
@@ -194,6 +195,7 @@ public class Mekanism implements ModInitializer {
             }
         });
         WorldLifecycle.register();
+        BlockEntityLoadQueue.register();
         WorldLifecycle.LOAD.register(this::onWorldLoad);
         WorldLifecycle.UNLOAD.register(this::onWorldUnload);
         CommandRegistrationCallback.EVENT.register((dispatcher, registries, selection) -> registerCommands(dispatcher));

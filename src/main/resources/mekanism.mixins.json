@@ -19,6 +19,8 @@
     "ServerPlayerGameModeMixin",
     "ItemPredicateMixin",
     "PlayerTickMixin",
+    "LevelBlockEntityLifecycleMixin",
+    "LevelChunkBlockEntityLifecycleMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",
