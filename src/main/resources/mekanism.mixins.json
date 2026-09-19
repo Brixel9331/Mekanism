@@ -28,6 +28,8 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
+    "client.ClientBlockEntityPacketMixin",
+    "client.ClientChunkBlockEntityMixin",
     "client.GameRendererMixin",
     "client.PlayerRendererMixin",
     "client.SoundEngineMixin",
