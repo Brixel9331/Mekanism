@@ -4,7 +4,7 @@ import mekanism.api.security.IOwnerObject;
 import mekanism.api.security.ISecurityObject;
 import mekanism.api.security.SecurityLookup;
 import mekanism.common.block.attribute.Attribute;
-import mekanism.common.block.attribute.AttributeSecurity;
+import mekanism.common.block.attribute.Attributes.AttributeSecurity;
 import mekanism.common.capabilities.security.item.ItemStackOwnerObject;
 import mekanism.common.capabilities.security.item.ItemStackSecurityObject;
 import mekanism.common.entity.EntityRobit;
