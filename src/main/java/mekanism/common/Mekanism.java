@@ -180,6 +180,7 @@ public class Mekanism implements ModInitializer {
 
     public Mekanism() {
         instance = this;
+        mekanism.common.registries.MekanismAttributes.register();
         MekanismSecurity.register();
         MekanismConfig.registerConfigs();
         //Register our custom serializer condition

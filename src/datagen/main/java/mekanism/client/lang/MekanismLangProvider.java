@@ -618,6 +618,8 @@ public class MekanismLangProvider extends BaseLanguageProvider {
     }
 
     private void addMisc() {
+        add("attribute.name.mekanism.step_height", "Step Height Addition");
+        add("attribute.name.mekanism.swim_speed", "Swim Speed");
         addJade();
         //Upgrades
         add(APILang.UPGRADE_SPEED, "Speed");
