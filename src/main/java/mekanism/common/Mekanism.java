@@ -181,6 +181,7 @@ public class Mekanism implements ModInitializer {
     public Mekanism() {
         instance = this;
         mekanism.common.registries.MekanismAttributes.register();
+        mekanism.common.lib.CraftingResultCallback.EVENT.register(mekanism.common.recipe.bin.BinInsertRecipe::onCrafting);
         MekanismSecurity.register();
         MekanismConfig.registerConfigs();
         //Register our custom serializer condition

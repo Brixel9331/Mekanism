@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 
 //TODO: Test this recipe in various modded crafting tables/auto crafters
 @NothingNullByDefault
@@ -181,13 +180,11 @@ public class BinInsertRecipe extends BinRecipe {
         return MekanismRecipeSerializers.BIN_INSERT.get();
     }
 
-    public static void onCrafting(ItemCraftedEvent event) {
-        ItemStack result = event.getCrafting();
+    public static void onCrafting(ItemStack result, Container craftingMatrix) {
         if (!result.isEmpty() && result.getItem() instanceof ItemBlockBin && ItemDataUtils.getBoolean(result, NBTConstants.FROM_RECIPE)) {
             BinInventorySlot slot = convertToSlot(result);
             ItemStack storedStack = slot.getStack();
             if (!storedStack.isEmpty()) {
-                Container craftingMatrix = event.getInventory();
                 for (int i = 0, slots = craftingMatrix.getContainerSize(); i < slots; ++i) {
                     ItemStack stack = craftingMatrix.getItem(i);
                     //Check remaining items

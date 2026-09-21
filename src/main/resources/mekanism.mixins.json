@@ -24,6 +24,7 @@
     "PlayerAttributesMixin",
     "StepHeightMixin",
     "SwimSpeedMixin",
+    "ResultSlotMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",
