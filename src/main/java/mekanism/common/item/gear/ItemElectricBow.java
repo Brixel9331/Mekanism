@@ -40,7 +40,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.ForgeEventFactory;
+import mekanism.common.lib.ArrowReleaseCallback;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvider, ICustomCreativeTabContents, ItemCapabilityProvider {
@@ -70,7 +70,7 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
             }
             boolean infinity = player.isCreative() || stack.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0;
             ItemStack ammo = player.getProjectile(stack);
-            int charge = ForgeEventFactory.onArrowLoose(stack, world, player, getUseDuration(stack) - timeLeft, !ammo.isEmpty() || infinity);
+            int charge = ArrowReleaseCallback.EVENT.invoker().release(stack, world, player, getUseDuration(stack) - timeLeft, !ammo.isEmpty() || infinity);
             if (charge < 0) {
                 return;
             }
