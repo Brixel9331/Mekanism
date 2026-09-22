@@ -32,6 +32,7 @@ import mekanism.common.inventory.container.sync.chemical.SyncablePigmentStack;
 import mekanism.common.inventory.container.sync.chemical.SyncableSlurryStack;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.network.BasePacketHandler;
+import mekanism.common.network.FluidStackPacketCodec;
 import mekanism.common.network.to_client.container.property.chemical.GasStackPropertyData;
 import mekanism.common.network.to_client.container.property.chemical.InfusionStackPropertyData;
 import mekanism.common.network.to_client.container.property.chemical.PigmentStackPropertyData;
@@ -61,7 +62,7 @@ public enum PropertyType {
     ITEM_STACK(ItemStack.class, ItemStack.EMPTY, (getter, setter) -> SyncableItemStack.create(() -> (ItemStack) getter.get(), setter::accept),
           (property, buffer) -> new ItemStackPropertyData(property, buffer.readItem())),
     FLUID_STACK(FluidStack.class, FluidStack.EMPTY, (getter, setter) -> SyncableFluidStack.create(() -> (FluidStack) getter.get(), setter::accept),
-          (property, buffer) -> new FluidStackPropertyData(property, buffer.readFluidStack())),
+          (property, buffer) -> new FluidStackPropertyData(property, FluidStackPacketCodec.read(buffer))),
     GAS_STACK(GasStack.class, GasStack.EMPTY, (getter, setter) -> SyncableGasStack.create(() -> (GasStack) getter.get(), setter::accept),
           (property, buffer) -> new GasStackPropertyData(property, ChemicalUtils.readGasStack(buffer))),
     INFUSION_STACK(InfusionStack.class, InfusionStack.EMPTY, (getter, setter) -> SyncableInfusionStack.create(() -> (InfusionStack) getter.get(), setter::accept),

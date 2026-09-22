@@ -52,6 +52,7 @@ import mekanism.common.inventory.slot.EntangloporterInventorySlot;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.common.network.FluidStackPacketCodec;
 import mekanism.common.tile.TileEntityQuantumEntangloporter;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.util.CapabilityUtils;
@@ -147,7 +148,7 @@ public class InventoryFrequency extends Frequency implements IMekanismInventory,
     public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         storedEnergy.getEnergy().writeToBuffer(buffer);
-        buffer.writeFluidStack(storedFluid.getFluid());
+        FluidStackPacketCodec.write(buffer, storedFluid.getFluid());
         ChemicalUtils.writeChemicalStack(buffer, storedGas.getStack());
         ChemicalUtils.writeChemicalStack(buffer, storedInfusion.getStack());
         ChemicalUtils.writeChemicalStack(buffer, storedPigment.getStack());
@@ -161,7 +162,7 @@ public class InventoryFrequency extends Frequency implements IMekanismInventory,
         super.read(dataStream);
         presetVariables();
         storedEnergy.setEnergy(FloatingLong.readFromBuffer(dataStream));
-        storedFluid.setStack(dataStream.readFluidStack());
+        storedFluid.setStack(FluidStackPacketCodec.read(dataStream));
         storedGas.setStack(ChemicalUtils.readGasStack(dataStream));
         storedInfusion.setStack(ChemicalUtils.readInfusionStack(dataStream));
         storedPigment.setStack(ChemicalUtils.readPigmentStack(dataStream));

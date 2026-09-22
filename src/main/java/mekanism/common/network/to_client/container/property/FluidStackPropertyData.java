@@ -2,6 +2,7 @@ package mekanism.common.network.to_client.container.property;
 
 import mekanism.api.fluid.FluidStack;
 import mekanism.common.inventory.container.MekanismContainer;
+import mekanism.common.network.FluidStackPacketCodec;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,6 @@ public class FluidStackPropertyData extends PropertyData {
     @Override
     public void writeToPacket(FriendlyByteBuf buffer) {
         super.writeToPacket(buffer);
-        buffer.writeFluidStack(value);
+        FluidStackPacketCodec.write(buffer, value);
     }
 }
