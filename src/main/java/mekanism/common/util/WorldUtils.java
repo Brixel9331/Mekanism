@@ -423,19 +423,7 @@ public class WorldUtils {
      * @return if the block is indirectly getting powered by LOADED chunks
      */
     public static boolean isGettingPowered(Level world, BlockPos pos) {
-        if (isBlockLoaded(world, pos)) {
-            for (Direction side : EnumUtils.DIRECTIONS) {
-                BlockPos offset = pos.relative(side);
-                if (isBlockLoaded(world, offset)) {
-                    BlockState blockState = world.getBlockState(offset);
-                    boolean weakPower = blockState.getBlock().shouldCheckWeakPower(blockState, world, pos, side);
-                    if (weakPower && isDirectlyGettingPowered(world, offset) || !weakPower && blockState.getSignal(world, offset, side) > 0) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return NeighborUpdates.isGettingPowered(world, pos);
     }
 
     /**
@@ -447,15 +435,7 @@ public class WorldUtils {
      * @return if the block is directly getting powered
      */
     public static boolean isDirectlyGettingPowered(Level world, BlockPos pos) {
-        for (Direction side : EnumUtils.DIRECTIONS) {
-            BlockPos offset = pos.relative(side);
-            if (isBlockLoaded(world, offset)) {
-                if (world.getSignal(pos, side) > 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return NeighborUpdates.isDirectlyGettingPowered(world, pos);
     }
 
     /**
@@ -502,23 +482,7 @@ public class WorldUtils {
      * @param pos   BlockPos to perform the operation on
      */
     public static void notifyLoadedNeighborsOfTileChange(Level world, BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
-        for (Direction dir : EnumUtils.DIRECTIONS) {
-            BlockPos offset = pos.relative(dir);
-            if (isBlockLoaded(world, offset)) {
-                notifyNeighborOfChange(world, offset, pos);
-                if (world.getBlockState(offset).isRedstoneConductor(world, offset)) {
-                    offset = offset.relative(dir);
-                    if (isBlockLoaded(world, offset)) {
-                        Block block1 = world.getBlockState(offset).getBlock();
-                        //TODO: Make sure this is passing the correct state
-                        if (block1.getWeakChanges(state, world, offset)) {
-                            block1.onNeighborChange(state, world, offset, pos);
-                        }
-                    }
-                }
-            }
-        }
+        NeighborUpdates.notifyLoadedNeighborsOfTileChange(world, pos);
     }
 
     /**
@@ -529,17 +493,7 @@ public class WorldUtils {
      * @param neighbors Sides to notify the neighbors on.
      */
     public static void notifyNeighborsOfChange(@Nullable Level world, BlockPos fromPos, Set<Direction> neighbors) {
-        if (!neighbors.isEmpty()) {
-            getBlockState(world, fromPos).ifPresent(sourceState -> {
-                for (Direction neighbor : neighbors) {
-                    BlockPos pos = fromPos.relative(neighbor);
-                    getBlockState(world, pos).ifPresent(state -> {
-                        state.onNeighborChange(world, pos, fromPos);
-                        state.neighborChanged(world, pos, sourceState.getBlock(), fromPos, false);
-                    });
-                }
-            });
-        }
+        NeighborUpdates.notifyNeighborsOfChange(world, fromPos, neighbors);
     }
 
     /**
@@ -550,10 +504,7 @@ public class WorldUtils {
      * @param fromPos pos of our block that updated
      */
     public static void notifyNeighborOfChange(@Nullable Level world, BlockPos pos, BlockPos fromPos) {
-        getBlockState(world, pos).ifPresent(state -> {
-            state.onNeighborChange(world, pos, fromPos);
-            state.neighborChanged(world, pos, world.getBlockState(fromPos).getBlock(), fromPos, false);
-        });
+        NeighborUpdates.notifyNeighborOfChange(world, pos, fromPos);
     }
 
     /**
