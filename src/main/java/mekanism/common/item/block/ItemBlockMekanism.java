@@ -27,6 +27,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -70,21 +72,21 @@ public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem implements
     }
 
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         if (exposesEnergyCap(oldStack) && exposesEnergyCap(newStack)) {
             //Ignore NBT for energized items causing re-equip animations
-            return slotChanged || oldStack.getItem() != newStack.getItem();
+            return oldStack.getItem() != newStack.getItem();
         }
-        return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+        return super.allowNbtUpdateAnimation(player, hand, oldStack, newStack);
     }
 
     @Override
-    public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
         if (exposesEnergyCap(oldStack) && exposesEnergyCap(newStack)) {
             //Ignore NBT for energized items causing block break reset
-            return oldStack.getItem() != newStack.getItem();
+            return oldStack.getItem() == newStack.getItem();
         }
-        return super.shouldCauseBlockBreakReset(oldStack, newStack);
+        return super.allowContinuingBlockBreaking(player, oldStack, newStack);
     }
 
     protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {

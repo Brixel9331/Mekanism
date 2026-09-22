@@ -14,6 +14,8 @@ import mekanism.common.registration.impl.CreativeTabDeferredRegister.ICustomCrea
 import mekanism.common.util.StorageUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -91,14 +93,14 @@ public class ItemEnergized extends CapabilityItem implements ICustomCreativeTabC
     }
 
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         //Ignore NBT for energized items causing re-equip animations
-        return slotChanged || oldStack.getItem() != newStack.getItem();
+        return oldStack.getItem() != newStack.getItem();
     }
 
     @Override
-    public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
         //Ignore NBT for energized items causing block break reset
-        return oldStack.getItem() != newStack.getItem();
+        return oldStack.getItem() == newStack.getItem();
     }
 }

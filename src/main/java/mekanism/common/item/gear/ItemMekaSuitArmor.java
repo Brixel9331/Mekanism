@@ -70,6 +70,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -428,15 +429,15 @@ public class ItemMekaSuitArmor extends ItemSpecialArmor implements IModuleContai
     }
 
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         //Ignore NBT for energized items causing re-equip animations
-        return slotChanged || oldStack.getItem() != newStack.getItem();
+        return oldStack.getItem() != newStack.getItem();
     }
 
     @Override
-    public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
         //Ignore NBT for energized items causing block break reset
-        return oldStack.getItem() != newStack.getItem();
+        return oldStack.getItem() == newStack.getItem();
     }
 
     public static float getDamageAbsorbed(Player player, DamageSource source, float amount) {
