@@ -182,7 +182,7 @@ public class GuiUtils {
     }
 
     public static int drawString(GuiGraphics guiGraphics, Font font, Component component, float x, float y, int color, boolean drawShadow) {
-        return guiGraphics.drawString(font, component.getVisualOrderText(), x, y, color, drawShadow);
+        return GuiRenderHelper.drawString(guiGraphics, font, component, x, y, color, drawShadow);
     }
 
     public static void renderItem(GuiGraphics guiGraphics, @NotNull ItemStack stack, int xAxis, int yAxis, float scale, Font font, @Nullable String text, boolean overlay) {

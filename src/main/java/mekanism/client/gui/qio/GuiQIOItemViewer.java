@@ -89,7 +89,7 @@ public abstract class GuiQIOItemViewer<CONTAINER extends QIOItemViewerContainer>
               41, ListSortType.class, menu::getSortType, menu::setSortType));
         addRenderableWidget(new GuiDigitalIconToggle<>(this, imageWidth - 9 - 12, QIOItemViewerContainer.SLOTS_START_Y + slotsY * 18 + 1,
               12, 12, SortDirection.class, menu::getSortDirection, menu::setSortDirection));
-        addRenderableWidget(new GuiResizeControls(this, (getMinecraft().getWindow().getGuiScaledHeight() / 2) - 20 - topPos, this::resize));
+        addRenderableWidget(new GuiResizeControls(this, (minecraft.getWindow().getGuiScaledHeight() / 2) - 20 - topPos, this::resize));
         craftingWindowTab = addRenderableWidget(new GuiCraftingWindowTab(this, () -> craftingWindowTab, menu));
     }
 
@@ -152,9 +152,9 @@ public abstract class GuiQIOItemViewer<CONTAINER extends QIOItemViewerContainer>
         @SuppressWarnings("unchecked")
         CONTAINER c = (CONTAINER) menu.recreate();
         GuiQIOItemViewer<CONTAINER> s = recreate(c);
-        getMinecraft().screen = null;
-        getMinecraft().player.containerMenu = s.getMenu();
-        getMinecraft().setScreen(s);
+        minecraft.screen = null;
+        minecraft.player.containerMenu = s.getMenu();
+        minecraft.setScreen(s);
         s.searchField.setText(searchField.getText());
         c.updateSearch(searchField.getText());
         //Transfer all the windows to the new GUI

@@ -137,7 +137,7 @@ public abstract class GuiModIDFilter<FILTER extends IModIDFilter<FILTER>, TILE e
             success = true;
         }
         if (click) {
-            playClickSound(SoundEvents.UI_BUTTON_CLICK);
+            playClickSound(SoundEvents.UI_BUTTON_CLICK::value);
         }
         return success;
     }

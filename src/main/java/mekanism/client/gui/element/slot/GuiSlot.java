@@ -78,7 +78,7 @@ public class GuiSlot extends GuiTexturedElement implements IJEIGhostTarget, ISup
 
     public GuiSlot click(IClickable onClick) {
         //Use default click sound
-        return click(onClick, SoundEvents.UI_BUTTON_CLICK);
+        return click(onClick, SoundEvents.UI_BUTTON_CLICK::value);
     }
 
     public GuiSlot click(IClickable onClick, @Nullable Supplier<SoundEvent> clickSound) {

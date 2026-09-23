@@ -115,7 +115,7 @@ public class GuiSecurityDesk extends GuiMekanismTile<TileEntitySecurityDesk, Mek
     }
 
     private boolean isOwner(@Nullable SecurityFrequency frequency) {
-        return frequency != null && tile.ownerMatches(getMinecraft().player);
+        return frequency != null && tile.ownerMatches(minecraft.player);
     }
 
     private void setTrusted() {

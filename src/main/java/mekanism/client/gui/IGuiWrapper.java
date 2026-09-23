@@ -41,28 +41,28 @@ public interface IGuiWrapper {
 
     default int getLeft() {
         if (this instanceof AbstractContainerScreen<?> screen) {
-            return screen.getGuiLeft();
+            return screen.leftPos;
         }
         return 0;
     }
 
     default int getTop() {
         if (this instanceof AbstractContainerScreen<?> screen) {
-            return screen.getGuiTop();
+            return screen.topPos;
         }
         return 0;
     }
 
     default int getWidth() {
         if (this instanceof AbstractContainerScreen<?> screen) {
-            return screen.getXSize();
+            return screen.imageWidth;
         }
         return 0;
     }
 
     default int getHeight() {
         if (this instanceof AbstractContainerScreen<?> screen) {
-            return screen.getYSize();
+            return screen.imageHeight;
         }
         return 0;
     }
@@ -110,7 +110,7 @@ public interface IGuiWrapper {
         } else {
             List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
             tooltip.addAll(toAppend);
-            guiGraphics.renderTooltip(getFont(), tooltip, stack.getTooltipImage(), stack, xAxis, yAxis);
+            guiGraphics.renderTooltip(getFont(), tooltip, stack.getTooltipImage(), xAxis, yAxis);
         }
     }
 

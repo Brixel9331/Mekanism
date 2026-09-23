@@ -1,6 +1,5 @@
 package mekanism.client.gui;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import mekanism.common.inventory.container.slot.IVirtualSlot;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -22,6 +21,27 @@ public abstract class VirtualSlotContainerScreen<T extends AbstractContainerMenu
 
     public VirtualSlotContainerScreen(T container, Inventory inv, Component titleIn) {
         super(container, inv, titleIn);
+    }
+
+    public int getGuiLeft() {
+        return leftPos;
+    }
+
+    public int getGuiTop() {
+        return topPos;
+    }
+
+    public int getXSize() {
+        return imageWidth;
+    }
+
+    public int getYSize() {
+        return imageHeight;
+    }
+
+    @Nullable
+    public Slot getSlotUnderMouse() {
+        return hoveredSlot;
     }
 
     protected abstract boolean isMouseOverSlot(@NotNull Slot slot, double mouseX, double mouseY);
@@ -126,8 +146,7 @@ public abstract class VirtualSlotContainerScreen<T extends AbstractContainerMenu
 
     public boolean slotClicked(@NotNull Slot slot, int button) {
         //Copy of super.mouseClicked, minus the call to all the sub elements as we know how we are interacting with it
-        InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(button);
-        boolean pickBlockButton = minecraft.options.keyPickItem.isActiveAndMatches(mouseKey);
+        boolean pickBlockButton = minecraft.options.keyPickItem.matchesMouse(button);
         long time = Util.getMillis();
         this.doubleclick = this.lastClickSlot == slot && time - this.lastClickTime < 250L && this.lastClickButton == button;
         this.skipNextRelease = false;

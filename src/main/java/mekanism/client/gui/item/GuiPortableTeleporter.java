@@ -54,8 +54,8 @@ public class GuiPortableTeleporter extends GuiMekanism<PortableTeleporterContain
             TeleporterFrequency frequency = getFrequency();
             if (frequency != null && menu.getStatus() == 1) {
                 //This should always be true if the teleport button is active, but validate it just in case
-                ClientTickHandler.portableTeleport(getMinecraft().player, menu.getHand(), frequency.getIdentity());
-                getMinecraft().player.closeContainer();
+                ClientTickHandler.portableTeleport(minecraft.player, menu.getHand(), frequency.getIdentity());
+                minecraft.player.closeContainer();
             } else {
                 //If something did go wrong make the teleport button not able to be pressed
                 teleportButton.active = false;

@@ -2,8 +2,13 @@ accessWidener v2 named
 
 accessible field net/minecraft/client/KeyMapping isDown Z
 accessible field net/minecraft/client/gui/Gui overlayMessageTime I
+accessible method net/minecraft/client/gui/GuiGraphics flushIfUnmanaged ()V
 accessible field net/minecraft/client/gui/components/EditBox canLoseFocus Z
 accessible method net/minecraft/client/gui/components/EditBox isEditable ()Z
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickCraftingType I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickCraftingButton I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackEnd Lnet/minecraft/world/inventory/Slot;

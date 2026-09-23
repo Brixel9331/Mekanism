@@ -62,6 +62,6 @@ public abstract class GuiItemStackFilter<FILTER extends IItemStackFilter<FILTER>
 
     protected void setFilterStackWithSound(@NotNull ItemStack stack) {
         setFilterStack(stack);
-        playClickSound(SoundEvents.UI_BUTTON_CLICK);
+        playClickSound(SoundEvents.UI_BUTTON_CLICK::value);
     }
 }

@@ -34,6 +34,9 @@ import org.lwjgl.glfw.GLFW;
 
 public abstract class GuiElement extends AbstractWidget implements IFancyFontRenderer {
 
+    public static final int UNSET_FG_COLOR = -1;
+    protected int packedFGColor = UNSET_FG_COLOR;
+
     private static final int BUTTON_TEX_X = 200, BUTTON_TEX_Y = 60, BUTTON_INDIVIDUAL_TEX_Y = BUTTON_TEX_Y / 3;
     public static final ResourceLocation WARNING_BACKGROUND_TEXTURE = MekanismUtils.getResource(ResourceType.GUI, "warning_background.png");
     public static final ResourceLocation WARNING_TEXTURE = MekanismUtils.getResource(ResourceType.GUI, "warning.png");
@@ -441,12 +444,19 @@ public abstract class GuiElement extends AbstractWidget implements IFancyFontRen
     public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
     }
 
-    @Override
     public int getFGColor() {
-        if (packedFGColor != UNSET_FG_COLOR){
+        if (packedFGColor != UNSET_FG_COLOR) {
             return packedFGColor;
         }
         return this.active ? activeButtonTextColor() : inactiveButtonTextColor();
+    }
+
+    public void setFGColor(int color) {
+        packedFGColor = color;
+    }
+
+    public void clearFGColor() {
+        packedFGColor = UNSET_FG_COLOR;
     }
 
     protected int getButtonTextColor(int mouseX, int mouseY) {

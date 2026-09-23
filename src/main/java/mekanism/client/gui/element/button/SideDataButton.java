@@ -11,7 +11,6 @@ import mekanism.common.network.to_server.PacketConfigurationUpdate;
 import mekanism.common.network.to_server.PacketConfigurationUpdate.ConfigurationPacket;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.config.DataType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -19,8 +18,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +40,7 @@ public class SideDataButton extends BasicColorButton {
             BlockPos otherBlockPos = tile.getTilePos().relative(globalSide);
             BlockState blockOnSide = tileWorld.getBlockState(otherBlockPos);
             if (!blockOnSide.isAir()) {
-                otherBlockItem = blockOnSide.getCloneItemStack(new BlockHitResult(Vec3.atCenterOf(otherBlockPos).relative(globalSide.getOpposite(), 0.5), globalSide.getOpposite(), otherBlockPos, false), tileWorld, otherBlockPos, Minecraft.getInstance().player);
+                otherBlockItem = blockOnSide.getBlock().getCloneItemStack(tileWorld, otherBlockPos, blockOnSide);
             } else {
                 otherBlockItem = ItemStack.EMPTY;
             }

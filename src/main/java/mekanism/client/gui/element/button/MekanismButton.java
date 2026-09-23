@@ -34,7 +34,7 @@ public class MekanismButton extends GuiElement {
         this.onHover = onHover;
         this.onLeftClick = Objects.requireNonNull(onLeftClick, "Buttons must have a left click behavior");
         this.onRightClick = onRightClick;
-        this.clickSound = SoundEvents.UI_BUTTON_CLICK;
+        this.clickSound = SoundEvents.UI_BUTTON_CLICK::value;
         setButtonBackground(ButtonBackground.DEFAULT);
     }
 

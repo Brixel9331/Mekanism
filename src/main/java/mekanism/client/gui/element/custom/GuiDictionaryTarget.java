@@ -135,7 +135,7 @@ public class GuiDictionaryTarget extends GuiElement implements IJEIGhostTarget {
                 }
                 //Entity type tags
                 if (item instanceof SpawnEggItem spawnEggItem) {
-                    tags.put(DictionaryTagType.ENTITY_TYPE, TagCache.getTagsAsStrings(spawnEggItem.getType(stack.getTag()).getTags()));
+                    tags.put(DictionaryTagType.ENTITY_TYPE, TagCache.getTagsAsStrings(spawnEggItem.getType(stack.getTag()).builtInRegistryHolder().tags()));
                 }
                 //Enchantment tags
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(stack);
@@ -214,7 +214,7 @@ public class GuiDictionaryTarget extends GuiElement implements IJEIGhostTarget {
         }
         //Update the list being viewed
         tagSetter.accept(tags.keySet());
-        playClickSound(SoundEvents.UI_BUTTON_CLICK);
+        playClickSound(SoundEvents.UI_BUTTON_CLICK::value);
     }
 
     private <STACK extends ChemicalStack<?>, HANDLER extends IChemicalHandler<?, STACK>> void addChemicalTags(DictionaryTagType tagType, ItemStack stack,

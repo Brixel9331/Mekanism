@@ -122,7 +122,7 @@ public abstract class GuiMekanism<CONTAINER extends AbstractContainerMenu> exten
      * Like {@link #addRenderableWidget(GuiEventListener)}, except doesn't add the element as narratable.
      */
     protected <T extends GuiElement> T addElement(T element) {
-        renderables.add(element);
+        addRenderableOnly(element);
         ((List<GuiEventListener>) children()).add(element);
         return element;
     }
