@@ -11,7 +11,7 @@ import mekanism.api.text.ILangEntry;
 import mekanism.common.CommonPlayerTickHandler;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.network.chat.Component;
@@ -99,8 +99,8 @@ public interface IJetpackItem {
         ItemStack chest = entity.getItemBySlot(EquipmentSlot.CHEST);
         if (matcher.test(chest)) {
             return chest;
-        } else if (Mekanism.hooks.CuriosLoaded) {
-            return CuriosIntegration.findFirstCurio(entity, matcher);
+        } else if (Mekanism.hooks.TrinketsLoaded) {
+            return TrinketsIntegration.findFirst(entity, matcher);
         }
         return ItemStack.EMPTY;
     }

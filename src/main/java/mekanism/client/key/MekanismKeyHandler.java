@@ -7,7 +7,8 @@ import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.base.KeySync;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration.SlotContext;
 import mekanism.common.inventory.container.ModuleTweakerContainer;
 import mekanism.common.item.interfaces.IGasItem;
 import mekanism.common.item.interfaces.IModeItem;
@@ -19,9 +20,9 @@ import mekanism.common.registries.MekanismSounds;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
-import top.theillusivec4.curios.api.SlotContext;
 
 public class MekanismKeyHandler {
 
@@ -75,9 +76,9 @@ public class MekanismKeyHandler {
             if (IModeItem.isModeItem(player, slot)) {
                 Mekanism.packetHandler().sendToServer(new PacketModeChange(slot, player.isShiftKeyDown()));
                 SoundHandler.playSound(MekanismSounds.HYDRAULIC);
-            } else if (Mekanism.hooks.CuriosLoaded) {
-                CuriosIntegration.findFirstCurioAsResult(player, stack -> {
-                    if (stack.canEquip(slot, player) && IModeItem.isModeItem(stack, slot)) {
+            } else if (Mekanism.hooks.TrinketsLoaded) {
+                TrinketsIntegration.findFirstResult(player, stack -> {
+                    if (Mob.getEquipmentSlotForItem(stack) == slot && IModeItem.isModeItem(stack, slot)) {
                         return !(stack.getItem() instanceof IGasItem item) || item.hasGas(stack);
                     }
                     return false;

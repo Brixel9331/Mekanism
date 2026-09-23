@@ -14,7 +14,7 @@ import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import mekanism.common.capabilities.holder.energy.EnergyContainerHelper;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.entity.EntityRobit;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.TileEntityMekanism;
@@ -30,8 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,11 +66,11 @@ public class TileEntityChargepad extends TileEntityMekanism {
                 break;
             } else if (entity instanceof EntityRobit robit) {
                 provideEnergy(robit);
-            } else if (entity instanceof Player) {
-                Optional<IItemHandler> itemHandlerCap = CapabilityUtils.getCapability(entity, ForgeCapabilities.ITEM_HANDLER).resolve();
-                if (!chargeHandler(itemHandlerCap) && Mekanism.hooks.CuriosLoaded) {
+            } else if (entity instanceof Player player && player.isAlive()) {
+                Optional<Container> itemHandlerCap = Optional.of(player.getInventory());
+                if (!chargeHandler(itemHandlerCap) && Mekanism.hooks.TrinketsLoaded) {
                     //If we didn't charge anything in the inventory and curios is loaded try charging things in the curios slots
-                    chargeHandler(CuriosIntegration.getCuriosInventory(entity));
+                    chargeHandler(TrinketsIntegration.getInventory(entity));
                 }
             }
         }
@@ -80,13 +79,13 @@ public class TileEntityChargepad extends TileEntityMekanism {
         }
     }
 
-    private boolean chargeHandler(Optional<? extends IItemHandler> itemHandlerCap) {
+    private boolean chargeHandler(Optional<? extends Container> itemHandlerCap) {
         //Ensure that we have an item handler capability, because if for example the player is dead we will not
         if (itemHandlerCap.isPresent()) {
-            IItemHandler itemHandler = itemHandlerCap.get();
-            int slots = itemHandler.getSlots();
+            Container itemHandler = itemHandlerCap.get();
+            int slots = itemHandler.getContainerSize();
             for (int slot = 0; slot < slots; slot++) {
-                ItemStack stack = itemHandler.getStackInSlot(slot);
+                ItemStack stack = itemHandler.getItem(slot);
                 if (!stack.isEmpty() && provideEnergy(EnergyCompatUtils.getStrictEnergyHandler(stack))) {
                     //Only allow charging one item per player each check
                     return true;

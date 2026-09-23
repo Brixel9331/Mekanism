@@ -13,6 +13,9 @@ public final class MekanismClientInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(BlockEntityLoadQueue::enqueue);
+        if (mekanism.common.Mekanism.hooks.TrinketsLoaded) {
+            mekanism.client.render.MekanismTrinketRenderer.register();
+        }
         MekanismKeyHandler.registerKeybindings();
         ClientTickHandler.register();
         RenderTickHandler.register();

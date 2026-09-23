@@ -25,6 +25,10 @@ repositories {
     maven { url = 'https://maven.blamejared.com' }
     maven { url = 'https://maven.shedaniel.me' }
     maven { url = 'https://maven.terraformersmc.com/releases' }
+    maven {
+        url = 'https://maven.ladysnake.org/releases'
+        content { includeGroup 'dev.onyxstudios.cardinal-components-api' }
+    }
     maven { url = 'https://maven.teamreborn.com' }
     maven { url = 'https://squiddev.cc/maven' }
     maven { url = 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/' }
@@ -97,6 +101,7 @@ configurations {
 }
 
 loom {
+    createRemapConfigurations(sourceSets.test)
     accessWidenerPath = file('src/main/resources/mekanism.accesswidener')
     mods {
         mekanism {
@@ -150,6 +155,13 @@ dependencies {
     modCompileOnly "com.blamejared.jeitweaker:JeiTweaker-fabric-${minecraft_version}:${jeitweaker_version}"
     modCompileOnly "cc.tweaked:cc-tweaked-${minecraft_version}-fabric-api:${cc_tweaked_version}"
     modCompileOnly "cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${cc_tweaked_version}"
+    modCompileOnly 'maven.modrinth:trinkets:AHxQGtuC'
+    modCompileOnly('dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.2') {
+        transitive = false
+    }
+    modCompileOnly('dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.2') {
+        transitive = false
+    }
     modCompileOnly 'maven.modrinth:jade:SlsObyHn'
     modCompileOnly 'maven.modrinth:wthit:z1T650Hb'
     modCompileOnly 'maven.modrinth:badpackets:JjLWLyDz'

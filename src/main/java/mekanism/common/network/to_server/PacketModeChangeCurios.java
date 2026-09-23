@@ -1,7 +1,7 @@
 package mekanism.common.network.to_server;
 
 import mekanism.common.Mekanism;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.item.interfaces.IModeItem.DisplayChange;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.network.BasePacketHandler;
@@ -36,8 +36,8 @@ public class PacketModeChangeCurios implements IMekanismPacket {
     @Override
     public void handle(PacketContext context) {
         Player player = context.getSender();
-        if (player != null && Mekanism.hooks.CuriosLoaded) {
-            ItemStack stack = CuriosIntegration.getCurioStack(player, slotType, slot);
+        if (player != null && Mekanism.hooks.TrinketsLoaded) {
+            ItemStack stack = TrinketsIntegration.getStack(player, slotType, slot);
             if (!stack.isEmpty() && stack.getItem() instanceof IModeItem modeItem) {
                 modeItem.changeMode(player, stack, shift, displayChangeMessage ? DisplayChange.OTHER : DisplayChange.NONE);
             }

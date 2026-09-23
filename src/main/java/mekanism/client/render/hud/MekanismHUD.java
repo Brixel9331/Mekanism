@@ -8,7 +8,7 @@ import mekanism.client.gui.GuiUtils;
 import mekanism.client.render.HUDRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.client.Minecraft;
@@ -44,8 +44,8 @@ public class MekanismHUD implements HudRenderCallback {
                     count += makeComponent(list -> hudProvider.addHUDStrings(list, player, stack, slotType), renderStrings);
                 }
             }
-            if (Mekanism.hooks.CuriosLoaded) {
-                for (ItemStack stack : CuriosIntegration.getEquippedItems(player)) {
+            if (Mekanism.hooks.TrinketsLoaded) {
+                for (ItemStack stack : TrinketsIntegration.getEquippedItems(player)) {
                     if (stack.getItem() instanceof IItemHUDProvider hudProvider) {
                         count += makeComponent(list -> hudProvider.addCurioHUDStrings(list, player, stack), renderStrings);
                     }

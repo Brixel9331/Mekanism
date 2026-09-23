@@ -15,13 +15,13 @@ import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.network.distribution.EnergySaveTarget;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.util.EmitUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.world.Container;
 
 @ParametersAreNotNullByDefault
 public class ModuleChargeDistributionUnit implements ICustomModule<ModuleChargeDistributionUnit> {
@@ -75,12 +75,12 @@ public class ModuleChargeDistributionUnit implements ICustomModule<ModuleChargeD
                     }
                 }
             }
-            if (!toCharge.isZero() && Mekanism.hooks.CuriosLoaded) {
-                Optional<? extends IItemHandler> curiosInventory = CuriosIntegration.getCuriosInventory(player);
+            if (!toCharge.isZero() && Mekanism.hooks.TrinketsLoaded) {
+                Optional<? extends Container> curiosInventory = TrinketsIntegration.getInventory(player);
                 if (curiosInventory.isPresent()) {
-                    IItemHandler handler = curiosInventory.get();
-                    for (int slot = 0, slots = handler.getSlots(); slot < slots; slot++) {
-                        toCharge = charge(module, player, handler.getStackInSlot(slot), toCharge);
+                    Container handler = curiosInventory.get();
+                    for (int slot = 0, slots = handler.getContainerSize(); slot < slots; slot++) {
+                        toCharge = charge(module, player, handler.getItem(slot), toCharge);
                         if (toCharge.isZero()) {
                             break;
                         }

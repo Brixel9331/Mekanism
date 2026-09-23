@@ -16,7 +16,7 @@ public final class MekanismHooks {
 
     public static final String CC_MOD_ID = "computercraft";
     public static final String CRAFTTWEAKER_MOD_ID = "crafttweaker";
-    public static final String CURIOS_MODID = "curios";
+    public static final String TRINKETS_MODID = "trinkets";
     public static final String DARK_MODE_EVERYWHERE_MODID = "darkmodeeverywhere";
     public static final String FLUX_NETWORKS_MOD_ID = "fluxnetworks";
     public static final String IC2_MOD_ID = "ic2";
@@ -31,7 +31,7 @@ public final class MekanismHooks {
 
     public boolean CCLoaded;
     public boolean CraftTweakerLoaded;
-    public boolean CuriosLoaded;
+    public boolean TrinketsLoaded;
     public boolean DMELoaded;
     public boolean FluxNetworksLoaded;
     public boolean IC2Loaded;
@@ -41,7 +41,7 @@ public final class MekanismHooks {
     public void hookConstructor() {
         FabricLoader loader = FabricLoader.getInstance();
         CraftTweakerLoaded = loader.isModLoaded(CRAFTTWEAKER_MOD_ID);
-        CuriosLoaded = loader.isModLoaded(CURIOS_MODID);
+        TrinketsLoaded = loader.isModLoaded(TRINKETS_MODID);
     }
 
     public void hookCommonSetup() {

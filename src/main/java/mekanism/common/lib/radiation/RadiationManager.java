@@ -36,7 +36,7 @@ import mekanism.api.text.ITooltipHelper;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.integration.curios.CuriosIntegration;
+import mekanism.common.integration.trinkets.TrinketsIntegration;
 import mekanism.common.lib.MekanismSavedData;
 import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.collection.HashList;
@@ -66,7 +66,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -309,13 +309,13 @@ public class RadiationManager implements IRadiationManager {
                 resistance += shielding.get().getRadiationShielding();
             }
         }
-        if (resistance < 1 && Mekanism.hooks.CuriosLoaded) {
-            Optional<? extends IItemHandler> handlerOptional = CuriosIntegration.getCuriosInventory(entity);
+        if (resistance < 1 && Mekanism.hooks.TrinketsLoaded) {
+            Optional<? extends Container> handlerOptional = TrinketsIntegration.getInventory(entity);
             if (handlerOptional.isPresent()) {
-                IItemHandler handler = handlerOptional.get();
-                int slots = handler.getSlots();
+                Container handler = handlerOptional.get();
+                int slots = handler.getContainerSize();
                 for (int i = 0; i < slots; i++) {
-                    ItemStack item = handler.getStackInSlot(i);
+                    ItemStack item = handler.getItem(i);
                     Optional<IRadiationShielding> shielding = CapabilityUtils.getCapability(item, Capabilities.RADIATION_SHIELDING, null).resolve();
                     if (shielding.isPresent()) {
                         resistance += shielding.get().getRadiationShielding();
