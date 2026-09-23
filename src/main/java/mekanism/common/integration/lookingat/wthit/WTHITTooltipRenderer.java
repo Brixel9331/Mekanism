@@ -14,6 +14,9 @@ import mekanism.common.integration.lookingat.EnergyElement;
 import mekanism.common.integration.lookingat.FluidElement;
 import mekanism.common.integration.lookingat.LookingAtElement;
 import mekanism.common.integration.lookingat.LookingAtUtils;
+import mekanism.common.integration.lookingat.wthit.WTHITLookingAtHelper.ChemicalData;
+import mekanism.common.integration.lookingat.wthit.WTHITLookingAtHelper.EnergyData;
+import mekanism.common.integration.lookingat.wthit.WTHITLookingAtHelper.FluidData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -36,13 +39,14 @@ public class WTHITTooltipRenderer implements IBlockComponentProvider, IEntityCom
 
     private void append(ITooltip tooltip, IDataReader dataReader, IPluginConfig config) {
         WTHITLookingAtHelper helper = dataReader.get(WTHITLookingAtHelper.class);
-        if (helper != null) {
+        if (helper != null && !helper.elements.isEmpty()) {
             //We have mek data, add an empty line for it so that we know to skip rendering the builtin types
             tooltip.setLine(MekanismWTHITPlugin.MEK_DATA);
             Component lastText = null;
             //Copy the data we need and have from the server and pass it on to the tooltip rendering
             for (Object element : helper.elements) {
                 ResourceLocation name;
+                LookingAtElement renderedElement;
                 if (element instanceof Component component) {
                     if (lastText != null) {
                         //Fallback to printing the last text
@@ -50,22 +54,26 @@ public class WTHITTooltipRenderer implements IBlockComponentProvider, IEntityCom
                     }
                     lastText = component;
                     continue;
-                } else if (element instanceof EnergyElement) {
+                } else if (element instanceof EnergyData energy) {
                     name = LookingAtUtils.ENERGY;
-                } else if (element instanceof FluidElement) {
+                    renderedElement = new EnergyElement(energy.stored(), energy.capacity());
+                } else if (element instanceof FluidData fluid) {
                     name = LookingAtUtils.FLUID;
-                } else if (element instanceof ChemicalElement chemicalElement) {
+                    renderedElement = new FluidElement(fluid.stored(), fluid.capacity());
+                } else if (element instanceof ChemicalData chemical) {
+                    ChemicalElement chemicalElement = new ChemicalElement(chemical.stored(), chemical.capacity());
                     name = switch (chemicalElement.getChemicalType()) {
                         case GAS -> LookingAtUtils.GAS;
                         case INFUSION -> LookingAtUtils.INFUSE_TYPE;
                         case PIGMENT -> LookingAtUtils.PIGMENT;
                         case SLURRY -> LookingAtUtils.SLURRY;
                     };
+                    renderedElement = chemicalElement;
                 } else {
                     continue;
                 }
                 if (config.getBoolean(name)) {
-                    tooltip.addLine(new MekElement(lastText, (LookingAtElement) element));
+                    tooltip.addLine(new MekElement(lastText, renderedElement));
                 }
                 lastText = null;
             }

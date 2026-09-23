@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import mcp.mobius.waila.api.IData;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalType;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.integration.lookingat.ChemicalElement;
-import mekanism.common.integration.lookingat.EnergyElement;
-import mekanism.common.integration.lookingat.FluidElement;
 import mekanism.common.integration.lookingat.LookingAtHelper;
+import mekanism.common.network.FluidStackPacketCodec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
@@ -23,12 +22,12 @@ public class WTHITLookingAtHelper implements LookingAtHelper, IData {
             LookingAtTypes type = buffer.readEnum(LookingAtTypes.class);
             Object element = switch (type) {
                 case UNKNOWN -> null;
-                case ENERGY -> new EnergyElement(FloatingLong.readFromBuffer(buffer), FloatingLong.readFromBuffer(buffer));
-                case FLUID -> new FluidElement(buffer.readFluidStack(), buffer.readVarInt());
-                case GAS -> new ChemicalElement(ChemicalUtils.readGasStack(buffer), buffer.readVarLong());
-                case INFUSION -> new ChemicalElement(ChemicalUtils.readInfusionStack(buffer), buffer.readVarLong());
-                case PIGMENT -> new ChemicalElement(ChemicalUtils.readPigmentStack(buffer), buffer.readVarLong());
-                case SLURRY -> new ChemicalElement(ChemicalUtils.readSlurryStack(buffer), buffer.readVarLong());
+                case ENERGY -> new EnergyData(FloatingLong.readFromBuffer(buffer), FloatingLong.readFromBuffer(buffer));
+                case FLUID -> new FluidData(FluidStackPacketCodec.read(buffer), buffer.readVarInt());
+                case GAS -> new ChemicalData(ChemicalUtils.readGasStack(buffer), buffer.readVarLong());
+                case INFUSION -> new ChemicalData(ChemicalUtils.readInfusionStack(buffer), buffer.readVarLong());
+                case PIGMENT -> new ChemicalData(ChemicalUtils.readPigmentStack(buffer), buffer.readVarLong());
+                case SLURRY -> new ChemicalData(ChemicalUtils.readSlurryStack(buffer), buffer.readVarLong());
                 case COMPONENT -> buffer.readComponent();
             };
             if (element != null) {
@@ -47,19 +46,19 @@ public class WTHITLookingAtHelper implements LookingAtHelper, IData {
             buf.writeEnum(type);
             switch (type) {
                 case ENERGY -> {
-                    EnergyElement energyElement = (EnergyElement) object;
-                    energyElement.getEnergy().writeToBuffer(buf);
-                    energyElement.getMaxEnergy().writeToBuffer(buf);
+                    EnergyData energy = (EnergyData) object;
+                    energy.stored().writeToBuffer(buf);
+                    energy.capacity().writeToBuffer(buf);
                 }
                 case FLUID -> {
-                    FluidElement fluidElement = (FluidElement) object;
-                    buf.writeFluidStack(fluidElement.getStored());
-                    buf.writeVarInt(fluidElement.getCapacity());
+                    FluidData fluid = (FluidData) object;
+                    FluidStackPacketCodec.write(buf, fluid.stored());
+                    buf.writeVarInt(fluid.capacity());
                 }
                 case GAS, INFUSION, PIGMENT, SLURRY -> {
-                    ChemicalElement chemicalElement = (ChemicalElement) object;
-                    ChemicalUtils.writeChemicalStack(buf, chemicalElement.getStored());
-                    buf.writeVarLong(chemicalElement.getCapacity());
+                    ChemicalData chemical = (ChemicalData) object;
+                    ChemicalUtils.writeChemicalStack(buf, chemical.stored());
+                    buf.writeVarLong(chemical.capacity());
                 }
                 case COMPONENT -> buf.writeComponent((Component) object);
             }
@@ -73,17 +72,26 @@ public class WTHITLookingAtHelper implements LookingAtHelper, IData {
 
     @Override
     public void addEnergyElement(FloatingLong energy, FloatingLong maxEnergy) {
-        elements.add(new EnergyElement(energy, maxEnergy));
+        elements.add(new EnergyData(energy.copyAsConst(), maxEnergy.copyAsConst()));
     }
 
     @Override
     public void addFluidElement(FluidStack stored, int capacity) {
-        elements.add(new FluidElement(stored, capacity));
+        elements.add(new FluidData(stored.copy(), capacity));
     }
 
     @Override
     public void addChemicalElement(ChemicalStack<?> stored, long capacity) {
-        elements.add(new ChemicalElement(stored, capacity));
+        elements.add(new ChemicalData(stored.copy(), capacity));
+    }
+
+    record EnergyData(FloatingLong stored, FloatingLong capacity) {
+    }
+
+    record FluidData(FluidStack stored, int capacity) {
+    }
+
+    record ChemicalData(ChemicalStack<?> stored, long capacity) {
     }
 
     private enum LookingAtTypes {
@@ -96,12 +104,12 @@ public class WTHITLookingAtHelper implements LookingAtHelper, IData {
         public static LookingAtTypes getType(Object element) {
             if (element instanceof Component) {
                 return COMPONENT;
-            } else if (element instanceof EnergyElement) {
+            } else if (element instanceof EnergyData) {
                 return ENERGY;
-            } else if (element instanceof FluidElement) {
+            } else if (element instanceof FluidData) {
                 return FLUID;
-            } else if (element instanceof ChemicalElement chemicalElement) {
-                return switch (chemicalElement.getChemicalType()) {
+            } else if (element instanceof ChemicalData chemical) {
+                return switch (ChemicalType.getTypeFor(chemical.stored())) {
                     case GAS -> GAS;
                     case INFUSION -> INFUSION;
                     case PIGMENT -> PIGMENT;
