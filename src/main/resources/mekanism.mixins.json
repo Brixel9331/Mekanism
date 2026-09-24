@@ -32,6 +32,7 @@
     "LevelChunkGenerationMixin"
   ],
   "client": [
+    "client.LevelRendererFrustumAccessor",
     "client.ClientBlockEntityPacketMixin",
     "client.ClientChunkBlockEntityMixin",
     "client.GameRendererMixin",

@@ -7,6 +7,7 @@ import mekanism.common.Mekanism;
 import mekanism.common.network.to_client.PacketUpdateTile;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.interfaces.IBlockEntityLifecycle;
+import mekanism.common.tile.interfaces.IBlockEntityRenderBounds;
 import mekanism.common.tile.interfaces.IBlockEntityUpdateReceiver;
 import mekanism.common.tile.interfaces.ITileWrapper;
 import mekanism.common.util.WorldUtils;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * Extension of TileEntity that adds various helpers we use across the majority of our Tiles even those that are not an instance of TileEntityMekanism. Additionally, we
  * improve the performance of markDirty by not firing neighbor updates unless the markDirtyComparator method is overridden.
  */
-public abstract class TileEntityUpdateable extends BlockEntity implements ITileWrapper, IBlockEntityLifecycle, IBlockEntityUpdateReceiver {
+public abstract class TileEntityUpdateable extends BlockEntity implements ITileWrapper, IBlockEntityLifecycle, IBlockEntityUpdateReceiver, IBlockEntityRenderBounds {
 
     @Nullable
     private Coord4D cachedCoord;
