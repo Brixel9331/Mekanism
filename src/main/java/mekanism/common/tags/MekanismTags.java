@@ -20,9 +20,7 @@ import mekanism.common.util.EnumUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
@@ -193,11 +191,11 @@ public class MekanismTags {
         public static final TagKey<Item> ARMORS_BOOTS_HAZMAT = forgeTag("armors/boots/hazmat");
 
         private static TagKey<Item> forgeTag(String name) {
-            return ItemTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(Registries.ITEM, new ResourceLocation("forge", name));
         }
 
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(Mekanism.rl(name));
+            return TagKey.create(Registries.ITEM, Mekanism.rl(name));
         }
     }
 
@@ -250,11 +248,11 @@ public class MekanismTags {
         public static final TagKey<Block> STORAGE_BLOCKS_FLUORITE = forgeTag("storage_blocks/fluorite");
 
         private static TagKey<Block> forgeTag(String name) {
-            return BlockTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(Registries.BLOCK, new ResourceLocation("forge", name));
         }
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(Mekanism.rl(name));
+            return TagKey.create(Registries.BLOCK, Mekanism.rl(name));
         }
     }
 
@@ -319,7 +317,7 @@ public class MekanismTags {
         public static final LazyTagLookup<Fluid> LAVA_LOOKUP = LazyTagLookup.create(BuiltInRegistries.FLUID, FluidTags.LAVA);
 
         private static TagKey<Fluid> forgeTag(String name) {
-            return FluidTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(Registries.FLUID, new ResourceLocation("forge", name));
         }
     }
 
