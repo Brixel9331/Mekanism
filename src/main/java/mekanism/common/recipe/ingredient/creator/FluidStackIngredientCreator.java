@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import io.netty.handler.codec.DecoderException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,23 +14,21 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import mekanism.api.JsonConstants;
+import mekanism.api.MekanismAPI;
 import mekanism.api.SerializerHelper;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.creator.IFluidStackIngredientCreator;
-import mekanism.common.Mekanism;
-import mekanism.common.network.BasePacketHandler;
 import mekanism.common.recipe.ingredient.IMultiIngredient;
 import mekanism.common.tags.LazyTagLookup;
 import mekanism.common.tags.TagUtils;
-import mekanism.common.util.RegistryUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
@@ -68,8 +67,13 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         Objects.requireNonNull(buffer, "FluidStackIngredients cannot be read from a null packet buffer.");
         return switch (buffer.readEnum(IngredientType.class)) {
             case SINGLE -> from(FluidStack.readFromPacket(buffer));
-            case TAGGED -> from(FluidTags.create(buffer.readResourceLocation()), buffer.readVarInt());
-            case MULTI -> createMulti(BasePacketHandler.readArray(buffer, FluidStackIngredient[]::new, this::read));
+            case TAGGED -> from(TagKey.create(Registries.FLUID, buffer.readResourceLocation()), buffer.readVarInt());
+            case MULTI -> createMulti(buffer.readCollection(size -> {
+                if (size < 0 || size > buffer.readableBytes()) {
+                    throw new DecoderException("Invalid collection length: " + size);
+                }
+                return new ArrayList<FluidStackIngredient>(size);
+            }, this::read).toArray(FluidStackIngredient[]::new));
         };
     }
 
@@ -222,7 +226,7 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         public JsonElement serialize() {
             JsonObject json = new JsonObject();
             json.addProperty(JsonConstants.AMOUNT, fluidInstance.getAmount());
-            json.addProperty(JsonConstants.FLUID, RegistryUtils.getName(fluidInstance.getFluid()).toString());
+            json.addProperty(JsonConstants.FLUID, BuiltInRegistries.FLUID.getKey(fluidInstance.getFluid()).toString());
             if (fluidInstance.hasTag()) {
                 json.addProperty(JsonConstants.NBT, fluidInstance.getTag().toString());
             }
@@ -294,7 +298,7 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         @Override
         public void logMissingTags() {
             if (tag.isEmpty()) {
-                Mekanism.logger.error("Empty tag: {}", tag.key());
+                MekanismAPI.logger.error("Empty tag: {}", tag.key());
             }
         }
 
@@ -434,7 +438,7 @@ public class FluidStackIngredientCreator implements IFluidStackIngredientCreator
         @Override
         public void write(FriendlyByteBuf buffer) {
             buffer.writeEnum(IngredientType.MULTI);
-            BasePacketHandler.writeArray(buffer, ingredients, InputIngredient::write);
+            buffer.writeCollection(Arrays.asList(ingredients), (packet, ingredient) -> ingredient.write(packet));
         }
 
         @Override
