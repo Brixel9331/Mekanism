@@ -17,7 +17,7 @@ public class LazyGasProvider implements IGasProvider {
      */
     public LazyGasProvider(ResourceLocation gasRegistryName) {
         this(() -> {
-            Gas gas = MekanismAPI.gasRegistry().getValue(gasRegistryName);
+            Gas gas = MekanismAPI.gasRegistry().get(gasRegistryName);
             return gas == null ? MekanismAPI.EMPTY_GAS : gas;
         });
     }

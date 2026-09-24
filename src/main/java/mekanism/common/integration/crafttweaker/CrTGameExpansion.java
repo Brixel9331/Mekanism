@@ -24,7 +24,7 @@ public class CrTGameExpansion {
     @ZenCodeType.Method
     @ZenCodeType.Getter("gases")
     public static Collection<Gas> getGases(Game _this) {
-        return MekanismAPI.gasRegistry();
+        return MekanismAPI.gasRegistry().stream().toList();
     }
 
     /**
@@ -33,7 +33,7 @@ public class CrTGameExpansion {
     @ZenCodeType.Method
     @ZenCodeType.Getter("infuseTypes")
     public static Collection<InfuseType> getInfuseTypes(Game _this) {
-        return MekanismAPI.infuseTypeRegistry();
+        return MekanismAPI.infuseTypeRegistry().stream().toList();
     }
 
     /**
@@ -42,7 +42,7 @@ public class CrTGameExpansion {
     @ZenCodeType.Method
     @ZenCodeType.Getter("pigments")
     public static Collection<Pigment> getPigments(Game _this) {
-        return MekanismAPI.pigmentRegistry();
+        return MekanismAPI.pigmentRegistry().stream().toList();
     }
 
     /**
@@ -51,7 +51,7 @@ public class CrTGameExpansion {
     @ZenCodeType.Method
     @ZenCodeType.Getter("slurries")
     public static Collection<Slurry> getSlurries(Game _this) {
-        return MekanismAPI.slurryRegistry();
+        return MekanismAPI.slurryRegistry().stream().toList();
     }
 
     /**
@@ -60,7 +60,7 @@ public class CrTGameExpansion {
     @ZenCodeType.Method
     @ZenCodeType.Getter("modules")
     public static Collection<ModuleData<?>> getModules(Game _this) {
-        return MekanismAPI.moduleRegistry();
+        return MekanismAPI.moduleRegistry().stream().toList();
     }
 
     /**

@@ -109,7 +109,7 @@ public class CrTBracketHandlers {
     }
 
     private static <V> V getValue(String bracket, String tokens, Registry<V> registry) {
-        return getValue(bracket, tokens, registry::containsKey, registry::getValue);
+        return getValue(bracket, tokens, registry::containsKey, registry::get);
     }
 
     private static <V> V getValue(String bracket, String tokens, ResourceKey<? extends Registry<? extends V>> registryKey) {
