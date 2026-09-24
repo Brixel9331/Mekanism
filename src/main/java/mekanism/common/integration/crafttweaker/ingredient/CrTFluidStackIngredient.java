@@ -10,11 +10,11 @@ import com.blamejared.crafttweaker.api.util.Many;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import java.util.List;
 import java.util.stream.Collectors;
-import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.creator.IFluidStackIngredientCreator;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.common.integration.crafttweaker.CrTConstants;
+import mekanism.common.integration.crafttweaker.CrTFluidUtils;
 import mekanism.common.integration.crafttweaker.CrTUtils;
 import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.MultiFluidStackIngredient;
 import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.SingleFluidStackIngredient;
@@ -60,7 +60,7 @@ public class CrTFluidStackIngredient {
         if (instance.isEmpty()) {
             throw new IllegalArgumentException("FluidStackIngredients cannot be created from an empty stack.");
         }
-        return IngredientCreatorAccess.fluid().from(instance.<FluidStack>getImmutableInternal());
+        return IngredientCreatorAccess.fluid().from(CrTFluidUtils.fromCraftTweaker(instance));
     }
 
     /**
@@ -101,7 +101,7 @@ public class CrTFluidStackIngredient {
         IFluidStackIngredientCreator ingredientCreator = IngredientCreatorAccess.fluid();
         return ingredient.mapTo(
               //Note: The ingredient creator will copy the stack to ensure it does not get modified
-              fluidStack -> ingredientCreator.from(fluidStack.<FluidStack>getInternal()),
+              fluidStack -> ingredientCreator.from(CrTFluidUtils.fromCraftTweaker(fluidStack)),
               ingredientCreator::from,
               ingredientCreator::from
         );
@@ -140,7 +140,7 @@ public class CrTFluidStackIngredient {
     public static CTFluidIngredient asCTFluidIngredient(FluidStackIngredient _this) {
         if (_this instanceof SingleFluidStackIngredient single) {
             //Note: We likely don't need to copy this, but just in case we want to make sure the raw input doesn't somehow leak
-            return new CTFluidIngredient.FluidStackIngredient(IFluidStack.of(single.getInputRaw().copy()));
+            return new CTFluidIngredient.FluidStackIngredient(CrTFluidUtils.toCraftTweaker(single.getInputRaw()));
         } else if (_this instanceof TaggedFluidStackIngredient tagged) {
             return new CTFluidIngredient.FluidTagWithAmountIngredient(CrTUtils.fluidTags()
                   .tag(tagged.getTag())
@@ -166,7 +166,7 @@ public class CrTFluidStackIngredient {
      */
     @ZenCodeType.Method
     public static boolean testType(FluidStackIngredient _this, IFluidStack type) {
-        return _this.testType(type.getInternal());
+        return _this.testType(CrTFluidUtils.fromCraftTweaker(type));
     }
 
     /**
@@ -178,7 +178,7 @@ public class CrTFluidStackIngredient {
      */
     @ZenCodeType.Method
     public static boolean test(FluidStackIngredient _this, IFluidStack stack) {
-        return _this.test(stack.getInternal());
+        return _this.test(CrTFluidUtils.fromCraftTweaker(stack));
     }
 
     /**

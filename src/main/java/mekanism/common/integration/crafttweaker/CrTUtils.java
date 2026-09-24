@@ -265,7 +265,7 @@ public class CrTUtils {
      * Helper to convert a list of items to a list of crafttweaker items.
      */
     public static List<IFluidStack> convertFluids(List<FluidStack> elements) {
-        return convert(elements, IFluidStack::of);
+        return convert(elements, CrTFluidUtils::toCraftTweaker);
     }
 
     /**

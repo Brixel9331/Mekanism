@@ -46,6 +46,7 @@ import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.api.recipes.ingredients.StrictNBTIngredient;
 import mekanism.common.integration.crafttweaker.CrTConstants;
+import mekanism.common.integration.crafttweaker.CrTFluidUtils;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents.ChemicalRecipeComponent;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents;
 import mekanism.common.integration.crafttweaker.CrTUtils;
@@ -120,7 +121,7 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
         if (param instanceof ItemStack stack) {
             return ItemStackUtil.getCommandString(stack);
         } else if (param instanceof FluidStack stack) {
-            return IFluidStack.of(stack).getCommandString();
+            return CrTFluidUtils.toCraftTweaker(stack).getCommandString();
         } else if (param instanceof GasStack stack) {
             return new CrTGasStack(stack).getCommandString();
         } else if (param instanceof InfusionStack stack) {
@@ -219,7 +220,7 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
         if (ingredient instanceof SingleFluidStackIngredient) {
             JsonObject serialized = ingredient.serialize().getAsJsonObject();
             //Note: Handled via implicit casts
-            return IFluidStack.of(SerializerHelper.deserializeFluid(serialized)).getCommandString();
+            return CrTFluidUtils.toCraftTweaker(SerializerHelper.deserializeFluid(serialized)).getCommandString();
         } else if (ingredient instanceof TaggedFluidStackIngredient) {
             JsonObject serialized = ingredient.serialize().getAsJsonObject();
             //Note: Handled via implicit casts
@@ -295,7 +296,7 @@ public abstract class MekanismRecipeHandler<RECIPE extends MekanismRecipe> imple
             } else if (data instanceof ItemStack stack) {
                 outputs.addItem(IItemStack.of(stack));
             } else if (data instanceof FluidStack stack) {
-                outputs.addFluid(IFluidStack.of(stack));
+                outputs.addFluid(CrTFluidUtils.toCraftTweaker(stack));
             } else if (data instanceof ChemicalStack<?> stack) {
                 outputs.addChemical(stack);
             } else if (data instanceof BoxedChemicalStack stack) {

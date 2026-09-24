@@ -6,6 +6,7 @@ import mekanism.api.recipes.RotaryRecipe;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.common.integration.crafttweaker.CrTConstants;
+import mekanism.common.integration.crafttweaker.CrTFluidUtils;
 import mekanism.common.integration.crafttweaker.CrTUtils;
 import mekanism.common.integration.crafttweaker.chemical.ICrTChemicalStack.ICrTGasStack;
 import mekanism.common.recipe.MekanismRecipeType;
@@ -117,7 +118,7 @@ public class RotaryRecipeManager extends MekanismRecipeManager<RotaryRecipe> {
             if (recipe.hasFluidToGas()) {
                 builder.append(" and ");
             }
-            builder.append(CrTUtils.describeOutputs(recipe.getFluidOutputDefinition(), IFluidStack::of))
+            builder.append(CrTUtils.describeOutputs(recipe.getFluidOutputDefinition(), CrTFluidUtils::toCraftTweaker))
                   .append(" for gas to fluid");
         }
         return builder.toString();
