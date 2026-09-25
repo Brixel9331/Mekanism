@@ -1,7 +1,9 @@
 package mekanism.common.inventory.container.slot;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -19,7 +21,11 @@ public class ArmorSlot extends InsertableSlot {
     public ArmorSlot(Inventory inventory, int index, int x, int y, EquipmentSlot slotType) {
         super(inventory, index, x, y);
         this.slotType = slotType;
-        setBackground(InventoryMenu.BLOCK_ATLAS, ARMOR_SLOT_TEXTURES[this.slotType.getIndex()]);
+    }
+
+    @Override
+    public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+        return Pair.of(InventoryMenu.BLOCK_ATLAS, ARMOR_SLOT_TEXTURES[slotType.getIndex()]);
     }
 
     @Override
@@ -29,7 +35,7 @@ public class ArmorSlot extends InsertableSlot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return stack.canEquip(slotType, ((Inventory) container).player);
+        return Mob.getEquipmentSlotForItem(stack) == slotType;
     }
 
     @Override
