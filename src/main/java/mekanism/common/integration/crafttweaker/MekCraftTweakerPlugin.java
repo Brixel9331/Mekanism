@@ -3,6 +3,7 @@ package mekanism.common.integration.crafttweaker;
 import com.blamejared.crafttweaker.api.CraftTweakerConstants;
 import com.blamejared.crafttweaker.api.plugin.CraftTweakerPlugin;
 import com.blamejared.crafttweaker.api.plugin.ICraftTweakerPlugin;
+import com.blamejared.crafttweaker.api.plugin.IListenerRegistrationHandler;
 import com.blamejared.crafttweaker.api.plugin.ILoaderRegistrationHandler;
 import com.blamejared.crafttweaker.api.plugin.IRecipeComponentRegistrationHandler;
 import com.blamejared.crafttweaker.api.plugin.IScriptLoadSourceRegistrationHandler;
@@ -10,9 +11,15 @@ import com.blamejared.crafttweaker.api.plugin.IScriptRunModuleConfiguratorRegist
 import com.blamejared.crafttweaker.api.zencode.scriptrun.IScriptRunModuleConfigurator;
 import mekanism.common.Mekanism;
 import mekanism.common.integration.crafttweaker.CrTRecipeComponents.ChemicalRecipeComponent;
+import mekanism.common.integration.crafttweaker.content.CrTContentUtils;
 
 @CraftTweakerPlugin(Mekanism.MODID + ":crt_plugin")
 public class MekCraftTweakerPlugin implements ICraftTweakerPlugin {
+
+    @Override
+    public void registerListeners(IListenerRegistrationHandler handler) {
+        handler.onCraftTweakerLoadCompletion(CrTContentUtils::onCraftTweakerReady);
+    }
 
     @Override
     public void registerLoadSource(IScriptLoadSourceRegistrationHandler handler) {

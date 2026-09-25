@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class CrTContentUtils {
 
+    private static final CrTContentRegistration REGISTRATION = new CrTContentRegistration(CrTContentUtils::loadAndRegisterContent);
     private static Map<ResourceLocation, Gas> queuedGases = new HashMap<>();
     private static Map<ResourceLocation, InfuseType> queuedInfuseTypes = new HashMap<>();
     private static Map<ResourceLocation, Pigment> queuedPigments = new HashMap<>();
@@ -77,6 +78,14 @@ public class CrTContentUtils {
     }
 
     public static void registerCrTContent() {
+        REGISTRATION.onMekanismReady();
+    }
+
+    public static void onCraftTweakerReady() {
+        REGISTRATION.onCraftTweakerReady();
+    }
+
+    private static void loadAndRegisterContent() {
         //We load our content scripts here in the first registry event of ours for our types of content
         // to make sure that the new registry events have fired and that the registries exist and the bracket handler
         // validators won't choke
