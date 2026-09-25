@@ -67,6 +67,7 @@ accessible method net/minecraft/world/entity/Entity isInRain ()Z
 accessible field net/minecraft/world/entity/LivingEntity effectsDirty Z
 accessible field net/minecraft/world/entity/item/ItemEntity age I
 accessible method net/minecraft/world/entity/Entity setLevel (Lnet/minecraft/world/level/Level;)V
+accessible method net/minecraft/world/entity/player/Player closeContainer ()V
 accessible method net/minecraft/world/inventory/AbstractContainerMenu synchronizeCarriedToRemote ()V
 accessible field net/minecraft/world/item/ArmorItem ARMOR_MODIFIER_UUID_PER_TYPE Ljava/util/EnumMap;
 accessible field net/minecraft/world/level/Explosion blockInteraction Lnet/minecraft/world/level/Explosion$BlockInteraction;
