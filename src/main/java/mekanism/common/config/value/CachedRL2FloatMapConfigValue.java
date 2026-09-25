@@ -23,7 +23,7 @@ public class CachedRL2FloatMapConfigValue extends CachedMapConfigValue<ResourceL
 
     public static CachedRL2FloatMapConfigValue define(IMekanismConfig config, ForgeConfigSpec.Builder builder, String path, Supplier<Map<ResourceLocation, Float>> defaults,
           FloatPredicate range) {
-        return new CachedRL2FloatMapConfigValue(config, builder.defineListAllowEmpty(path,
+        return new CachedRL2FloatMapConfigValue(config, builder.defineListAllowEmpty(List.of(path.split("\\.", -1)),
               () -> encodeStatic(defaults.get(), CachedRL2FloatMapConfigValue::encodeStatic),
               o -> {
                   if (o instanceof String string) {

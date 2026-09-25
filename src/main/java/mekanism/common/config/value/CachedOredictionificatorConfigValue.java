@@ -20,7 +20,7 @@ public class CachedOredictionificatorConfigValue extends CachedMapConfigValue<St
 
     public static CachedOredictionificatorConfigValue define(IMekanismConfig config, ForgeConfigSpec.Builder builder, String path,
           Supplier<Map<String, List<String>>> defaults) {
-        return new CachedOredictionificatorConfigValue(config, builder.defineListAllowEmpty(path,
+        return new CachedOredictionificatorConfigValue(config, builder.defineListAllowEmpty(List.of(path.split("\\.", -1)),
               () -> encodeStatic(defaults.get(), CachedOredictionificatorConfigValue::encodeStatic),
               o -> o instanceof String string && ResourceLocation.isValidResourceLocation(string.toLowerCase(Locale.ROOT))));
     }
