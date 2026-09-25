@@ -17,7 +17,7 @@ import mekanism.common.content.evaporation.EvaporationMultiblockData;
 import mekanism.common.tier.ChemicalTankTier;
 import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tier.FluidTankTier;
-import net.minecraft.resources.ResourceLocation;
+import mekanism.common.util.text.InputValidator;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
 
@@ -141,7 +141,7 @@ public class GeneralConfig extends BaseMekanismConfig {
         blockDeactivationDelay = CachedIntValue.wrap(this, builder.comment("How many ticks must pass until a block's active state is synced with the client, if it has been rapidly changing.")
               .defineInRange("blockDeactivationDelay", 60, 0, 1_200));
         cardboardModBlacklist = CachedConfigValue.wrap(this, builder.comment("Any mod ids added to this list will not be able to have any of their blocks, picked up by the cardboard box. For example: [\"mekanism\"]")
-              .defineListAllowEmpty(Collections.singletonList("cardboardModBlacklist"), ArrayList::new, e -> e instanceof String modid && ResourceLocation.isValidNamespace(modid)));
+              .defineListAllowEmpty(Collections.singletonList("cardboardModBlacklist"), ArrayList::new, e -> e instanceof String modid && InputValidator.test(modid, InputValidator.RL_NAMESPACE)));
         transmitterAlloyUpgrade = CachedBooleanValue.wrap(this, builder.comment("Allow right clicking on Cables/Pipes/Tubes with alloys to upgrade the tier.")
               .define("transmitterAlloyUpgrade", true));
         //If this is less than 1, upgrades make machines worse. If less than 0, I don't even know.

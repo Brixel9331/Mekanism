@@ -10,6 +10,7 @@ import mekanism.common.integration.crafttweaker.example.component.CrTExampleRemo
 import mekanism.common.integration.crafttweaker.example.component.CrTImportsComponent;
 import mekanism.common.integration.crafttweaker.example.component.ICrTExampleComponent;
 import mekanism.common.integration.crafttweaker.recipe.manager.MekanismRecipeManager;
+import mekanism.common.util.text.InputValidator;
 import net.minecraft.resources.ResourceLocation;
 
 public class CrTExampleBuilder<BUILDER_TYPE extends CrTExampleBuilder<BUILDER_TYPE>> {
@@ -72,7 +73,7 @@ public class CrTExampleBuilder<BUILDER_TYPE extends CrTExampleBuilder<BUILDER_TY
 
     public CrTExampleSnipComponentBuilder<BUILDER_TYPE> modLoadedSnip(String modid) {
         //Note: We don't make use of all the possible supported modloaded conditions, but it doesn't really matter for now as we don't need them
-        if (!ResourceLocation.isValidNamespace(modid)) {
+        if (!InputValidator.test(modid, InputValidator.RL_NAMESPACE)) {
             throw new IllegalArgumentException("Invalid modid: '" + modid + "' found non [a-z0-9_.-] character.");
         }
         return snip("modloaded", modid);
