@@ -1,10 +1,13 @@
 package mekanism.common.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import mekanism.api.capabilities.Capability;
 import mekanism.api.capabilities.CapabilityProvider;
 import mekanism.api.capabilities.CapabilityReference;
 import mekanism.api.capabilities.ItemCapabilityProvider;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +26,16 @@ public abstract class ItemStackCapabilityMixin implements CapabilityProvider {
     @Inject(method = "setCount", at = @At("RETURN"))
     private void mekanism$invalidateEmptyStack(int count, CallbackInfo callback) {
         if (((ItemStack) (Object) this).isEmpty()) {
+            invalidateCapabilities();
+        }
+    }
+
+    @WrapMethod(method = "setTag")
+    private void mekanism$invalidateReplacedTag(@Nullable CompoundTag tag, Operation<Void> original) {
+        CompoundTag previous = ((ItemStack) (Object) this).getTag();
+        boolean replaced = previous != tag && (previous != null || tag != null && !tag.isEmpty());
+        original.call(tag);
+        if (replaced) {
             invalidateCapabilities();
         }
     }
