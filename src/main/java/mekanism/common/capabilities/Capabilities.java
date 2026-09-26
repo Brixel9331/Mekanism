@@ -21,6 +21,7 @@ import mekanism.api.radiation.capability.IRadiationShielding;
 import mekanism.common.integration.fluid.fabric.FabricFluidHandler;
 import mekanism.common.integration.fluid.fabric.FabricFluidHandlerStorage;
 import mekanism.common.integration.fluid.fabric.FabricItemFluidHandler;
+import mekanism.common.integration.fluid.fabric.FabricItemFluidStorage;
 import mekanism.common.integration.item.fabric.FabricItemHandler;
 import mekanism.common.integration.item.fabric.FabricItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -78,5 +79,6 @@ public class Capabilities {
         });
         ItemStorage.SIDED.registerFallback((level, pos, state, tile, side) -> FabricItemStorage.create(tile, side));
         FluidStorage.SIDED.registerFallback((level, pos, state, tile, side) -> FabricFluidHandlerStorage.create(tile, side));
+        FluidStorage.ITEM.registerFallback(FabricItemFluidStorage::create);
     }
 }
