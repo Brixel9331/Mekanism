@@ -71,7 +71,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
 import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +102,7 @@ public abstract class BlockMekanism extends Block implements IExplosionBlock {
 
     @NotNull
     @Override
-    public ItemStack getCloneItemStack(@NotNull BlockState state, HitResult target, @NotNull BlockGetter world, @NotNull BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(@NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {
         ItemStack itemStack = new ItemStack(this);
         TileEntityMekanism tile = WorldUtils.getTileEntity(TileEntityMekanism.class, world, pos);
         if (tile == null) {

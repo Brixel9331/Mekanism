@@ -11,6 +11,7 @@ import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.registries.MekanismTileEntityTypes;
 import mekanism.common.resource.BlockResourceInfo;
 import mekanism.common.tile.TileEntityBoundingBlock;
+import mekanism.common.util.BoundingBlockInteraction;
 import mekanism.common.util.ExplosionBlockInteraction;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
@@ -113,7 +114,7 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
                 BlockState mainState = world.getBlockState(mainPos);
                 if (!mainState.isAir()) {
                     //Set the main block to air, which will invalidate the rest of the bounding blocks
-                    world.removeBlock(mainPos, false);
+                    BoundingBlockInteraction.removeMainBlock(world, mainPos, mainState, WorldUtils.getTileEntity(world, pos));
                 }
             }
             super.onRemove(state, world, pos, newState, isMoving);
@@ -125,30 +126,8 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
      */
     @NotNull
     @Override
-    public ItemStack getCloneItemStack(@NotNull BlockState state, HitResult target, @NotNull BlockGetter world, @NotNull BlockPos pos, Player player) {
-        BlockPos mainPos = getMainBlockPos(world, pos);
-        if (mainPos == null) {
-            return ItemStack.EMPTY;
-        }
-        BlockState mainState = world.getBlockState(mainPos);
-        return mainState.getBlock().getCloneItemStack(mainState, target, world, mainPos, player);
-    }
-
-    @Override
-    public boolean onDestroyedByPlayer(@NotNull BlockState state, Level world, @NotNull BlockPos pos, @NotNull Player player, boolean willHarvest,
-          FluidState fluidState) {
-        if (willHarvest) {
-            return true;
-        }
-        BlockPos mainPos = getMainBlockPos(world, pos);
-        if (mainPos != null) {
-            BlockState mainState = world.getBlockState(mainPos);
-            if (!mainState.isAir()) {
-                //Set the main block to air, which will invalidate the rest of the bounding blocks
-                mainState.onDestroyedByPlayer(world, mainPos, player, false, mainState.getFluidState());
-            }
-        }
-        return super.onDestroyedByPlayer(state, world, pos, player, false, fluidState);
+    public ItemStack getCloneItemStack(@NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {
+        return BoundingBlockInteraction.pickMainBlock(world, getMainBlockPos(world, pos));
     }
 
     @Override
@@ -191,14 +170,9 @@ public class BlockBounding extends Block implements IHasTileEntity<TileEntityBou
     @Override
     public void playerDestroy(@NotNull Level world, @NotNull Player player, @NotNull BlockPos pos, @NotNull BlockState state, BlockEntity te,
           @NotNull ItemStack stack) {
-        BlockPos mainPos = getMainBlockPos(world, pos);
-        if (mainPos != null) {
-            BlockState mainState = world.getBlockState(mainPos);
-            mainState.getBlock().playerDestroy(world, player, mainPos, mainState, WorldUtils.getTileEntity(world, mainPos), stack);
-        } else {
+        if (!BoundingBlockInteraction.playerDestroy(world, player, te, stack)) {
             super.playerDestroy(world, player, pos, state, te, stack);
         }
-        world.removeBlock(pos, false);
     }
 
     @Override

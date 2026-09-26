@@ -11,7 +11,9 @@ import mekanism.common.registries.MekanismTileEntityTypes;
 import mekanism.common.tile.base.TileEntityUpdateable;
 import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.tile.interfaces.IBoundingBlock;
+import mekanism.common.tile.interfaces.IBoundingBlockRemoval;
 import mekanism.common.tile.interfaces.IUpgradeTile;
+import mekanism.common.util.BoundingBlockInteraction.RemovedMainBlock;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
@@ -29,15 +31,30 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Multi-block used by wind turbines, solar panels, and other machines
  */
-public class TileEntityBoundingBlock extends TileEntityUpdateable implements IUpgradeTile, Nameable, CapabilityProvider {
+public class TileEntityBoundingBlock extends TileEntityUpdateable implements IUpgradeTile, Nameable, CapabilityProvider, IBoundingBlockRemoval {
 
     private BlockPos mainPos = BlockPos.ZERO;
 
     private boolean receivedCoords;
     private int currentRedstoneLevel;
+    @Nullable
+    private RemovedMainBlock removedMainBlock;
 
     public TileEntityBoundingBlock(BlockPos pos, BlockState state) {
         super(MekanismTileEntityTypes.BOUNDING_BLOCK, pos, state);
+    }
+
+    @Override
+    public void setRemovedMainBlock(@Nullable RemovedMainBlock mainBlock) {
+        removedMainBlock = mainBlock;
+    }
+
+    @Nullable
+    @Override
+    public RemovedMainBlock takeRemovedMainBlock() {
+        RemovedMainBlock mainBlock = removedMainBlock;
+        removedMainBlock = null;
+        return mainBlock;
     }
 
     public void setMainLocation(BlockPos pos) {
