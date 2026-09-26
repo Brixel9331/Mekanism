@@ -3,7 +3,6 @@ package mekanism.common;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
-import io.github.fabricators_of_create.porting_lib.chunk.loading.PortingLibChunkManager;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -64,6 +63,7 @@ import mekanism.common.lib.MekAnnotationScanner;
 import mekanism.common.lib.ServerLifecycle;
 import mekanism.common.lib.Version;
 import mekanism.common.lib.WorldLifecycle;
+import mekanism.common.lib.chunkloading.MekanismChunkManager;
 import mekanism.common.lib.frequency.FrequencyManager;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.inventory.personalstorage.PersonalStorageManager;
@@ -326,7 +326,7 @@ public class Mekanism implements ModInitializer {
         //Register advancement criteria
         MekanismCriteriaTriggers.init();
         //Add chunk loading callbacks
-        PortingLibChunkManager.setForcedChunkLoadingCallback(Mekanism.MODID, ChunkValidationCallback.INSTANCE);
+        MekanismChunkManager.setForcedChunkLoadingCallback(Mekanism.MODID, ChunkValidationCallback.INSTANCE);
         //Register dispenser behaviors
         MekanismFluids.FLUIDS.registerBucketDispenserBehavior();
         registerFluidTankBehaviors(MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK,

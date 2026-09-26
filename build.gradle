@@ -130,7 +130,7 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
-    for (String portingModule : ['core', 'chunk_loading']) {
+    for (String portingModule : ['core']) {
         modImplementation include("io.github.fabricators_of_create.Porting-Lib:${portingModule}:${porting_lib_version}") {
             transitive = false
         }

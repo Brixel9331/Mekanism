@@ -24,7 +24,6 @@
     "java": ">=17",
     "team_reborn_energy": ">=3.0.0",
     "forgeconfigapiport": ">=8.0.3",
-    "fabric-permissions-api-v0": ">=0.3.1",
-    "porting_lib_chunk_loading": ">=2.3.15"
+    "fabric-permissions-api-v0": ">=0.3.1"
   }
 }
