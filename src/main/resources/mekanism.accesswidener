@@ -90,3 +90,9 @@ accessible method com/mojang/blaze3d/vertex/BufferUploader bindImmediateBuffer (
 accessible field net/minecraft/world/item/BucketItem content Lnet/minecraft/world/level/material/Fluid;
 
 accessible class net/minecraft/client/renderer/RenderStateShard$ShaderStateShard
+
+accessible field net/minecraft/world/entity/item/PrimedTnt owner Lnet/minecraft/world/entity/LivingEntity;
+extendable method net/minecraft/world/entity/item/PrimedTnt explode ()V
+accessible field net/minecraft/world/entity/monster/Creeper explosionRadius I
+extendable method net/minecraft/world/entity/monster/Creeper explodeCreeper ()V
+accessible method net/minecraft/world/entity/monster/Creeper spawnLingeringCloud ()V
