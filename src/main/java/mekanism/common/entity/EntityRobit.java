@@ -125,7 +125,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.common.ForgeHooks;
+import mekanism.common.lib.LivingDamageCallback;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -484,7 +484,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
 
     @Override
     protected void actuallyHurt(@NotNull DamageSource damageSource, float amount) {
-        amount = ForgeHooks.onLivingHurt(this, damageSource, amount);
+        amount = LivingDamageCallback.EVENT.invoker().modifyDamage(this, damageSource, amount);
         if (amount <= 0) {
             return;
         }
