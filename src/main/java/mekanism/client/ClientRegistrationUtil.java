@@ -154,7 +154,7 @@ public class ClientRegistrationUtil {
     }
 
     public static void setPropertyOverride(IItemProvider itemProvider, ResourceLocation override, ItemPropertyFunction propertyGetter) {
-        ItemProperties.register(itemProvider.asItem(), override, propertyGetter);
+        ItemProperties.PROPERTIES.computeIfAbsent(itemProvider.asItem(), item -> new java.util.HashMap<>()).put(override, propertyGetter);
     }
 
     public static void registerItemColorHandler(ItemColor itemColor, IItemProvider... items) {

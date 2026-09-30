@@ -9,19 +9,16 @@ import mekanism.common.config.MekanismConfig;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.data.ModelData;
 import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class DigitalMinerBakedModel extends ExtensionBakedModel<Void> {
+public class DigitalMinerBakedModel extends ExtensionBakedModel {
 
     @Nullable
     private static TextureAtlasSprite AFD_SAD, AFD_TEXT, MAY_4TH;
 
-    public static void onStitch(TextureStitchEvent.Post event) {
-        TextureAtlas atlas = event.getAtlas();
+    public static void onStitch(TextureAtlas atlas) {
         AFD_SAD = atlas.getSprite(Mekanism.rl("block/models/digital_miner_screen_afd_sad"));
         AFD_TEXT = atlas.getSprite(Mekanism.rl("block/models/digital_miner_screen_afd_text"));
         MAY_4TH = atlas.getSprite(Mekanism.rl("block/models/digital_miner_screen_may4th"));
@@ -40,19 +37,15 @@ public class DigitalMinerBakedModel extends ExtensionBakedModel<Void> {
 
     @Nullable
     @Override
-    protected QuadsKey<Void> createKey(QuadsKey<Void> key, ModelData data) {
+    protected QuadTransformation getTransformation() {
         if (MekanismConfig.client.holidays.get()) {
             if (HolidayManager.MAY_4.isToday()) {
-                return key.transform(MAY_4TH_TRANSFORM);
+                return MAY_4TH_TRANSFORM.get();
             } else if (HolidayManager.APRIL_FOOLS.isToday()) {
-                return key.transform(APRIL_FOOLS_TRANSFORM);
+                return APRIL_FOOLS_TRANSFORM.get();
             }
         }
         return null;
     }
 
-    @Override
-    protected DigitalMinerBakedModel wrapModel(BakedModel model) {
-        return new DigitalMinerBakedModel(model);
-    }
 }

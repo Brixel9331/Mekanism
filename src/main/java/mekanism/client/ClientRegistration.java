@@ -4,12 +4,9 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table.Cell;
 import java.util.Map.Entry;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import mekanism.api.gear.IModule;
 import mekanism.api.gear.IModuleHelper;
@@ -95,10 +92,7 @@ import mekanism.client.model.ModelScubaMask;
 import mekanism.client.model.ModelScubaTank;
 import mekanism.client.model.ModelTransporterBox;
 import mekanism.client.model.baked.DigitalMinerBakedModel;
-import mekanism.client.model.baked.DriveArrayBakedModel;
 import mekanism.client.model.baked.ExtensionBakedModel.LightedBakedModel;
-import mekanism.client.model.energycube.EnergyCubeModelLoader;
-import mekanism.client.model.robit.RobitModel;
 import mekanism.client.particle.JetpackFlameParticle;
 import mekanism.client.particle.JetpackSmokeParticle;
 import mekanism.client.particle.LaserParticle;
@@ -158,7 +152,6 @@ import mekanism.common.item.ItemCraftingFormula;
 import mekanism.common.item.block.ItemBlockCardboardBox;
 import mekanism.common.item.block.machine.ItemBlockFluidTank;
 import mekanism.common.lib.Color;
-import mekanism.common.lib.FieldReflectionHelper;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.registration.impl.ItemRegistryObject;
@@ -193,80 +186,74 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
-import net.minecraftforge.client.event.ModelEvent.ModifyBakingResult;
-import net.minecraftforge.client.event.ModelEvent.RegisterAdditional;
-import net.minecraftforge.client.event.ModelEvent.RegisterGeometryLoaders;
-import net.minecraftforge.client.model.SeparateTransformsModel;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.Nullable;
+import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import java.util.Collection;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientRegistration {
 
-    private static final FieldReflectionHelper<SeparateTransformsModel.Baked, BakedModel> SEPARATE_PERSPECTIVE_BASE_MODEL =
-          new FieldReflectionHelper<>(SeparateTransformsModel.Baked.class, "baseModel", () -> null);
-    private static final FieldReflectionHelper<SeparateTransformsModel.Baked, ImmutableMap<ItemDisplayContext, BakedModel>> SEPARATE_PERSPECTIVE_PERSPECTIVES =
-          new FieldReflectionHelper<>(SeparateTransformsModel.Baked.class, "perspectives", ImmutableMap::of);
     private static final Map<ResourceLocation, CustomModelRegistryObject> customModels = new ConcurrentHashMap<>();
 
-    @SubscribeEvent
-    public static void init(FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
+    public static void init() {
         IModuleHelper moduleHelper = IModuleHelper.INSTANCE;
         moduleHelper.addMekaSuitModuleModels(Mekanism.rl("models/entity/mekasuit_modules.obj"));
         moduleHelper.addMekaSuitModuleModelSpec("jetpack", MekanismModules.JETPACK_UNIT, EquipmentSlot.CHEST);
         moduleHelper.addMekaSuitModuleModelSpec("modulator", MekanismModules.GRAVITATIONAL_MODULATING_UNIT, EquipmentSlot.CHEST);
         moduleHelper.addMekaSuitModuleModelSpec("elytra", MekanismModules.ELYTRA_UNIT, EquipmentSlot.CHEST, LivingEntity::isFallFlying);
 
-        event.enqueueWork(() -> {
-            //Set fluids to a translucent render layer
-            FluidRenderRegistration.register(MekanismFluids.FLUIDS);
-            ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
-                  (stack, world, entity, seed) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(world, stack) == null ? 0 : 1);
+        //Set fluids to a translucent render layer
+        FluidRenderRegistration.register(MekanismFluids.FLUIDS);
+        ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
+              (stack, world, entity, seed) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(world, stack) == null ? 0 : 1);
 
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("invalid"), (stack, world, entity, seed) -> {
-                ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
-                return formula.hasInventory(stack) && formula.isInvalid(stack) ? 1 : 0;
-            });
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("encoded"), (stack, world, entity, seed) -> {
-                ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
-                return formula.hasInventory(stack) && !formula.isInvalid(stack) ? 1 : 0;
-            });
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CONFIGURATION_CARD, Mekanism.rl("encoded"),
-                  (stack, world, entity, seed) -> ((ItemConfigurationCard) stack.getItem()).hasData(stack) ? 1 : 0);
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("invalid"), (stack, world, entity, seed) -> {
+            ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
+            return formula.hasInventory(stack) && formula.isInvalid(stack) ? 1 : 0;
+        });
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("encoded"), (stack, world, entity, seed) -> {
+            ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
+            return formula.hasInventory(stack) && !formula.isInvalid(stack) ? 1 : 0;
+        });
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.CONFIGURATION_CARD, Mekanism.rl("encoded"),
+              (stack, world, entity, seed) -> ((ItemConfigurationCard) stack.getItem()).hasData(stack) ? 1 : 0);
 
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pull"),
-                  (stack, world, entity, seed) -> entity != null && entity.getUseItem() == stack ? (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F : 0);
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pulling"),
-                  (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pull"),
+              (stack, world, entity, seed) -> entity != null && entity.getUseItem() == stack ? (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F : 0);
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pulling"),
+              (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.GEIGER_COUNTER, Mekanism.rl("radiation"), (stack, world, entity, seed) -> {
-                if (entity instanceof Player) {
-                    return RadiationManager.get().getClientScale().ordinal();
-                }
-                return 0;
-            });
-            //Note: Our implementation allows for a null entity so don't worry about it and pass it
-            ClientRegistrationUtil.setPropertyOverride(MekanismItems.HDPE_REINFORCED_ELYTRA, Mekanism.rl("broken"), (stack, world, entity, seed) -> {
-                boolean canFly;
-                if (entity == null) {
-                    //Fallback to the vanilla check in case any mods like quark are making vanilla actually make use of the entity
-                    canFly = stack.getDamageValue() < stack.getMaxDamage() - 1;
-                } else {
-                    canFly = MekanismItems.HDPE_REINFORCED_ELYTRA.get().canElytraFly(stack, entity);
-                }
-                return canFly ? 0.0F : 1.0F;
-            });
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.GEIGER_COUNTER, Mekanism.rl("radiation"), (stack, world, entity, seed) -> {
+            if (entity instanceof Player) {
+                return RadiationManager.get().getClientScale().ordinal();
+            }
+            return 0;
+        });
+        //Note: Our implementation allows for a null entity so don't worry about it and pass it
+        ClientRegistrationUtil.setPropertyOverride(MekanismItems.HDPE_REINFORCED_ELYTRA, Mekanism.rl("broken"), (stack, world, entity, seed) -> {
+            boolean canFly;
+            if (entity == null) {
+                //Fallback to the vanilla check in case any mods like quark are making vanilla actually make use of the entity
+                canFly = stack.getDamageValue() < stack.getMaxDamage() - 1;
+            } else {
+                canFly = net.minecraft.world.item.ElytraItem.isFlyEnabled(stack);
+            }
+            return canFly ? 0.0F : 1.0F;
         });
 
-        addCustomModel(MekanismBlocks.QIO_DRIVE_ARRAY, (orig, evt) -> new DriveArrayBakedModel(orig));
         addCustomModel(MekanismBlocks.DIGITAL_MINER, (orig, evt) -> new DigitalMinerBakedModel(orig));
 
         addLitModel(MekanismItems.MEKA_TOOL);
@@ -335,8 +322,6 @@ public class ClientRegistration {
     }
 
     public static void registerClientReloadListeners() {
-        //Robit Texture Atlas
-        ClientRegistrationUtil.registerClientReloadListeners(new RobitSpriteUploader(Minecraft.getInstance().getTextureManager()));
         ClientRegistrationUtil.registerClientReloadListeners(
               //ISTERs
               RenderEnergyCubeItem.RENDERER, RenderJetpack.ARMORED_RENDERER, RenderAtomicDisassembler.RENDERER, RenderFlameThrower.RENDERER, RenderFreeRunners.RENDERER,
@@ -428,29 +413,37 @@ public class ClientRegistration {
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.MATRIX_STATS, GuiMatrixStats::new);
     }
 
-    @SubscribeEvent
-    public static void registerModelLoaders(RegisterGeometryLoaders event) {
-        event.register("robit", RobitModel.Loader.INSTANCE);
-        event.register("energy_cube", EnergyCubeModelLoader.INSTANCE);
-        event.register("transmitter", TransmitterLoader.INSTANCE);
-    }
-
-    @SubscribeEvent
-    public static void registerAdditionalModels(RegisterAdditional event) {
-        MekanismModelCache.INSTANCE.setup(event);
-    }
-
-    @SubscribeEvent
-    public static void onModelBake(ModifyBakingResult event) {
-        event.getModels().replaceAll((rl, model) -> {
-            CustomModelRegistryObject obj = customModels.get(new ResourceLocation(rl.getNamespace(), rl.getPath()));
-            return obj == null ? model : obj.createModel(model, event);
+    public static void registerModels() {
+        RegisterGeometryLoadersCallback.EVENT.register(loaders -> {
+            loaders.put(Mekanism.rl("transmitter"), TransmitterLoader.INSTANCE);
+            loaders.put(new ResourceLocation("forge", "obj"), mekanism.client.render.obj.ObjModelLoader.INSTANCE);
         });
-    }
+        ModelLoadingPlugin.register(context -> {
+            MekanismModelCache.INSTANCE.setup(context);
+            context.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, bake) -> {
+                ResourceLocation id = bake.id();
+                CustomModelRegistryObject custom = customModels.get(new ResourceLocation(id.getNamespace(), id.getPath()));
+                return model == null || custom == null ? model : custom.createModel(model, bake);
+            });
+        });
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public ResourceLocation getFabricId() {
+                return Mekanism.rl("model_cache");
+            }
 
-    @SubscribeEvent
-    public static void onModelBake(BakingCompleted event) {
-        MekanismModelCache.INSTANCE.onBake(event);
+            @Override
+            public Collection<ResourceLocation> getFabricDependencies() {
+                return List.of(ResourceReloadListenerKeys.MODELS);
+            }
+
+            @Override
+            public void onResourceManagerReload(ResourceManager resources) {
+                ModelManager manager = Minecraft.getInstance().getModelManager();
+                MekanismModelCache.INSTANCE.onBake(manager);
+                MekanismRenderer.onStitch(manager.getAtlas(TextureAtlas.LOCATION_BLOCKS));
+            }
+        });
     }
 
     public static void registerParticleFactories() {
@@ -616,19 +609,12 @@ public class ClientRegistration {
     }
 
     private static BakedModel lightBakedModel(BakedModel orig) {
-        if (orig instanceof SeparateTransformsModel.Baked separatePerspectiveModel) {
-            //Transform inner components of the separate perspective model and then return the original model
-            SEPARATE_PERSPECTIVE_BASE_MODEL.transformValue(separatePerspectiveModel, Objects::nonNull, ClientRegistration::lightBakedModel);
-            SEPARATE_PERSPECTIVE_PERSPECTIVES.transformValue(separatePerspectiveModel, v -> !v.isEmpty(), org -> ImmutableMap.copyOf(Maps.transformValues(org,
-                  ClientRegistration::lightBakedModel)));
-            return orig;
-        }
         return new LightedBakedModel(orig);
     }
 
     @FunctionalInterface
     public interface CustomModelRegistryObject {
 
-        BakedModel createModel(BakedModel original, ModifyBakingResult event);
+        BakedModel createModel(BakedModel original, ModelModifier.AfterBake.Context event);
     }
 }

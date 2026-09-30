@@ -46,14 +46,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TileEntityTransmitter extends CapabilityTileEntity implements ISidedConfigurable, IAlloyInteraction {
-
-    public static final ModelProperty<TransmitterModelData> TRANSMITTER_PROPERTY = new ModelProperty<>();
+public abstract class TileEntityTransmitter extends CapabilityTileEntity implements ISidedConfigurable, IAlloyInteraction, RenderAttachmentBlockEntity {
 
     private final Transmitter<?, ?, ?> transmitter;
     private boolean forceUpdate = true;
@@ -292,10 +289,10 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
 
     @NotNull
     @Override
-    public ModelData getModelData() {
+    public TransmitterModelData getRenderAttachmentData() {
         TransmitterModelData data = initModelData();
         updateModelData(data);
-        return ModelData.builder().with(TRANSMITTER_PROPERTY, data).build();
+        return data;
     }
 
     protected void updateModelData(TransmitterModelData modelData) {

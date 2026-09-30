@@ -10,8 +10,8 @@ import mekanism.client.render.item.MekanismISTER;
 import mekanism.client.render.tileentity.RenderEnergyCube;
 import mekanism.common.item.block.ItemBlockEnergyCube;
 import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.common.lib.render.EnergyCubeModelData;
 import mekanism.common.tier.EnergyCubeTier;
-import mekanism.common.tile.TileEntityEnergyCube;
 import mekanism.common.tile.TileEntityEnergyCube.CubeSideState;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.util.EnumUtils;
@@ -25,7 +25,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 
 public class RenderEnergyCubeItem extends MekanismISTER {
@@ -61,7 +60,18 @@ public class RenderEnergyCubeItem extends MekanismISTER {
                 sideStates[side.ordinal()] = tier == EnergyCubeTier.CREATIVE || side == RelativeSide.FRONT ? CubeSideState.ACTIVE_LIT : CubeSideState.ACTIVE_UNLIT;
             }
         }
-        ModelData modelData = ModelData.builder().with(TileEntityEnergyCube.SIDE_STATE_PROPERTY, sideStates).build();
+        int activeSides = 0;
+        int litSides = 0;
+        for (RelativeSide side : EnumUtils.SIDES) {
+            int mask = 1 << side.ordinal();
+            if (sideStates[side.ordinal()] != CubeSideState.INACTIVE) {
+                activeSides |= mask;
+            }
+            if (sideStates[side.ordinal()] == CubeSideState.ACTIVE_LIT) {
+                litSides |= mask;
+            }
+        }
+        EnergyCubeModelData modelData = new EnergyCubeModelData(activeSides, litSides);
         renderBlockItem(stack, displayContext, matrix, renderer, light, overlayLight, modelData);
         double energyPercentage = StorageUtils.getStoredEnergyFromNBT(stack).divideToLevel(tier.getMaxEnergy());
         if (energyPercentage > 0) {

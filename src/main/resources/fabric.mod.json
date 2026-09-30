@@ -24,6 +24,16 @@
     "java": ">=17",
     "team_reborn_energy": ">=3.0.0",
     "forgeconfigapiport": ">=8.0.3",
-    "fabric-permissions-api-v0": ">=0.3.1"
+    "fabric-permissions-api-v0": ">=0.3.1",
+    "porting_lib_obj_loader": ">=2.3.15"
+  },
+  "custom": {
+    "porting_lib:provided_loaders": [
+      "mekanism:energy_cube",
+      "mekanism:robit",
+      "forge:composite",
+      "forge:separate_transforms",
+      "forge:item_layers"
+    ]
   }
 }

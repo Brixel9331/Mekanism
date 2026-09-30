@@ -9,7 +9,7 @@ import mekanism.common.lib.transmitter.ConnectionType;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class TransmitterModelConfiguration extends VisibleModelConfiguration {
     @NotNull
     private final IconStatus iconStatus;
 
-    public TransmitterModelConfiguration(IGeometryBakingContext internal, String piece, @NotNull IconStatus iconStatus) {
+    public TransmitterModelConfiguration(BlockModel internal, String piece, @NotNull IconStatus iconStatus) {
         super(internal, Collections.singletonList(piece));
         this.iconStatus = Objects.requireNonNull(iconStatus, "Icon status must be present.");
     }
@@ -92,8 +92,8 @@ public class TransmitterModelConfiguration extends VisibleModelConfiguration {
     }
 
     @Override
-    public boolean hasMaterial(@NotNull String name) {
-        return internal.hasMaterial(adjustTextureName(name));
+    public boolean hasTexture(@NotNull String name) {
+        return internal.hasTexture(adjustTextureName(name));
     }
 
     @NotNull

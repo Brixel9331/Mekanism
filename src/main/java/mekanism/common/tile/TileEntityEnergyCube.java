@@ -15,6 +15,7 @@ import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
 import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.common.lib.render.EnergyCubeModelData;
 import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.component.ITileComponent;
@@ -32,14 +33,11 @@ import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityEnergyCube extends TileEntityConfigurableMachine {
-
-    public static final ModelProperty<CubeSideState[]> SIDE_STATE_PROPERTY = new ModelProperty<>();
+public class TileEntityEnergyCube extends TileEntityConfigurableMachine implements RenderAttachmentBlockEntity {
 
     /**
      * This Energy Cube's tier.
@@ -179,25 +177,26 @@ public class TileEntityEnergyCube extends TileEntityConfigurableMachine {
 
     @NotNull
     @Override
-    public ModelData getModelData() {
+    public EnergyCubeModelData getRenderAttachmentData() {
         ConfigInfo config = getConfig().getConfig(TransmissionType.ENERGY);
         if (config == null) {//Should not happen but validate it anyway
-            return super.getModelData();
+            return EnergyCubeModelData.INACTIVE;
         }
-        CubeSideState[] sideStates = new CubeSideState[EnumUtils.SIDES.length];
+        int activeSides = 0;
+        int litSides = 0;
         for (RelativeSide side : EnumUtils.SIDES) {
-            CubeSideState state = CubeSideState.INACTIVE;
             ISlotInfo slotInfo = config.getSlotInfo(side);
             if (slotInfo != null) {
+                int mask = 1 << side.ordinal();
                 if (slotInfo.canOutput()) {
-                    state = CubeSideState.ACTIVE_LIT;
+                    activeSides |= mask;
+                    litSides |= mask;
                 } else if (slotInfo.canInput()) {
-                    state = CubeSideState.ACTIVE_UNLIT;
+                    activeSides |= mask;
                 }
             }
-            sideStates[side.ordinal()] = state;
         }
-        return ModelData.builder().with(SIDE_STATE_PROPERTY, sideStates).build();
+        return new EnergyCubeModelData(activeSides, litSides);
     }
 
     public enum CubeSideState {

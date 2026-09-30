@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 
 public class RenderFluidTankItem extends MekanismISTER {
@@ -39,6 +38,6 @@ public class RenderFluidTankItem extends MekanismISTER {
                       MekanismRenderer.getColorARGB(fluid, fluidScale), MekanismRenderer.calculateGlowLight(light, fluid), overlayLight, FaceDisplay.FRONT, getCamera());
             }
         }
-        renderBlockItem(stack, displayContext, matrix, renderer, light, overlayLight, ModelData.EMPTY);
+        renderBlockItem(stack, displayContext, matrix, renderer, light, overlayLight, null);
     }
 }

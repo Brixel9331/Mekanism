@@ -53,14 +53,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MekanismRenderer {
 
     //TODO: Replace various usages of LightTexture.FULL_BRIGHT with the getter for calculating glow light, at least if we end up making it only
@@ -288,9 +283,7 @@ public class MekanismRenderer {
         }
     }
 
-    @SubscribeEvent
-    public static void onStitch(TextureStitchEvent.Post event) {
-        TextureAtlas map = event.getAtlas();
+    public static void onStitch(TextureAtlas map) {
         if (!map.location().equals(TextureAtlas.LOCATION_BLOCKS)) {
             return;
         }
@@ -304,7 +297,7 @@ public class MekanismRenderer {
         redstonePulse = map.getSprite(Mekanism.rl("icon/redstone_control_pulse"));
         teleporterPortal = map.getSprite(Mekanism.rl("block/teleporter_portal"));
 
-        DigitalMinerBakedModel.onStitch(event);
+        DigitalMinerBakedModel.onStitch(map);
 
         //Note: These are called in post rather than pre to make sure the icons have properly been stitched/attached
         RenderLogisticalTransporter.onStitch(map);

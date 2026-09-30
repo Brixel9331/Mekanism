@@ -7,9 +7,7 @@ import java.util.function.Function;
 import mekanism.client.render.lib.Quad;
 import mekanism.client.render.lib.QuadUtils;
 import mekanism.client.render.lib.Vertex;
-import mekanism.common.Mekanism;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -17,24 +15,26 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
-import net.minecraftforge.client.event.ModelEvent.RegisterAdditional;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.client.model.obj.ObjLoader;
-import net.minecraftforge.client.model.obj.ObjModel;
-import net.minecraftforge.client.model.obj.ObjModel.ModelSettings;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.obj.ObjLoader;
+import io.github.fabricators_of_create.porting_lib.models.obj.ObjModel;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 public class BaseModelCache {
+
+    private static volatile ModelBaker currentBaker;
+
+    public static ModelBaker getBaker() {
+        return java.util.Objects.requireNonNull(currentBaker, "Models have not been baked");
+    }
 
     private final Map<ResourceLocation, MekanismModelData> modelMap = new Object2ObjectOpenHashMap<>();
 
@@ -48,12 +48,16 @@ public class BaseModelCache {
         return new ResourceLocation(modid, path);
     }
 
-    public void onBake(BakingCompleted evt) {
+    public void onBake(ModelManager evt) {
         modelMap.values().forEach(m -> m.reload(evt));
     }
 
-    public void setup(RegisterAdditional event) {
+    public void setup(ModelLoadingPlugin.Context event) {
         modelMap.values().forEach(mekanismModelData -> mekanismModelData.setup(event));
+        event.modifyModelAfterBake().register((model, context) -> {
+            currentBaker = context.baker();
+            return model;
+        });
     }
 
     protected OBJModelData registerOBJ(String path) {
@@ -73,18 +77,13 @@ public class BaseModelCache {
     }
 
     protected JSONModelData registerJSONAndBake(ResourceLocation rl) {
-        ModelManager modelManager = Minecraft.getInstance().getModelManager();
-        ModelBakery modelBakery = modelManager.getModelBakery();
-        ModelBaker baker = modelBakery.new ModelBakerImpl(
-              (modelLoc, material) -> material.sprite(),
-              rl
-        );
+        ModelBaker baker = getBaker();
         //Register the model
         JSONModelData data = registerJSON(rl);
         //Manually run the JsonModelData#reload logic
-        data.bakedModel = baker.bake(rl, BlockModelRotation.X0_Y0, Material::sprite);
-        if (modelBakery.getModel(rl) instanceof BlockModel blockModel) {
-            data.model = blockModel.customData.getCustomGeometry();
+        data.bakedModel = baker.bake(rl, BlockModelRotation.X0_Y0);
+        if (baker.getModel(rl) instanceof BlockModel blockModel) {
+            data.model = blockModel.getCustomGeometry();
         }
         return data;
     }
@@ -95,11 +94,11 @@ public class BaseModelCache {
         return data;
     }
 
-    public static BakedModel getBakedModel(BakingCompleted evt, ResourceLocation rl) {
-        BakedModel bakedModel = evt.getModels().get(rl);
+    public static BakedModel getBakedModel(ModelManager evt, ResourceLocation rl) {
+        BakedModel bakedModel = evt.bakedRegistry.get(rl);
         if (bakedModel == null) {
-            Mekanism.logger.error("Baked model doesn't exist: {}", rl.toString());
-            return evt.getModelManager().getMissingModel();
+            LogUtils.getLogger().error("Baked model doesn't exist: {}", rl);
+            return evt.getMissingModel();
         }
         return bakedModel;
     }
@@ -109,26 +108,23 @@ public class BaseModelCache {
         protected IUnbakedGeometry<?> model;
 
         protected final ResourceLocation rl;
-        private final Map<IGeometryBakingContext, BakedModel> bakedMap = new Object2ObjectOpenHashMap<>();
+        private final Map<BlockModel, BakedModel> bakedMap = new Object2ObjectOpenHashMap<>();
 
         protected MekanismModelData(ResourceLocation rl) {
             this.rl = rl;
         }
 
-        protected void reload(BakingCompleted evt) {
+        protected void reload(ModelManager evt) {
             bakedMap.clear();
         }
 
-        protected void setup(RegisterAdditional event) {
+        protected void setup(ModelLoadingPlugin.Context event) {
         }
 
-        public BakedModel bake(IGeometryBakingContext config) {
+        public BakedModel bake(BlockModel config) {
             return bakedMap.computeIfAbsent(config, c -> {
-                ModelBaker baker = Minecraft.getInstance().getModelManager().getModelBakery().new ModelBakerImpl(
-                      (modelLoc, material) -> material.sprite(),
-                      rl
-                );
-                return model.bake(c, baker, Material::sprite, BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, rl);
+                ModelBaker baker = getBaker();
+                return model.bake(c, baker, Material::sprite, BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, rl, false);
             });
         }
 
@@ -144,9 +140,12 @@ public class BaseModelCache {
         }
 
         @Override
-        protected void reload(BakingCompleted evt) {
+        protected void reload(ModelManager evt) {
             super.reload(evt);
-            model = ObjLoader.INSTANCE.loadModel(new ModelSettings(rl, true, useDiffuseLighting(), true, true, null));
+            JsonObject definition = new JsonObject();
+            definition.addProperty("model", rl.toString());
+            definition.addProperty("shadeQuads", useDiffuseLighting());
+            model = ObjLoader.INSTANCE.read(definition, null);
         }
 
         @Override
@@ -168,18 +167,18 @@ public class BaseModelCache {
         }
 
         @Override
-        protected void reload(BakingCompleted evt) {
+        protected void reload(ModelManager evt) {
             super.reload(evt);
             bakedModel = BaseModelCache.getBakedModel(evt, rl);
-            UnbakedModel unbaked = evt.getModelBakery().getModel(rl);
+            UnbakedModel unbaked = getBaker().getModel(rl);
             if (unbaked instanceof BlockModel blockModel) {
-                model = blockModel.customData.getCustomGeometry();
+                model = blockModel.getCustomGeometry();
             }
         }
 
         @Override
-        protected void setup(RegisterAdditional event) {
-            event.register(rl);
+        protected void setup(ModelLoadingPlugin.Context event) {
+            event.addModels(rl);
         }
 
         public void collectQuadVertices(List<Vertex[]> vertices, RandomSource random) {
@@ -193,8 +192,8 @@ public class BaseModelCache {
             return getBakedModel().getQuads(null, null, random);
         }
 
-        public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
-            return getBakedModel().getQuads(state, side, rand, data, renderType);
+        public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
+            return getBakedModel().getQuads(state, side, rand);
         }
 
         public BakedModel getBakedModel() {

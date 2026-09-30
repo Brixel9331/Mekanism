@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import mekanism.api.math.MathUtils;
 import mekanism.api.robit.RobitSkin;
-import mekanism.client.RobitSpriteUploader;
+import mekanism.client.model.robit.RobitTextureAtlas;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiElement;
@@ -32,7 +32,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.model.data.ModelData;
+import mekanism.client.model.robit.RobitModels;
 import org.jetbrains.annotations.NotNull;
 
 public class GuiRobitSkinSelectScroll extends GuiElement {
@@ -179,7 +179,7 @@ public class GuiRobitSkinSelectScroll extends GuiElement {
             return;
         }
         MultiBufferSource.BufferSource buffer = guiGraphics.bufferSource();
-        VertexConsumer builder = buffer.getBuffer(RobitSpriteUploader.RENDER_TYPE);
+        VertexConsumer builder = buffer.getBuffer(RobitTextureAtlas.RENDER_TYPE);
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
         //Translate to the proper position and do our best job at centering it
@@ -187,15 +187,14 @@ public class GuiRobitSkinSelectScroll extends GuiElement {
         pose.scale(SLOT_DIMENSIONS, SLOT_DIMENSIONS, SLOT_DIMENSIONS);
         pose.mulPose(Axis.ZP.rotationDegrees(180));
         PoseStack.Pose matrixEntry = pose.last();
-        ModelData modelData = ModelData.builder().with(EntityRobit.SKIN_TEXTURE_PROPERTY, MathUtils.getByIndexMod(textures, index)).build();
-        List<BakedQuad> quads = model.getQuads(null, null, robit.level().random, modelData, null);
+        List<BakedQuad> quads = RobitModels.getQuads(model, MathUtils.getByIndexMod(textures, index), robit.level().random);
         //TODO: Ideally at some point we will want to be able to have the rotations happen via the matrix stack
         // so that we aren't having to transform the quads directly
         quads = QuadUtils.transformBakedQuads(quads, rotation);
         for (BakedQuad quad : quads) {
             builder.putBulkData(matrixEntry, quad, 1, 1, 1, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         }
-        buffer.endBatch(RobitSpriteUploader.RENDER_TYPE);
+        buffer.endBatch(RobitTextureAtlas.RENDER_TYPE);
 
         pose.popPose();
     }

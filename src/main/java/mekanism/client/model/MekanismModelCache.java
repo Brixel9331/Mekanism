@@ -14,7 +14,7 @@ import mekanism.common.tile.qio.TileEntityQIODriveArray.DriveStatus;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
+import net.minecraft.client.resources.model.ModelManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +53,7 @@ public class MekanismModelCache extends BaseModelCache {
     }
 
     @Override
-    public void onBake(BakingCompleted evt) {
+    public void onBake(ModelManager evt) {
         super.onBake(evt);
         callbacks.forEach(Runnable::run);
         BASE_ROBIT = getBakedModel(evt, new ModelResourceLocation(Mekanism.rl("robit"), "inventory"));

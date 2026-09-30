@@ -3,8 +3,8 @@ package mekanism.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import mekanism.client.RobitSpriteUploader;
-import mekanism.client.model.MekanismModelCache;
+import mekanism.client.model.robit.RobitModels;
+import mekanism.client.render.lib.ModelQuadRenderer;
 import mekanism.client.render.entity.RenderRobit.RobitModelWrapper;
 import mekanism.common.Mekanism;
 import mekanism.common.entity.EntityRobit;
@@ -14,6 +14,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public class RenderRobit extends MobRenderer<EntityRobit, RobitModelWrapper> {
     @NotNull
     @Override
     public ResourceLocation getTextureLocation(@NotNull EntityRobit robit) {
-        return RobitSpriteUploader.ATLAS_LOCATION;
+        return TextureAtlas.LOCATION_BLOCKS;
     }
 
     public static class RobitModelWrapper extends EntityModel<EntityRobit> {
@@ -51,23 +52,22 @@ public class RenderRobit extends MobRenderer<EntityRobit, RobitModelWrapper> {
                 //Setup didn't happen right
                 return;
             }
-            SkinLookup skinLookup = MekanismRobitSkins.lookup(robit.level().registryAccess(), robit.getSkin());
-            BakedModel model = MekanismModelCache.INSTANCE.getRobitSkin(skinLookup);
-            if (model == null) {
-                //No model means we can't render (this shouldn't happen as we try to fall back to the default skin)
-                Mekanism.logger.warn("Robit with skin: {} does not have a model. If this happened during a resource reload this can be ignored.", skinLookup.location());
-            } else {
-                matrix.pushPose();
+            matrix.pushPose();
+            try {
+                ResourceLocation texture = robit.getModelTexture();
+                SkinLookup skinLookup = MekanismRobitSkins.lookup(robit.level().registryAccess(), robit.getSkin());
+                BakedModel model = RobitModels.getModel(skinLookup.skin().customModel());
                 matrix.mulPose(Axis.XP.rotationDegrees(180));
                 matrix.translate(-0.5, -1.5, -0.5);
                 PoseStack.Pose last = matrix.last();
-                for (BakedQuad quad : model.getQuads(null, null, robit.level().random, robit.getModelData(), null)) {
-                    builder.putBulkData(last, quad, red, green, blue, alpha, light, overlayLight, false);
+                for (BakedQuad quad : RobitModels.getQuads(model, texture, robit.level().random)) {
+                    ModelQuadRenderer.render(last, builder, quad, red, green, blue, alpha, light, overlayLight);
                 }
+            } finally {
                 matrix.popPose();
+                //Clear current robit after rendering it
+                robit = null;
             }
-            //Clear current robit after rendering it
-            robit = null;
         }
     }
 }

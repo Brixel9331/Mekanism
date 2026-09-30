@@ -1,6 +1,11 @@
 {
   "sources": [
     {
+      "type": "minecraft:directory",
+      "source": "entity/robit",
+      "prefix": "entity/robit/"
+    },
+    {
       "type": "minecraft:single",
       "resource": "mekanism:liquid/energy"
     },

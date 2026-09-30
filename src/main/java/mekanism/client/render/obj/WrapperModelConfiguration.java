@@ -4,28 +4,24 @@ import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.RenderTypeGroup;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WrapperModelConfiguration implements IGeometryBakingContext {
+public class WrapperModelConfiguration extends BlockModel {
 
-    protected final IGeometryBakingContext internal;
+    protected final BlockModel internal;
 
-    protected WrapperModelConfiguration(IGeometryBakingContext internal) {
+    protected WrapperModelConfiguration(BlockModel internal) {
+        super(null, List.of(), Map.of(), internal.hasAmbientOcclusion(), internal.getGuiLight(), internal.getTransforms(), List.of());
         this.internal = internal;
     }
 
-    @NotNull
     @Override
-    public String getModelName() {
-        return internal.getModelName();
-    }
-
-    @Override
-    public boolean hasMaterial(@NotNull String name) {
-        return internal.hasMaterial(name);
+    public boolean hasTexture(@NotNull String name) {
+        return internal.hasTexture(name);
     }
 
     @NotNull
@@ -35,18 +31,13 @@ public class WrapperModelConfiguration implements IGeometryBakingContext {
     }
 
     @Override
-    public boolean isGui3d() {
-        return internal.isGui3d();
+    public GuiLight getGuiLight() {
+        return GuiLight.FRONT;
     }
 
     @Override
-    public boolean useBlockLight() {
-        return false;
-    }
-
-    @Override
-    public boolean useAmbientOcclusion() {
-        return internal.useAmbientOcclusion();
+    public boolean hasAmbientOcclusion() {
+        return internal.hasAmbientOcclusion();
     }
 
     @NotNull
@@ -65,14 +56,4 @@ public class WrapperModelConfiguration implements IGeometryBakingContext {
         return internal.isComponentVisible(component, fallback);
     }
 
-    @Nullable
-    @Override
-    public ResourceLocation getRenderTypeHint() {
-        return internal.getRenderTypeHint();
-    }
-
-    @Override
-    public RenderTypeGroup getRenderType(ResourceLocation name) {
-        return internal.getRenderType(name);
-    }
 }

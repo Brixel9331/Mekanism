@@ -38,6 +38,7 @@
     "client.ClientBlockEntityPacketMixin",
     "client.ClientChunkBlockEntityMixin",
     "client.GameRendererMixin",
+    "client.ObjModelMixin",
     "client.PlayerRendererMixin",
     "client.SoundEngineMixin",
     "client.MouseHandlerMixin",

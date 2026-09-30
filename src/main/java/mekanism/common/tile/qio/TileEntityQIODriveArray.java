@@ -16,20 +16,19 @@ import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.integration.computer.ComputerException;
 import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.slot.QIODriveSlot;
+import mekanism.common.lib.render.DriveArrayModelData;
 import mekanism.common.registries.MekanismBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class TileEntityQIODriveArray extends TileEntityQIOComponent implements IQIODriveHolder {
+public class TileEntityQIODriveArray extends TileEntityQIOComponent implements IQIODriveHolder, RenderAttachmentBlockEntity {
 
-    public static final ModelProperty<byte[]> DRIVE_STATUS_PROPERTY = new ModelProperty<>();
-    public static final int DRIVE_SLOTS = 12;
+    public static final int DRIVE_SLOTS = DriveArrayModelData.SLOTS;
 
     private List<IInventorySlot> driveSlots;
     private byte[] driveStatus = new byte[DRIVE_SLOTS];
@@ -103,8 +102,8 @@ public class TileEntityQIODriveArray extends TileEntityQIOComponent implements I
 
     @NotNull
     @Override
-    public ModelData getModelData() {
-        return ModelData.builder().with(DRIVE_STATUS_PROPERTY, driveStatus).build();
+    public DriveArrayModelData getRenderAttachmentData() {
+        return DriveArrayModelData.of(driveStatus);
     }
 
     @NotNull
@@ -118,7 +117,7 @@ public class TileEntityQIODriveArray extends TileEntityQIOComponent implements I
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
-        byte[] status = tag.getByteArray(NBTConstants.DRIVES);
+        byte[] status = DriveArrayModelData.of(tag.getByteArray(NBTConstants.DRIVES)).toArray();
         if (!Arrays.equals(status, driveStatus)) {
             driveStatus = status;
             updateModelData();

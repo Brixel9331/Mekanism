@@ -8,7 +8,6 @@ import com.google.common.collect.Table;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.mojang.math.Transformation;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMaps;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -33,6 +32,7 @@ import mekanism.client.model.BaseModelCache.MekanismModelData;
 import mekanism.client.model.BaseModelCache.OBJModelData;
 import mekanism.client.model.MekanismModelCache;
 import mekanism.client.render.MekanismRenderType;
+import mekanism.client.render.lib.ModelQuadRenderer;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.client.render.lib.QuadUtils;
 import mekanism.client.render.lib.QuickHash;
@@ -66,9 +66,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -199,7 +198,7 @@ public class MekaSuitArmor implements ICustomArmor {
 
     private void putQuads(List<BakedQuad> quads, VertexConsumer builder, PoseStack.Pose pose, int light, int overlayLight, Color color) {
         for (BakedQuad quad : quads) {
-            builder.putBulkData(pose, quad, color.rf(), color.gf(), color.bf(), color.af(), light, overlayLight, false);
+            ModelQuadRenderer.render(pose, builder, quad, color.rf(), color.gf(), color.bf(), color.af(), light, overlayLight);
         }
     }
 
@@ -209,10 +208,10 @@ public class MekaSuitArmor implements ICustomArmor {
         //Note: We need to use a new list to not accidentally pollute the cached bake quads with the LED quads that we match them with
         // this also means that we can avoid even baking the data against empty part lists entirely
         if (!parts.isEmpty()) {
-            quads.addAll(data.bake(new MekaSuitModelConfiguration(parts)).getQuads(null, null, random, ModelData.EMPTY, null));
+            quads.addAll(data.bake(new MekaSuitModelConfiguration(parts)).getQuads(null, null, random));
         }
         if (!ledParts.isEmpty()) {
-            List<BakedQuad> ledQuads = data.bake(new MekaSuitModelConfiguration(ledParts)).getQuads(null, null, random, ModelData.EMPTY, null);
+            List<BakedQuad> ledQuads = data.bake(new MekaSuitModelConfiguration(ledParts)).getQuads(null, null, random);
             quads.addAll(QuadUtils.transformBakedQuads(ledQuads, QuadTransformation.fullbright));
         }
         if (transform != null) {
@@ -579,8 +578,9 @@ public class MekaSuitArmor implements ICustomArmor {
         }
 
         @Override
-        protected void reload(BakingCompleted evt) {
+        protected void reload(ModelManager evt) {
             super.reload(evt);
+            specParts.clear();
             Collection<ModuleModelSpec> modules = moduleModelSpec.values();
             for (String name : getModel().getRootComponentNames()) {
                 //Find the "best" spec by checking all the specs and finding out which one is listed first
@@ -616,69 +616,34 @@ public class MekaSuitArmor implements ICustomArmor {
         }
     }
 
-    private record MekaSuitModelConfiguration(Set<String> parts) implements IGeometryBakingContext {
+    private static final class MekaSuitModelConfiguration extends BlockModel {
 
         private static final Material NO_MATERIAL = new Material(TextureAtlas.LOCATION_BLOCKS, MissingTextureAtlasSprite.getLocation());
+        private final Set<String> parts;
 
-        private MekaSuitModelConfiguration {
-            parts = parts.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(parts);
-        }
-
-        @NotNull
-        @Override
-        public String getModelName() {
-            return "mekanism:mekasuit";
+        private MekaSuitModelConfiguration(Set<String> parts) {
+            super(null, List.of(), Map.of(), true, GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, List.of());
+            this.parts = Set.copyOf(parts);
         }
 
         @Override
-        public boolean hasMaterial(@NotNull String name) {
-            return false;
-        }
-
-        @NotNull
-        @Override
-        public Material getMaterial(@NotNull String name) {
+        public Material getMaterial(String name) {
             return NO_MATERIAL;
         }
 
         @Override
-        public boolean isGui3d() {
-            return false;
-        }
-
-        @Override
-        public boolean useBlockLight() {
-            return false;
-        }
-
-        @Override
-        public boolean useAmbientOcclusion() {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        @Deprecated
-        public ItemTransforms getTransforms() {
-            return ItemTransforms.NO_TRANSFORMS;
-        }
-
-        @NotNull
-        @Override
-        public Transformation getRootTransform() {
-            return Transformation.identity();
-        }
-
-        @Nullable
-        @Override
-        public ResourceLocation getRenderTypeHint() {
-            return null;
-        }
-
-        @Override
         public boolean isComponentVisible(String component, boolean fallback) {
-            //Ignore fallback as we always have a true or false answer
             return parts.contains(component);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof MekaSuitModelConfiguration configuration && parts.equals(configuration.parts);
+        }
+
+        @Override
+        public int hashCode() {
+            return parts.hashCode();
         }
     }
 }

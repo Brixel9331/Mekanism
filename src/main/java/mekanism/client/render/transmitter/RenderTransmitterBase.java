@@ -32,20 +32,15 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.StandaloneGeometryBakingContext;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import mekanism.client.model.BaseModelCache;
 import org.joml.Vector3f;
 
 @NothingNullByDefault
 public abstract class RenderTransmitterBase<TRANSMITTER extends TileEntityTransmitter> extends MekanismTileEntityRenderer<TRANSMITTER> {
 
     public static final ResourceLocation MODEL_LOCATION = MekanismUtils.getResource(ResourceType.MODEL, "transmitter_contents.obj");
-    private static final IGeometryBakingContext contentsConfiguration = StandaloneGeometryBakingContext.builder()
-          .withGui3d(false)
-          .withUseBlockLight(false)
-          .withUseAmbientOcclusion(false)
-          .build(Mekanism.rl("transmitter_contents"));
+    private static final BlockModel contentsConfiguration = BlockModel.fromString("{\"gui_light\":\"front\",\"ambientocclusion\":false}");
     private static final Map<ContentsModelData, List<BakedQuad>> contentModelCache = new Object2ObjectOpenHashMap<>();
     private static final Vector3f NORMAL = Util.make(new Vector3f(1, 1, 1), Vector3f::normalize);
 
@@ -55,15 +50,12 @@ public abstract class RenderTransmitterBase<TRANSMITTER extends TileEntityTransm
 
     private static List<BakedQuad> getBakedQuads(List<String> visible, TextureAtlasSprite icon, Level world) {
         return contentModelCache.computeIfAbsent(new ContentsModelData(visible, icon), modelData -> {
-            ModelBaker baker = Minecraft.getInstance().getModelManager().getModelBakery().new ModelBakerImpl(
-                  (modelLoc, material) -> material.sprite(),
-                  MODEL_LOCATION
-            );
+            ModelBaker baker = BaseModelCache.getBaker();
             //Note: We get model and then bake as we use different parameters and are caching after modifying
             List<BakedQuad> bakedQuads = MekanismModelCache.INSTANCE.TRANSMITTER_CONTENTS.getModel()
                   .bake(new VisibleModelConfiguration(contentsConfiguration, modelData.visible), baker, material -> modelData.icon,
-                        BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, MODEL_LOCATION)
-                  .getQuads(null, null, world.getRandom(), ModelData.EMPTY, null);
+                        BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, MODEL_LOCATION, false)
+                  .getQuads(null, null, world.getRandom());
             List<Quad> unpackedQuads = QuadUtils.unpack(bakedQuads);
             for (Quad unpackedQuad : unpackedQuads) {
                 //Set the normals to ones that ignore the diffuse light in the same way we do it in Render Resizable Cuboid
@@ -91,7 +83,7 @@ public abstract class RenderTransmitterBase<TRANSMITTER extends TileEntityTransm
             Pose entry = matrix.last();
             //Get all the sides
             for (BakedQuad quad : getBakedQuads(visible, icon, transmitter.getLevel())) {
-                builder.putBulkData(entry, quad, red, green, blue, alpha, light, overlayLight, false);
+                mekanism.client.render.lib.ModelQuadRenderer.render(entry, builder, quad, red, green, blue, alpha, light, overlayLight);
             }
         }
     }

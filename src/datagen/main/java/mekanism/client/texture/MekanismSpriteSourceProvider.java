@@ -14,6 +14,7 @@ public class MekanismSpriteSourceProvider extends BaseSpriteSourceProvider {
     @Override
     protected void addSources() {
         SourceList atlas = atlas(BLOCKS_ATLAS);
+        addDirectory(atlas, "entity/robit", "entity/robit/");
         addFiles(atlas, Mekanism.rl("liquid/energy"));
         addFiles(atlas, Mekanism.rl("liquid/heat"));
         addFiles(atlas, Mekanism.rl("icon/redstone_control_pulse"));

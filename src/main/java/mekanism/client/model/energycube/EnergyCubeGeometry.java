@@ -1,6 +1,5 @@
 package mekanism.client.model.energycube;
 
-import com.mojang.math.Transformation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -9,13 +8,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import mekanism.api.RelativeSide;
+import mekanism.client.model.ModelGeometry;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.client.render.lib.QuadUtils;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -23,13 +24,9 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.RenderTypeGroup;
-import net.minecraftforge.client.model.SimpleModelState;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 import org.jetbrains.annotations.Nullable;
 
-public class EnergyCubeGeometry implements IUnbakedGeometry<EnergyCubeGeometry> {
+public class EnergyCubeGeometry implements ModelGeometry {
 
     private final List<BlockElement> frame;
     private final Map<RelativeSide, List<BlockElement>> leds;
@@ -42,23 +39,19 @@ public class EnergyCubeGeometry implements IUnbakedGeometry<EnergyCubeGeometry> 
     }
 
     @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
-          ItemOverrides overrides, ResourceLocation modelLocation) {
-        TextureAtlasSprite particle = spriteGetter.apply(context.getMaterial("particle"));
-
-        ResourceLocation renderTypeHint = context.getRenderTypeHint();
-        RenderTypeGroup renderTypes = renderTypeHint == null ? RenderTypeGroup.EMPTY : context.getRenderType(renderTypeHint);
-
-        Transformation rootTransform = context.getRootTransform();
-        if (!rootTransform.isIdentity()) {
-            modelState = new SimpleModelState(modelState.getRotation().compose(rootTransform), modelState.isUvLocked());
-        }
-        Function<String, TextureAtlasSprite> rawSpriteGetter = spriteGetter.compose(context::getMaterial);
+    public BakedModel bake(BlockModel source, BakedModel original, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
+          ResourceLocation modelLocation, BlendMode blendMode) {
+        Function<String, TextureAtlasSprite> rawSpriteGetter = spriteGetter.compose(source::getMaterial);
         FaceData frame = bakeElement(rawSpriteGetter, modelState, modelLocation, this.frame);
         Map<RelativeSide, FaceData> leds = bakeElements(rawSpriteGetter, modelState, modelLocation, this.leds);
         Map<RelativeSide, FaceData> ports = bakeElements(rawSpriteGetter, modelState, modelLocation, this.ports);
-        return new EnergyCubeBakedModel(context.useAmbientOcclusion(), context.useBlockLight(), context.isGui3d(), context.getTransforms(), overrides, particle, frame, leds, ports,
-              renderTypes);
+        QuadTransformation rootTransform = ModelGeometry.rootTransform(source, modelState);
+        if (rootTransform != QuadTransformation.identity) {
+            frame = frame.transform(rootTransform);
+            leds.replaceAll((side, faces) -> faces.transform(rootTransform));
+            ports.replaceAll((side, faces) -> faces.transform(rootTransform));
+        }
+        return new EnergyCubeBakedModel(original, frame, leds, ports, blendMode);
     }
 
     private Map<RelativeSide, FaceData> bakeElements(Function<String, TextureAtlasSprite> spriteGetter, ModelState modelState,
@@ -78,8 +71,9 @@ public class EnergyCubeGeometry implements IUnbakedGeometry<EnergyCubeGeometry> 
                 BlockElementFace face = faceEntry.getValue();
                 TextureAtlasSprite sprite = spriteGetter.apply(face.texture);
                 //noinspection ConstantConditions (can be null)
-                Direction direction = face.cullForDirection == null ? null : modelState.getRotation().rotateTransform(face.cullForDirection);
-                data.addFace(direction, BlockModel.bakeFace(element, face, sprite, faceEntry.getKey(), modelState, modelLocation));
+                Direction direction = face.cullForDirection == null ? null : Direction.rotate(modelState.getRotation().getMatrix(), face.cullForDirection);
+                data.addFace(direction, new FaceBakery().bakeQuad(element.from, element.to, face, sprite, faceEntry.getKey(), modelState,
+                      element.rotation, element.shade, modelLocation));
             }
         }
         return data;

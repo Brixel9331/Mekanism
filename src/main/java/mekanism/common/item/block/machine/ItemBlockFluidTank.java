@@ -2,7 +2,6 @@ package mekanism.common.item.block.machine;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
@@ -13,7 +12,6 @@ import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.api.text.EnumColor;
-import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.attribute.Attribute;
@@ -64,7 +62,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,11 +69,6 @@ public class ItemBlockFluidTank extends ItemBlockMachine implements IModeItem {
 
     public ItemBlockFluidTank(BlockFluidTank block) {
         super(block);
-    }
-
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(RenderPropertiesProvider.fluidTank());
     }
 
     @NotNull

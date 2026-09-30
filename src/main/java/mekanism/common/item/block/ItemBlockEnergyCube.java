@@ -1,12 +1,10 @@
 package mekanism.common.item.block;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
-import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.BlockEnergyCube;
 import mekanism.common.block.attribute.Attribute;
@@ -30,18 +28,12 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemBlockEnergyCube extends ItemBlockTooltip<BlockEnergyCube> implements IItemSustainedInventory, ICustomCreativeTabContents {
 
     public ItemBlockEnergyCube(BlockEnergyCube block) {
         super(block);
-    }
-
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(RenderPropertiesProvider.energyCube());
     }
 
     @NotNull

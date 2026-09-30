@@ -14,10 +14,7 @@ import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.client.model.data.TransmitterModelData;
 import mekanism.client.render.obj.TransmitterModelConfiguration.IconStatus;
 import mekanism.common.lib.transmitter.ConnectionType;
-import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.EnumUtils;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -31,24 +28,24 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.ChunkRenderTypeSet;
-import net.minecraftforge.client.model.BakedModelWrapper;
-import net.minecraftforge.client.model.SimpleModelState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.obj.ObjModel;
+import mekanism.client.model.baked.DynamicBakedModel;
+import mekanism.client.render.lib.ModelQuadMaterials;
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import java.util.function.Supplier;
+import io.github.fabricators_of_create.porting_lib.models.geometry.SimpleModelState;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import io.github.fabricators_of_create.porting_lib.models.obj.ObjModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 @NothingNullByDefault
-public class TransmitterBakedModel extends BakedModelWrapper<BakedModel> {
+public class TransmitterBakedModel extends DynamicBakedModel<TransmitterModelData> {
 
-    private static final ChunkRenderTypeSet CUTOUT = ChunkRenderTypeSet.of(RenderType.cutout());
-    private static final ChunkRenderTypeSet FULL = ChunkRenderTypeSet.of(RenderType.cutout(), RenderType.translucent());
 
-    private final IGeometryBakingContext owner;
+    private final BlockModel owner;
     private final ModelBaker baker;
     private final Function<Material, TextureAtlasSprite> spriteGetter;
     private final ModelState modelTransform;
@@ -76,11 +73,11 @@ public class TransmitterBakedModel extends BakedModelWrapper<BakedModel> {
         }
     });
 
-    public TransmitterBakedModel(ObjModel internal, @Nullable ObjModel glass, IGeometryBakingContext owner, ModelBaker baker,
-          Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    public TransmitterBakedModel(ObjModel internal, @Nullable ObjModel glass, BlockModel owner, ModelBaker baker,
+          Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
         //We define our baked variant to be how the item is. As we should always have model data when we have a state
         super(internal.bake(new VisibleModelConfiguration(owner, Arrays.stream(EnumUtils.DIRECTIONS).map(side -> getPartName(side, ConnectionType.NONE)).toList()),
-              baker, spriteGetter, modelTransform, overrides, modelLocation));
+              baker, spriteGetter, modelTransform, overrides, modelLocation, isGui3d), TransmitterModelData.class, BlendMode.CUTOUT);
         this.owner = owner;
         this.baker = baker;
         this.spriteGetter = spriteGetter;
@@ -92,46 +89,35 @@ public class TransmitterBakedModel extends BakedModelWrapper<BakedModel> {
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
-        return getQuads(state, side, rand, ModelData.EMPTY, null);
-    }
-
-    @NotNull
-    @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData,
-          @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource random, @Nullable TransmitterModelData data) {
         if (side != null) {
-            return Collections.emptyList();
+            return List.of();
         }
-        TransmitterModelData data = extraData.get(TileEntityTransmitter.TRANSMITTER_PROPERTY);
-        if (data != null) {
-            boolean renderGlass = renderType == RenderType.translucent();
-            if (renderGlass && (glassPartsCache == null || !data.getHasColor())) {
-                //Skip rendering the glass if we don't actually have any glass, or we don't have a color for it
-                return Collections.emptyList();
+        if (data == null) {
+            return wrapped.getQuads(state, null, random);
+        }
+        List<BakedQuad> quads = cache.getUnchecked(new TransmitterDataKey(data, false));
+        if (glassPartsCache != null && data.getHasColor()) {
+            quads = new ArrayList<>(quads);
+            quads.addAll(cache.getUnchecked(new TransmitterDataKey(data, true)));
+        }
+        return quads;
+    }
+
+    @Override
+    public void emitQuads(@Nullable BlockState state, Supplier<RandomSource> random, RenderContext context, @Nullable TransmitterModelData data) {
+        if (data == null) {
+            super.emitQuads(state, random, context, null);
+            return;
+        }
+        for (BakedQuad quad : cache.getUnchecked(new TransmitterDataKey(data, false))) {
+            ModelQuadMaterials.emit(quad, null, BlendMode.CUTOUT, context.getEmitter());
+        }
+        if (glassPartsCache != null && data.getHasColor()) {
+            for (BakedQuad quad : cache.getUnchecked(new TransmitterDataKey(data, true))) {
+                ModelQuadMaterials.emit(quad, null, BlendMode.TRANSLUCENT, context.getEmitter());
             }
-            return cache.getUnchecked(new TransmitterDataKey(data, renderGlass));
         }
-        //Fallback to our "default" model arrangement. The item variant uses this
-        return super.getQuads(state, null, rand, extraData, renderType);
-    }
-
-    @Override
-    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
-        return glassPartsCache == null ? CUTOUT : FULL;
-    }
-
-    @Override
-    public List<RenderType> getRenderTypes(ItemStack itemStack, boolean fabulous) {
-        if (glassPartsCache == null) {
-            return List.of(Sheets.cutoutBlockSheet());
-        }
-        return List.of(Sheets.cutoutBlockSheet(), fabulous ? Sheets.translucentCullBlockSheet() : Sheets.translucentItemSheet());
-    }
-
-    @Override
-    public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
-        return Collections.singletonList(this);
     }
 
     private static String getPartName(Direction side, ConnectionType connectionType) {
@@ -160,10 +146,10 @@ public class TransmitterBakedModel extends BakedModelWrapper<BakedModel> {
                     Transformation matrix = new Transformation(null, quaternion, null, null);
                     transform = new SimpleModelState(transform.getRotation().compose(matrix), transform.isUvLocked());
                 }
-                BakedModel bakedModel = model.bake(new TransmitterModelConfiguration(owner, part, iconStatus), baker, spriteGetter, transform, overrides, modelLocation);
+                BakedModel bakedModel = model.bake(new TransmitterModelConfiguration(owner, part, iconStatus), baker, spriteGetter, transform, overrides, modelLocation, false);
                 //Note: We don't actually care about the state, or the side anywhere and the model returns the proper values even if we don't provide a render type
                 // We also just use a new random source as we don't have one in our current context
-                return bakedModel.getQuads(null, null, RandomSource.create(), ModelData.EMPTY, null);
+                return bakedModel.getQuads(null, null, RandomSource.create());
             }
         };
     }

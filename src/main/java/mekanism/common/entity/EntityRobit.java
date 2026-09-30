@@ -123,8 +123,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
 import mekanism.common.lib.LivingDamageCallback;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,8 +134,6 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
     public static AttributeSupplier.Builder getDefaultAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 1.0D).add(Attributes.MOVEMENT_SPEED, 0.3F);
     }
-
-    public static final ModelProperty<ResourceLocation> SKIN_TEXTURE_PROPERTY = new ModelProperty<>();
 
     private static <T> EntityDataAccessor<T> define(EntityDataSerializer<T> dataSerializer) {
         return SynchedEntityData.defineId(EntityRobit.class, dataSerializer);
@@ -731,15 +727,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
     /**
      * @apiNote Only call on the client.
      */
-    public ModelData getModelData() {
-        //TODO: Eventually we might want to evaluate caching this model data object
-        return ModelData.builder().with(SKIN_TEXTURE_PROPERTY, getModelTexture()).build();
-    }
-
-    /**
-     * @apiNote Only call on the client.
-     */
-    private ResourceLocation getModelTexture() {
+    public ResourceLocation getModelTexture() {
         Registry<RobitSkin> robitSkins = level().registryAccess().registryOrThrow(MekanismAPI.ROBIT_SKIN_REGISTRY_NAME);
         ResourceKey<RobitSkin> skinKey = getSkin();
         RobitSkin skin = robitSkins.get(skinKey);

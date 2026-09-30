@@ -9,9 +9,9 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.client.model.obj.ObjModel;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.obj.ObjModel;
 import org.jetbrains.annotations.Nullable;
 
 public class TransmitterModel implements IUnbakedGeometry<TransmitterModel> {
@@ -26,13 +26,13 @@ public class TransmitterModel implements IUnbakedGeometry<TransmitterModel> {
     }
 
     @Override
-    public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform,
-          ItemOverrides overrides, ResourceLocation modelLocation) {
-        return new TransmitterBakedModel(internal, glass, owner, baker, spriteGetter, modelTransform, overrides, modelLocation);
+    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform,
+          ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+        return new TransmitterBakedModel(internal, glass, owner, baker, spriteGetter, modelTransform, overrides, modelLocation, isGui3d);
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
+    public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
         internal.resolveParents(modelGetter, context);
         if (glass != null) {
             glass.resolveParents(modelGetter, context);

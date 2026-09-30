@@ -36,7 +36,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -188,7 +187,7 @@ public class RenderNutritionalLiquifier extends MekanismTileEntityRenderer<TileE
             this.yd = (this.yd / f1) * f * 0.4 + 0.1;
             this.zd = (this.zd / f1) * f * 0.4;
 
-            sprite = Minecraft.getInstance().getItemRenderer().getModel(stack, world, null, 0).getParticleIcon(ModelData.EMPTY);
+            sprite = Minecraft.getInstance().getItemRenderer().getModel(stack, world, null, 0).getParticleIcon();
             this.gravity = 1.0F;
             this.quadSize = 0.1F * (world.random.nextFloat() * 0.5F + 0.5F);
             this.uo = world.random.nextFloat() * 3.0F;

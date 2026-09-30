@@ -1,13 +1,13 @@
 package mekanism.client.render.obj;
 
 import java.util.Collection;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraft.client.renderer.block.model.BlockModel;
 
 public class VisibleModelConfiguration extends WrapperModelConfiguration {
 
     private final Collection<String> visibleGroups;
 
-    public VisibleModelConfiguration(IGeometryBakingContext internal, Collection<String> visibleGroups) {
+    public VisibleModelConfiguration(BlockModel internal, Collection<String> visibleGroups) {
         super(internal);
         this.visibleGroups = visibleGroups;
     }

@@ -1,44 +1,34 @@
 package mekanism.client.model.baked;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.Collections;
 import java.util.List;
-import mekanism.api.annotations.NothingNullByDefault;
+import java.util.function.Supplier;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.BakedModelWrapper;
-import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
-@NothingNullByDefault
-public class ModelDataBakedModel extends BakedModelWrapper<BakedModel> {
+public class ModelDataBakedModel<T> extends ForwardingBakedModel {
 
-    private final ModelData modelData;
-    private final List<BakedModel> renderPasses;
+    private final DynamicBakedModel<T> original;
+    @Nullable
+    private final T data;
 
-    public ModelDataBakedModel(BakedModel original, ModelData data) {
-        super(original);
-        this.modelData = data;
-        this.renderPasses = Collections.singletonList(this);
+    public ModelDataBakedModel(DynamicBakedModel<T> original, @Nullable T data) {
+        wrapped = original;
+        this.original = original;
+        this.data = data;
     }
 
     @Override
-    @Deprecated
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
-        return getQuads(state, side, rand, modelData, null);
-    }
-
-    @Override
-    @Deprecated
-    public TextureAtlasSprite getParticleIcon() {
-        return getParticleIcon(modelData);
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource random) {
+        return original.getQuads(state, side, random, data);
     }
 
     @Override
@@ -47,16 +37,12 @@ public class ModelDataBakedModel extends BakedModelWrapper<BakedModel> {
     }
 
     @Override
-    public BakedModel applyTransform(ItemDisplayContext displayContext, PoseStack mat, boolean applyLeftHandTransform) {
-        // have the original model apply any perspective transforms onto the MatrixStack
-        super.applyTransform(displayContext, mat, applyLeftHandTransform);
-        // return this model, as we want to draw the item variant quads ourselves
-        return this;
+    public void emitBlockQuads(BlockAndTintGetter view, BlockState state, BlockPos pos, Supplier<RandomSource> random, RenderContext context) {
+        original.emitQuads(state, random, context, data);
     }
 
     @Override
-    public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
-        //Make sure our model is the one that gets rendered rather than the internal one
-        return renderPasses;
+    public void emitItemQuads(ItemStack stack, Supplier<RandomSource> random, RenderContext context) {
+        original.emitItemQuads(stack, random, context, data);
     }
 }
