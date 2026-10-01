@@ -3,9 +3,7 @@ package mekanism.common.item.gear;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
-import java.util.function.Consumer;
 import mekanism.api.annotations.NothingNullByDefault;
-import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.attribute.AttributeCache;
@@ -17,7 +15,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemArmoredFreeRunners extends ItemFreeRunners implements IAttributeRefresher {
@@ -30,11 +27,6 @@ public class ItemArmoredFreeRunners extends ItemFreeRunners implements IAttribut
         super(ARMORED_FREE_RUNNER_MATERIAL, properties);
         this.attributeCache = new AttributeCache(this, MekanismConfig.gear.armoredFreeRunnerArmor, MekanismConfig.gear.armoredFreeRunnerToughness,
               MekanismConfig.gear.armoredFreeRunnerKnockbackResistance);
-    }
-
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(RenderPropertiesProvider.armoredFreeRunners());
     }
 
     @Override

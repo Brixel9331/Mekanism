@@ -16,6 +16,8 @@ public final class MekanismClientInitializer implements ClientModInitializer {
         ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(BlockEntityLoadQueue::enqueue);
         ClientRegistration.init();
         ClientRegistration.registerModels();
+        ClientRegistration.addLayers();
+        mekanism.client.render.RenderPropertiesProvider.register();
         if (mekanism.common.Mekanism.hooks.TrinketsLoaded) {
             mekanism.client.render.MekanismTrinketRenderer.register();
         }

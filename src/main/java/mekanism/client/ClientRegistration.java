@@ -121,7 +121,6 @@ import mekanism.client.render.item.gear.RenderFreeRunners;
 import mekanism.client.render.item.gear.RenderJetpack;
 import mekanism.client.render.item.gear.RenderScubaMask;
 import mekanism.client.render.item.gear.RenderScubaTank;
-import mekanism.client.render.layer.MekanismArmorLayer;
 import mekanism.client.render.layer.MekanismElytraLayer;
 import mekanism.client.render.obj.TransmitterLoader;
 import mekanism.client.render.tileentity.RenderBin;
@@ -171,13 +170,11 @@ import mekanism.common.tile.transmitter.TileEntityLogisticalTransporter;
 import mekanism.common.util.RegistryUtils;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.ElytraLayer;
-import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
@@ -186,14 +183,11 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
 import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -203,7 +197,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import java.util.Collection;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientRegistration {
 
     private static final Map<ResourceLocation, CustomModelRegistryObject> customModels = new ConcurrentHashMap<>();
@@ -545,56 +538,22 @@ public class ClientRegistration {
               MekanismBlocks.BASIC_UNIVERSAL_CABLE, MekanismBlocks.ADVANCED_UNIVERSAL_CABLE, MekanismBlocks.ELITE_UNIVERSAL_CABLE, MekanismBlocks.ULTIMATE_UNIVERSAL_CABLE);
     }
 
-    @SubscribeEvent
-    public static void addLayers(EntityRenderersEvent.AddLayers event) {
-        //Add our own custom armor layer to the various player renderers
-        for (String skinName : event.getSkins()) {
-            addCustomLayers(EntityType.PLAYER, (PlayerRenderer) event.getSkin(skinName), event.getContext().getModelManager());
-        }
-        //Add our own custom armor layer to everything that has an armor layer
-        //Note: This includes any modded mobs that have vanilla's BipedArmorLayer added to them
-        for (Entry<EntityType<?>, EntityRenderer<?>> entry : Minecraft.getInstance().getEntityRenderDispatcher().renderers.entrySet()) {
-            EntityRenderer<?> renderer = entry.getValue();
-            if (renderer instanceof LivingEntityRenderer) {
-                EntityType<?> entityType = entry.getKey();
-                //noinspection unchecked,rawtypes
-                addCustomLayers(entityType, event.getRenderer((EntityType) entityType), event.getContext().getModelManager());
-            }
-        }
+    public static void addLayers() {
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, registration, context) ->
+              addCustomLayers(type, (LivingEntityRenderer) renderer, registration, context.getModelSet()));
     }
 
-    private static <T extends LivingEntity, M extends HumanoidModel<T>> void addCustomLayers(EntityType<?> type, @Nullable LivingEntityRenderer<T, M> renderer,
-          ModelManager modelManager) {
+    private static <T extends LivingEntity, M extends EntityModel<T>> void addCustomLayers(EntityType<?> type, @Nullable LivingEntityRenderer<T, M> renderer,
+          LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registration, EntityModelSet models) {
         if (renderer == null) {
             return;
         }
-        HumanoidArmorLayer<T, M, ?> bipedArmorLayer = null;
-        boolean hasElytra = false;
-        for (RenderLayer<T, M> layerRenderer : renderer.layers) {
-            //Validate against the layer render being null, as it seems like some mods do stupid things and add in null layers
-            if (layerRenderer != null) {
-                //Only allow an exact class match, so we don't add to modded entities that only have a modded extended armor or elytra layer
-                Class<?> layerClass = layerRenderer.getClass();
-                if (layerClass == HumanoidArmorLayer.class) {
-                    bipedArmorLayer = (HumanoidArmorLayer<T, M, ?>) layerRenderer;
-                    if (hasElytra) {
-                        break;
-                    }
-                } else if (layerClass == ElytraLayer.class) {
-                    hasElytra = true;
-                    if (bipedArmorLayer != null) {
-                        break;
-                    }
-                }
+        for (RenderLayer<T, M> layer : renderer.layers) {
+            if (layer != null && layer.getClass() == ElytraLayer.class) {
+                registration.register(new MekanismElytraLayer<>(renderer, models));
+                Mekanism.logger.debug("Added Mekanism Elytra Layer to entity of type: {}", RegistryUtils.getName(type));
+                break;
             }
-        }
-        if (bipedArmorLayer != null) {
-            renderer.addLayer(new MekanismArmorLayer<>(renderer, bipedArmorLayer.innerModel, bipedArmorLayer.outerModel, modelManager));
-            Mekanism.logger.debug("Added Mekanism Armor Layer to entity of type: {}", RegistryUtils.getName(type));
-        }
-        if (hasElytra) {
-            renderer.addLayer(new MekanismElytraLayer<>(renderer, Minecraft.getInstance().getEntityModels()));
-            Mekanism.logger.debug("Added Mekanism Elytra Layer to entity of type: {}", RegistryUtils.getName(type));
         }
     }
 

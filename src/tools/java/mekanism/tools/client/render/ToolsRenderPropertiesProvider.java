@@ -1,9 +1,9 @@
 package mekanism.tools.client.render;
 
-import mekanism.client.render.RenderPropertiesProvider.MekRenderProperties;
 import mekanism.tools.client.render.item.RenderMekanismShieldItem;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -17,7 +17,12 @@ public class ToolsRenderPropertiesProvider {
     }
 
     public static IClientItemExtensions shield() {
-        return new MekRenderProperties(RenderMekanismShieldItem.RENDERER);
+        return new IClientItemExtensions() {
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return RenderMekanismShieldItem.RENDERER;
+            }
+        };
     }
 
     public static IClientItemExtensions glowArmor() {

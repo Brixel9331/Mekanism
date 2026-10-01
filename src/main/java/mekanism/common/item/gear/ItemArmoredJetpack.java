@@ -3,9 +3,7 @@ package mekanism.common.item.gear;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
-import java.util.function.Consumer;
 import mekanism.api.annotations.NothingNullByDefault;
-import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.attribute.AttributeCache;
@@ -17,7 +15,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemArmoredJetpack extends ItemJetpack implements IAttributeRefresher {
@@ -30,11 +27,6 @@ public class ItemArmoredJetpack extends ItemJetpack implements IAttributeRefresh
         super(ARMORED_JETPACK_MATERIAL, properties);
         this.attributeCache = new AttributeCache(this, MekanismConfig.gear.armoredJetpackArmor, MekanismConfig.gear.armoredJetpackToughness,
               MekanismConfig.gear.armoredJetpackKnockbackResistance);
-    }
-
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(RenderPropertiesProvider.armoredJetpack());
     }
 
     @Override
