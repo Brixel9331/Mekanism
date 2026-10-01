@@ -19,6 +19,7 @@ import mekanism.common.capabilities.chemical.item.RateLimitGasHandler;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.CapabilityItem;
 import mekanism.common.item.interfaces.IGasItem;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.registration.impl.CreativeTabDeferredRegister.ICustomCreativeTabContents;
@@ -41,7 +42,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemFlamethrower extends CapabilityItem implements IItemHUDProvider, IModeItem, IGasItem, ICustomCreativeTabContents {
+public class ItemFlamethrower extends CapabilityItem implements IItemEnchantments, IItemHUDProvider, IModeItem, IGasItem, ICustomCreativeTabContents {
 
     public ItemFlamethrower(Properties properties) {
         super(properties.stacksTo(1).rarity(Rarity.RARE).setNoRepair());

@@ -15,6 +15,7 @@ import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.energy.item.RateLimitEnergyHandler;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.item.interfaces.IModeItem;
 import mekanism.common.registration.impl.CreativeTabDeferredRegister.ICustomCreativeTabContents;
@@ -39,12 +40,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import mekanism.common.lib.ArrowReleaseCallback;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvider, ICustomCreativeTabContents, ItemCapabilityProvider {
+public class ItemElectricBow extends BowItem implements IItemEnchantments, IModeItem, IItemHUDProvider, ICustomCreativeTabContents, ItemCapabilityProvider {
 
     public ItemElectricBow(Properties properties) {
         super(properties.rarity(Rarity.RARE).setNoRepair().stacksTo(1));
@@ -69,7 +71,7 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
                     return;
                 }
             }
-            boolean infinity = player.isCreative() || stack.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0;
+            boolean infinity = player.isCreative() || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack ammo = player.getProjectile(stack);
             int charge = ArrowReleaseCallback.EVENT.invoker().release(stack, world, player, getUseDuration(stack) - timeLeft, !ammo.isEmpty() || infinity);
             if (charge < 0) {
@@ -92,15 +94,15 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
                     if (velocity == 1) {
                         arrowEntity.setCritArrow(true);
                     }
-                    int power = stack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
+                    int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                     if (power > 0) {
                         arrowEntity.setBaseDamage(arrowEntity.getBaseDamage() + 0.5 * power + 0.5);
                     }
-                    int punch = stack.getEnchantmentLevel(Enchantments.PUNCH_ARROWS);
+                    int punch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
                     if (punch > 0) {
                         arrowEntity.setKnockback(punch);
                     }
-                    if (stack.getEnchantmentLevel(Enchantments.FLAMING_ARROWS) > 0) {
+                    if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                         arrowEntity.setSecondsOnFire(100);
                     }
                     //Vanilla diff - Instead of damaging the item we remove energy from it
@@ -129,22 +131,21 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
         //Note: This stops application of it via enchanted books while in survival. We don't override isBookEnchantable as we don't care
         // if someone enchants it in creative and would rather not stop players from enchanting with books that have flame and power on them
-        return enchantment != Enchantments.FLAMING_ARROWS && super.canApplyAtEnchantingTable(stack, enchantment);
+        return enchantment != Enchantments.FLAMING_ARROWS && enchantment.category.canEnchant(this);
     }
 
     @Override
-    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment, int storedLevel) {
         if (stack.isEmpty()) {
             return 0;
         } else if (enchantment == Enchantments.FLAMING_ARROWS && getFireState(stack)) {
-            return Math.max(1, super.getEnchantmentLevel(stack, enchantment));
+            return Math.max(1, storedLevel);
         }
-        return super.getEnchantmentLevel(stack, enchantment);
+        return storedLevel;
     }
 
     @Override
-    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack) {
-        Map<Enchantment, Integer> enchantments = super.getAllEnchantments(stack);
+    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack, Map<Enchantment, Integer> enchantments) {
         if (getFireState(stack)) {
             enchantments.merge(Enchantments.FLAMING_ARROWS, 1, Math::max);
         }

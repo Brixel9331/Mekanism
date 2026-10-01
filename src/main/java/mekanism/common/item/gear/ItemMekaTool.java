@@ -44,6 +44,7 @@ import mekanism.common.content.gear.mekatool.ModuleVeinMiningUnit;
 import mekanism.common.content.gear.shared.ModuleEnergyUnit;
 import mekanism.common.item.ItemEnergized;
 import mekanism.common.item.interfaces.IBlockStartBreakItem;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.radial.IGenericRadialModeItem;
 import mekanism.common.lib.radial.data.NestingRadialData;
@@ -86,7 +87,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem, IBlastingItem, IGenericRadialModeItem, IBlockStartBreakItem {
+public class ItemMekaTool extends ItemEnergized implements IItemEnchantments, IModuleContainerItem, IBlastingItem, IGenericRadialModeItem, IBlockStartBreakItem {
 
     private static final ResourceLocation RADIAL_ID = Mekanism.rl("meka_tool");
 
@@ -144,19 +145,19 @@ public class ItemMekaTool extends ItemEnergized implements IModuleContainerItem,
     }
 
     @Override
-    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment, int storedLevel) {
         if (stack.isEmpty()) {
             return 0;
         }
         //Enchantments in our data
         ListTag enchantments = ItemDataUtils.getList(stack, NBTConstants.ENCHANTMENTS);
-        return Math.max(MekanismUtils.getEnchantmentLevel(enchantments, enchantment), super.getEnchantmentLevel(stack, enchantment));
+        return Math.max(MekanismUtils.getEnchantmentLevel(enchantments, enchantment), storedLevel);
     }
 
     @Override
-    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack) {
+    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack, Map<Enchantment, Integer> storedEnchantments) {
         Map<Enchantment, Integer> enchantments = EnchantmentHelper.deserializeEnchantments(ItemDataUtils.getList(stack, NBTConstants.ENCHANTMENTS));
-        super.getAllEnchantments(stack).forEach((enchantment, level) -> enchantments.merge(enchantment, level, Math::max));
+        storedEnchantments.forEach((enchantment, level) -> enchantments.merge(enchantment, level, Math::max));
         return enchantments;
     }
 

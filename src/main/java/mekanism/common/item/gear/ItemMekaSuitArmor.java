@@ -216,19 +216,19 @@ public class ItemMekaSuitArmor extends ItemSpecialArmor implements IModuleContai
     }
 
     @Override
-    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+    public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment, int storedLevel) {
         if (stack.isEmpty()) {
             return 0;
         }
         //Enchantments in our data
         ListTag enchantments = ItemDataUtils.getList(stack, NBTConstants.ENCHANTMENTS);
-        return Math.max(MekanismUtils.getEnchantmentLevel(enchantments, enchantment), super.getEnchantmentLevel(stack, enchantment));
+        return Math.max(MekanismUtils.getEnchantmentLevel(enchantments, enchantment), storedLevel);
     }
 
     @Override
-    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack) {
+    public Map<Enchantment, Integer> getAllEnchantments(ItemStack stack, Map<Enchantment, Integer> storedEnchantments) {
         Map<Enchantment, Integer> enchantments = EnchantmentHelper.deserializeEnchantments(ItemDataUtils.getList(stack, NBTConstants.ENCHANTMENTS));
-        super.getAllEnchantments(stack).forEach((enchantment, level) -> enchantments.merge(enchantment, level, Math::max));
+        storedEnchantments.forEach((enchantment, level) -> enchantments.merge(enchantment, level, Math::max));
         return enchantments;
     }
 

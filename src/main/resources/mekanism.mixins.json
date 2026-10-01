@@ -27,6 +27,8 @@
     "StepHeightMixin",
     "SwimSpeedMixin",
     "ResultSlotMixin",
+    "ItemEnchantmentMixin",
+    "AnvilEnchantmentMixin",
     "BiomeSelectionContextAccessor",
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",

@@ -6,6 +6,7 @@ import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.radiation.item.RadiationShieldingHandler;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +15,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProvider {
+public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProvider, IItemEnchantments {
 
     private static final HazmatMaterial HAZMAT_MATERIAL = new HazmatMaterial();
 
@@ -48,12 +49,12 @@ public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProv
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return isEnchantable(stack) && super.isBookEnchantable(stack, book);
+        return isEnchantable(stack);
     }
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return isEnchantable(stack) && super.canApplyAtEnchantingTable(stack, enchantment);
+        return isEnchantable(stack) && enchantment.category.canEnchant(this);
     }
 
     @NothingNullByDefault

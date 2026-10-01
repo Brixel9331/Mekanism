@@ -6,6 +6,7 @@ import mekanism.api.capabilities.CapabilityProvider;
 import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -15,7 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class ItemSpecialArmor extends ArmorItem implements ItemCapabilityProvider {
+public abstract class ItemSpecialArmor extends ArmorItem implements ItemCapabilityProvider, IItemEnchantments {
 
     protected ItemSpecialArmor(ArmorMaterial material, ArmorItem.Type armorType, Properties properties) {
         super(material, armorType, properties);
@@ -33,12 +34,12 @@ public abstract class ItemSpecialArmor extends ArmorItem implements ItemCapabili
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return isEnchantable(stack) && super.isBookEnchantable(stack, book);
+        return isEnchantable(stack);
     }
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return isEnchantable(stack) && super.canApplyAtEnchantingTable(stack, enchantment);
+        return isEnchantable(stack) && enchantment.category.canEnchant(this);
     }
 
     protected boolean areCapabilityConfigsLoaded() {

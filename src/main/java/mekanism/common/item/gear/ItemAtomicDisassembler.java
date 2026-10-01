@@ -32,6 +32,7 @@ import mekanism.common.content.gear.mekatool.ModuleVeinMiningUnit;
 import mekanism.common.item.ItemEnergized;
 import mekanism.common.item.gear.ItemAtomicDisassembler.DisassemblerMode;
 import mekanism.common.item.interfaces.IBlockStartBreakItem;
+import mekanism.common.item.interfaces.IItemEnchantments;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
@@ -61,7 +62,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemAtomicDisassembler extends ItemEnergized implements IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher, IBlockStartBreakItem {
+public class ItemAtomicDisassembler extends ItemEnergized implements IItemEnchantments, IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher, IBlockStartBreakItem {
 
     //All basic dig actions except shears
     public static final Set<ToolAction> ALWAYS_SUPPORTED_ACTIONS = Set.of(ToolAction.AXE_DIG, ToolAction.HOE_DIG, ToolAction.SHOVEL_DIG, ToolAction.PICKAXE_DIG,
