@@ -17,7 +17,7 @@ public class PacketLaserHitBlock implements IMekanismPacket {
     @Override
     public void handle(PacketContext context) {
         if (Minecraft.getInstance().level != null) {
-            Minecraft.getInstance().particleEngine.addBlockHitEffects(result.getBlockPos(), result);
+            Minecraft.getInstance().particleEngine.crack(result.getBlockPos(), result.getDirection());
         }
     }
 

@@ -3,7 +3,6 @@ package mekanism.common.block;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -12,7 +11,6 @@ import mekanism.api.chemical.gas.attribute.GasAttributes;
 import mekanism.api.radiation.IRadiationManager;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.api.security.SecurityLookup;
-import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
@@ -71,7 +69,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
 import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,11 +78,6 @@ public abstract class BlockMekanism extends Block implements IExplosionBlock {
     protected BlockMekanism(BlockBehaviour.Properties properties) {
         super(BlockStateHelper.applyLightLevelAdjustments(properties));
         registerDefaultState(BlockStateHelper.getDefaultState(stateDefinition.any()));
-    }
-
-    @Override
-    public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
-        consumer.accept(RenderPropertiesProvider.particles());
     }
 
     @Nullable

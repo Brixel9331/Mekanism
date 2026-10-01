@@ -30,7 +30,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,12 +90,12 @@ public class RenderPropertiesProvider {
         case BOOTS -> MekaSuitArmor.BOOTS;
     };
 
-    public static IClientBlockExtensions particles() {
+    public static BlockParticleEffects particles() {
         return PARTICLE_HANDLER;
     }
 
-    public static IClientBlockExtensions boundingParticles() {
-        return new IClientBlockExtensions() {
+    public static BlockParticleEffects boundingParticles() {
+        return new BlockParticleEffects() {
             @Override
             public boolean addHitEffects(BlockState state, Level world, HitResult target, ParticleEngine manager) {
                 if (target.getType() == Type.BLOCK && target instanceof BlockHitResult blockTarget) {
@@ -119,8 +118,7 @@ public class RenderPropertiesProvider {
                                 case WEST -> x = pos.getX() + axisalignedbb.minX - 0.1;
                                 case EAST -> x = pos.getX() + axisalignedbb.maxX + 0.1;
                             }
-                            manager.add(new TerrainParticle((ClientLevel) world, x, y, z, 0, 0, 0, mainState)
-                                  .updateSprite(mainState, mainPos).setPower(0.2F).scale(0.6F));
+                            manager.add(new TerrainParticle((ClientLevel) world, x, y, z, 0, 0, 0, mainState, mainPos).setPower(0.2F).scale(0.6F));
                             return true;
                         }
                     }
@@ -152,7 +150,7 @@ public class RenderPropertiesProvider {
         }
     }
 
-    private static final IClientBlockExtensions PARTICLE_HANDLER = new IClientBlockExtensions() {
+    private static final BlockParticleEffects PARTICLE_HANDLER = new BlockParticleEffects() {
         @Override
         public boolean addDestroyEffects(BlockState state, Level Level, BlockPos pos, ParticleEngine manager) {
             //Copy of ParticleManager#addBlockDestroyEffects, but removes the minimum number of particles each voxel shape produces
@@ -175,7 +173,7 @@ public class RenderPropertiesProvider {
                                 double d8 = d5 * yDif + minY;
                                 double d9 = d6 * zDif + minZ;
                                 manager.add(new TerrainParticle((ClientLevel) Level, pos.getX() + d7, pos.getY() + d8,
-                                      pos.getZ() + d9, d4 - 0.5, d5 - 0.5, d6 - 0.5, state).updateSprite(state, pos));
+                                      pos.getZ() + d9, d4 - 0.5, d5 - 0.5, d6 - 0.5, state, pos));
                             }
                         }
                     }
