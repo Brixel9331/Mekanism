@@ -1,17 +1,9 @@
 package mekanism.common.integration.gender;
 
 import com.wildfire.api.IGenderArmor;
-import java.util.function.Consumer;
-import mekanism.api.capabilities.Capability;
-import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
-import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
-import mekanism.common.capabilities.resolver.ICapabilityResolver;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 
-public final class MekanismGenderArmor extends ItemCapability implements IGenderArmor {
+public final class MekanismGenderArmor implements IGenderArmor {
 
-    private static final Capability<IGenderArmor> GENDER_ARMOR_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
     public static final MekanismGenderArmor OPEN_FRONT = new MekanismGenderArmor(false, false, 0, 0);
     public static final MekanismGenderArmor HIDES_BREASTS = new MekanismGenderArmor(true, true, 0, 0);
     static final MekanismGenderArmor HAZMAT = new MekanismGenderArmor(0.5F, 0.25F);
@@ -61,8 +53,4 @@ public final class MekanismGenderArmor extends ItemCapability implements IGender
         return tightness;
     }
 
-    @Override
-    protected void gatherCapabilityResolvers(Consumer<ICapabilityResolver> consumer) {
-        consumer.accept(BasicCapabilityResolver.constant(GENDER_ARMOR_CAPABILITY, this));
-    }
 }

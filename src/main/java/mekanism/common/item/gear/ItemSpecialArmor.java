@@ -6,7 +6,6 @@ import mekanism.api.capabilities.CapabilityProvider;
 import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
-import mekanism.common.integration.gender.GenderCapabilityHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -47,7 +46,6 @@ public abstract class ItemSpecialArmor extends ArmorItem implements ItemCapabili
     }
 
     protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
-        GenderCapabilityHelper.addGenderCapability(this, capabilities::add);
     }
 
     @Override

@@ -162,6 +162,7 @@ dependencies {
     modCompileOnly('dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.2') {
         transitive = false
     }
+    modCompileOnly 'maven.modrinth:bcOsQHnC:nYZ0oktX'
     modCompileOnly 'maven.modrinth:jade:SlsObyHn'
     modCompileOnly 'maven.modrinth:wthit:z1T650Hb'
     modCompileOnly 'maven.modrinth:badpackets:JjLWLyDz'

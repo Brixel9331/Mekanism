@@ -18,6 +18,9 @@ public final class MekanismClientInitializer implements ClientModInitializer {
         ClientRegistration.registerModels();
         ClientRegistration.addLayers();
         mekanism.client.render.RenderPropertiesProvider.register();
+        if (mekanism.common.Mekanism.hooks.WildfireGenderModLoaded) {
+            mekanism.common.integration.gender.GenderCapabilityHelper.register();
+        }
         if (mekanism.common.Mekanism.hooks.TrinketsLoaded) {
             mekanism.client.render.MekanismTrinketRenderer.register();
         }

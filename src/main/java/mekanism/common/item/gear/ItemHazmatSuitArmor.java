@@ -6,7 +6,6 @@ import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.radiation.item.RadiationShieldingHandler;
-import mekanism.common.integration.gender.GenderCapabilityHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -39,9 +38,7 @@ public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProv
 
     @Override
     public CapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-        ItemCapabilityWrapper wrapper = new ItemCapabilityWrapper(stack, RadiationShieldingHandler.create(item -> getShieldingByArmor(getType())));
-        GenderCapabilityHelper.addGenderCapability(this, wrapper::add);
-        return wrapper;
+        return new ItemCapabilityWrapper(stack, RadiationShieldingHandler.create(item -> getShieldingByArmor(getType())));
     }
 
     @Override
