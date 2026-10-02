@@ -99,8 +99,8 @@ import mekanism.common.tile.transmitter.TileEntityThermodynamicConductor;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.tile.transmitter.TileEntityUniversalCable;
 import mekanism.common.util.EnumUtils;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder.Factory;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 
 public class MekanismTileEntityTypes {
 
@@ -272,7 +272,7 @@ public class MekanismTileEntityTypes {
     }
 
     private static <BE extends TileEntityTransmitter> TileEntityTypeRegistryObject<BE> registerTransmitter(BlockRegistryObject<?, ?> block,
-          BlockEntitySupplier<? extends BE> factory, BlockEntityTicker<BE> serverTicker) {
+          Factory<? extends BE> factory, BlockEntityTicker<BE> serverTicker) {
         //Note: There is no data fixer type as forge does not currently have a way exposing data fixers to mods yet
         return TILE_ENTITY_TYPES.<BE>builder(block, factory).serverTicker(serverTicker).build();
     }
