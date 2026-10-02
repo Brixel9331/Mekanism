@@ -127,7 +127,7 @@ public class TileEntityNutritionalLiquifier extends TileEntityProgressMachine<It
         InventorySlotHelper builder = InventorySlotHelper.forSideWithConfig(this::getDirection, this::getConfig);
         builder.addSlot(inputSlot = InputInventorySlot.at(stack -> {
                   if (stack.getItem().isEdible()) {//Double-check the stack is food
-                      FoodProperties food = stack.getFoodProperties(null);
+                      FoodProperties food = stack.getItem().getFoodProperties();
                       //And only allow inserting foods that actually would provide paste
                       return food != null && food.getNutrition() > 0;
                   }
@@ -184,7 +184,7 @@ public class TileEntityNutritionalLiquifier extends TileEntityProgressMachine<It
         if (stack.isEmpty() || !stack.getItem().isEdible()) {
             return null;
         }
-        FoodProperties food = stack.getFoodProperties(null);
+        FoodProperties food = stack.getItem().getFoodProperties();
         if (food == null || food.getNutrition() == 0) {
             //If the food provides no healing don't allow consuming it as it won't provide any paste
             return null;

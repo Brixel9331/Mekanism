@@ -58,7 +58,7 @@ public class RecipeRegistryHelper {
                 ItemStack stack = new ItemStack(item);
                 //TODO: If any mods adds presets to the creative menu we may want to consider gathering all
                 // deduplicating and then add recipes for them in JEI
-                FoodProperties food = stack.getFoodProperties(null);
+                FoodProperties food = stack.getItem().getFoodProperties();
                 //Only display consuming foods that provide healing as otherwise no paste will be made
                 if (food != null && food.getNutrition() > 0) {
                     list.add(new NutritionalLiquifierIRecipe(item, IngredientCreatorAccess.item().from(stack),
