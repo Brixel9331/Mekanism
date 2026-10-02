@@ -322,7 +322,7 @@ public class ItemMekaTool extends ItemEnergized implements IItemEnchantments, IM
 
     @NotNull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot, @NotNull ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull ItemStack stack, @NotNull EquipmentSlot slot) {
         if (slot == EquipmentSlot.MAINHAND) {
             int unitDamage = 0;
             IModule<ModuleAttackAmplificationUnit> attackAmplificationUnit = getModule(stack, MekanismModules.ATTACK_AMPLIFICATION_UNIT);
@@ -358,7 +358,7 @@ public class ItemMekaTool extends ItemEnergized implements IItemEnchantments, IM
                       MekanismConfig.gear.mekaToolAttackSpeed.get(), Operation.ADDITION));
             }, MekanismConfig.gear.mekaToolBaseDamage, MekanismConfig.gear.mekaToolAttackSpeed)).get();
         }
-        return super.getAttributeModifiers(slot, stack);
+        return super.getAttributeModifiers(stack, slot);
     }
 
     @NotNull

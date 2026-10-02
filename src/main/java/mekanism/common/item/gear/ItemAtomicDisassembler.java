@@ -206,7 +206,7 @@ public class ItemAtomicDisassembler extends ItemEnergized implements IItemEnchan
 
     @NotNull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot, @NotNull ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull ItemStack stack, @NotNull EquipmentSlot slot) {
         if (slot == EquipmentSlot.MAINHAND) {
             IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
             FloatingLong energy = energyContainer == null ? FloatingLong.ZERO : energyContainer.getEnergy();
@@ -225,7 +225,7 @@ public class ItemAtomicDisassembler extends ItemEnergized implements IItemEnchan
             builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", MekanismConfig.gear.disassemblerAttackSpeed.get(), Operation.ADDITION));
             return builder.build();
         }
-        return super.getAttributeModifiers(slot, stack);
+        return super.getAttributeModifiers(stack, slot);
     }
 
     @Override
