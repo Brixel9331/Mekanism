@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class ItemGasArmor extends ItemSpecialArmor implements IGasItem, ICustomCreativeTabContents {
 
     protected ItemGasArmor(ArmorMaterial material, ArmorItem.Type armorType, Properties properties) {
-        super(material, armorType, properties.rarity(Rarity.RARE).setNoRepair().stacksTo(1));
+        super(material, armorType, properties.rarity(Rarity.RARE).stacksTo(1));
     }
 
     protected abstract CachedLongValue getMaxGas();

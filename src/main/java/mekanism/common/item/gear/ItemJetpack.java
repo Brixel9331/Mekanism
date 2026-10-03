@@ -41,7 +41,7 @@ public class ItemJetpack extends ItemGasArmor implements IItemHUDProvider, IMode
     }
 
     public ItemJetpack(ArmorMaterial material, Properties properties) {
-        super(material, ArmorItem.Type.CHESTPLATE, properties.setNoRepair());
+        super(material, ArmorItem.Type.CHESTPLATE, properties);
     }
 
     @Override

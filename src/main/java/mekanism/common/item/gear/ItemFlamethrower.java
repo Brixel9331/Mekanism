@@ -45,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
 public class ItemFlamethrower extends CapabilityItem implements IItemEnchantments, IItemHUDProvider, IModeItem, IGasItem, ICustomCreativeTabContents {
 
     public ItemFlamethrower(Properties properties) {
-        super(properties.stacksTo(1).rarity(Rarity.RARE).setNoRepair());
+        super(properties.stacksTo(1).rarity(Rarity.RARE));
     }
 
     @Override

@@ -82,7 +82,7 @@ public class ItemAtomicDisassembler extends ItemEnergized implements IItemEnchan
     private final AttributeCache attributeCache;
 
     public ItemAtomicDisassembler(Properties properties) {
-        super(MekanismConfig.gear.disassemblerChargeRate, MekanismConfig.gear.disassemblerMaxEnergy, properties.rarity(Rarity.RARE).setNoRepair());
+        super(MekanismConfig.gear.disassemblerChargeRate, MekanismConfig.gear.disassemblerMaxEnergy, properties.rarity(Rarity.RARE));
         this.attributeCache = new AttributeCache(this, MekanismConfig.gear.disassemblerMaxDamage, MekanismConfig.gear.disassemblerAttackSpeed);
     }
 

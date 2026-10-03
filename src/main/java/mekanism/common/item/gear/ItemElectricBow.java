@@ -49,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
 public class ItemElectricBow extends BowItem implements IItemEnchantments, IModeItem, IItemHUDProvider, ICustomCreativeTabContents, ItemCapabilityProvider {
 
     public ItemElectricBow(Properties properties) {
-        super(properties.rarity(Rarity.RARE).setNoRepair().stacksTo(1));
+        super(properties.rarity(Rarity.RARE).stacksTo(1));
     }
 
     @Override

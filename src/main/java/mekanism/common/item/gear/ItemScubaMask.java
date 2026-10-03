@@ -13,7 +13,7 @@ public class ItemScubaMask extends ItemSpecialArmor {
     private static final ScubaMaskMaterial SCUBA_MASK_MATERIAL = new ScubaMaskMaterial();
 
     public ItemScubaMask(Properties properties) {
-        super(SCUBA_MASK_MATERIAL, ArmorItem.Type.HELMET, properties.rarity(Rarity.RARE).setNoRepair());
+        super(SCUBA_MASK_MATERIAL, ArmorItem.Type.HELMET, properties.rarity(Rarity.RARE));
     }
 
     @Override

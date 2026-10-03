@@ -44,7 +44,7 @@ public class ItemFreeRunners extends ItemSpecialArmor implements IItemHUDProvide
     }
 
     public ItemFreeRunners(ArmorMaterial material, Properties properties) {
-        super(material, ArmorItem.Type.BOOTS, properties.rarity(Rarity.RARE).setNoRepair());
+        super(material, ArmorItem.Type.BOOTS, properties.rarity(Rarity.RARE));
     }
 
     @Override

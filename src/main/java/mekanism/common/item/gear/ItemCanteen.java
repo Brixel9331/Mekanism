@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class ItemCanteen extends CapabilityItem implements ICustomCreativeTabContents {
 
     public ItemCanteen(Properties properties) {
-        super(properties.rarity(Rarity.UNCOMMON).stacksTo(1).setNoRepair());
+        super(properties.rarity(Rarity.UNCOMMON).stacksTo(1));
     }
 
     @Override
