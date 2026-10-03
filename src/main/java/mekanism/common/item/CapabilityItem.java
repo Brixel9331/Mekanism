@@ -6,11 +6,12 @@ import mekanism.api.capabilities.CapabilityProvider;
 import mekanism.api.capabilities.ItemCapabilityProvider;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class CapabilityItem extends Item implements ItemCapabilityProvider {
+public class CapabilityItem extends Item implements IItemStackProperties, ItemCapabilityProvider {
 
     protected CapabilityItem(Item.Properties properties) {
         super(properties);

@@ -11,6 +11,7 @@ import mekanism.client.key.MekKeyHandler;
 import mekanism.client.key.MekanismKeyHandler;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.gear.IModuleItem;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +20,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemModule extends Item implements IModuleItem {
+public class ItemModule extends Item implements IItemStackProperties, IModuleItem {
 
     private final IModuleDataProvider<?> moduleData;
 

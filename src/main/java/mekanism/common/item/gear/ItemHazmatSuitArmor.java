@@ -7,6 +7,7 @@ import mekanism.common.Mekanism;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.radiation.item.RadiationShieldingHandler;
 import mekanism.common.item.interfaces.IItemEnchantments;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProvider, IItemEnchantments {
+public class ItemHazmatSuitArmor extends ArmorItem implements IItemStackProperties, ItemCapabilityProvider, IItemEnchantments {
 
     private static final HazmatMaterial HAZMAT_MATERIAL = new HazmatMaterial();
 
@@ -34,7 +35,7 @@ public class ItemHazmatSuitArmor extends ArmorItem implements ItemCapabilityProv
 
     @Override
     public int getDefaultTooltipHideFlags(@NotNull ItemStack stack) {
-        return super.getDefaultTooltipHideFlags(stack) | TooltipPart.MODIFIERS.getMask();
+        return IItemStackProperties.super.getDefaultTooltipHideFlags(stack) | TooltipPart.MODIFIERS.getMask();
     }
 
     @Override

@@ -6,6 +6,7 @@ import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.common.MekanismLang;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.core.NonNullList;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemCraftingFormula extends Item {
+public class ItemCraftingFormula extends Item implements IItemStackProperties {
 
     public ItemCraftingFormula(Properties properties) {
         super(properties);

@@ -9,6 +9,7 @@ import mekanism.common.block.BlockCardboardBox;
 import mekanism.common.block.BlockCardboardBox.BlockData;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.common.lib.DropCapture;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.TileEntityCardboardBox;
@@ -35,7 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> {
+public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> implements IItemStackProperties {
 
     public ItemBlockCardboardBox(BlockCardboardBox block) {
         super(block, new Item.Properties().stacksTo(16));
@@ -149,6 +150,6 @@ public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> 
     @Override
     public int getMaxStackSize(ItemStack stack) {
         BlockData blockData = getBlockData(null, stack);
-        return blockData == null ? super.getMaxStackSize(stack) : 1;
+        return blockData == null ? getMaxStackSize() : 1;
     }
 }
