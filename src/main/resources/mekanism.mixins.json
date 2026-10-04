@@ -36,7 +36,11 @@
     "StructureSettingsAccessor",
     "ChunkWorldgenStateMixin",
     "ChunkSerializerMixin",
-    "LevelChunkGenerationMixin"
+    "LevelChunkGenerationMixin",
+    "EquipmentDamageMixin",
+    "EnderMaskMixin",
+    "PowderSnowEquipmentMixin",
+    "PiglinEquipmentMixin"
   ],
   "client": [
     "client.LevelRendererFrustumAccessor",
