@@ -16,6 +16,7 @@ import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.gear.ToolAction;
+import mekanism.api.gear.IToolActionItem;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.MathUtils;
 import mekanism.api.radial.IRadialDataHelper;
@@ -62,7 +63,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemAtomicDisassembler extends ItemEnergized implements IItemEnchantments, IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher, IBlockStartBreakItem {
+public class ItemAtomicDisassembler extends ItemEnergized implements IToolActionItem, IItemEnchantments, IItemHUDProvider, IRadialEnumModeItem<DisassemblerMode>, IAttributeRefresher, IBlockStartBreakItem {
 
     //All basic dig actions except shears
     public static final Set<ToolAction> ALWAYS_SUPPORTED_ACTIONS = Set.of(ToolAction.AXE_DIG, ToolAction.HOE_DIG, ToolAction.SHOVEL_DIG, ToolAction.PICKAXE_DIG,

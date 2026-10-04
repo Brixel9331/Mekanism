@@ -23,6 +23,7 @@ import mekanism.common.network.to_client.PacketLightningRender;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
+import mekanism.common.util.ToolModification;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction;
@@ -194,7 +195,7 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
             //Skip modifying the blocks if there is something we think is invalid about the position in the world in general
             return InteractionResult.PASS;
         }
-        BlockState modifiedState = clickedState.getToolModifiedState(context, action, false);
+        BlockState modifiedState = ToolModification.getModifiedState(clickedState, context, action, false);
         if (modifiedState == null) {
             //Skip modifying the blocks if the one we clicked cannot be modified
             return InteractionResult.PASS;
@@ -227,14 +228,14 @@ public class ModuleFarmingUnit implements ICustomModule<ModuleFarmingUnit> {
             UseOnContext adjustedContext = new UseOnContext(world, context.getPlayer(), context.getHand(), context.getItemInHand(), new BlockHitResult(
                   context.getClickLocation().add(newPos.getX() - pos.getX(), newPos.getY() - pos.getY(), newPos.getZ() - pos.getZ()),
                   context.getClickedFace(), newPos, context.isInside()));
-            if (toolAOEData.isValid(world, newPos, state) && modifiedState == state.getToolModifiedState(adjustedContext, action, true)) {
+            if (toolAOEData.isValid(world, newPos, state) && modifiedState == ToolModification.getModifiedState(state, adjustedContext, action, true)) {
                 //Some of the below methods don't behave properly when the BlockPos is mutable, so now that we are onto ones where it may actually
                 // matter we make sure to get an immutable instance of newPos
                 newPos = newPos.immutable();
                 //Update energy cost
                 energyUsed = nextEnergyUsed;
                 //Run it without simulation in case there are any side effects
-                state.getToolModifiedState(adjustedContext, action, false);
+                ToolModification.getModifiedState(state, adjustedContext, action, false);
                 //Replace the block. Note it just directly sets it (in the same way the normal tools do).
                 world.setBlock(newPos, modifiedState, Block.UPDATE_ALL_IMMEDIATE);
                 world.playSound(null, newPos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);

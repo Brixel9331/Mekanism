@@ -40,7 +40,10 @@
     "EquipmentDamageMixin",
     "EnderMaskMixin",
     "PowderSnowEquipmentMixin",
-    "PiglinEquipmentMixin"
+    "PiglinEquipmentMixin",
+    "PumpkinToolActionMixin",
+    "BeehiveToolActionMixin",
+    "TripWireToolActionMixin"
   ],
   "client": [
     "client.LevelRendererFrustumAccessor",

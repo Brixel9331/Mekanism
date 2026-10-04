@@ -23,6 +23,7 @@ import mekanism.api.event.MekanismTeleportEvent;
 import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.IModule;
 import mekanism.api.gear.ToolAction;
+import mekanism.api.gear.IToolActionItem;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.radial.RadialData;
 import mekanism.api.radial.mode.IRadialMode;
@@ -87,7 +88,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekaTool extends ItemEnergized implements IItemEnchantments, IModuleContainerItem, IBlastingItem, IGenericRadialModeItem, IBlockStartBreakItem {
+public class ItemMekaTool extends ItemEnergized implements IToolActionItem, IItemEnchantments, IModuleContainerItem, IBlastingItem, IGenericRadialModeItem, IBlockStartBreakItem {
 
     private static final ResourceLocation RADIAL_ID = Mekanism.rl("meka_tool");
 
