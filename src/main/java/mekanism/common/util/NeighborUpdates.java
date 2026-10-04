@@ -1,6 +1,7 @@
 package mekanism.common.util;
 
 import java.util.Set;
+import mekanism.common.block.interfaces.IBlockEntityNeighborBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -17,6 +18,19 @@ public final class NeighborUpdates {
     private static final Direction[] DIRECTIONS = Direction.values();
 
     private NeighborUpdates() {
+    }
+
+    public static void notifyBlockEntityNeighbors(Level world, BlockPos fromPos) {
+        if (!world.isInWorldBounds(fromPos)) {
+            return;
+        }
+        for (Direction side : DIRECTIONS) {
+            BlockPos pos = fromPos.relative(side);
+            BlockState state = getLoadedState(world, pos);
+            if (state != null && state.getBlock() instanceof IBlockEntityNeighborBlock block) {
+                block.onNeighborChange(state, world, pos, fromPos);
+            }
+        }
     }
 
     public static boolean isGettingPowered(Level world, BlockPos pos) {

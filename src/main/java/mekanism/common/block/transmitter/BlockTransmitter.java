@@ -9,6 +9,7 @@ import java.util.function.UnaryOperator;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.block.BlockMekanism;
+import mekanism.common.block.interfaces.IBlockEntityNeighborBlock;
 import mekanism.common.block.states.IStateFluidLoggable;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.lib.transmitter.ConnectionType;
@@ -44,7 +45,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockTransmitter extends BlockMekanism implements IStateFluidLoggable {
+public abstract class BlockTransmitter extends BlockMekanism implements IBlockEntityNeighborBlock, IStateFluidLoggable {
 
     //Max retained size if we used a HashMap with a key of record(Size, ConnectionType[6]) ~= 1,343,576B
     //Max retained size packing it like this 163,987B

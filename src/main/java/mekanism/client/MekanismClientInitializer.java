@@ -14,6 +14,7 @@ public final class MekanismClientInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(BlockEntityLoadQueue::enqueue);
+        ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(BlockEntityLoadQueue::enqueueNeighbors);
         ClientRegistration.init();
         ClientRegistration.registerModels();
         ClientRegistration.addLayers();
