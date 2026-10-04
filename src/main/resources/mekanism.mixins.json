@@ -43,7 +43,8 @@
     "PiglinEquipmentMixin",
     "PumpkinToolActionMixin",
     "BeehiveToolActionMixin",
-    "TripWireToolActionMixin"
+    "TripWireToolActionMixin",
+    "PiglinCurrencyMixin"
   ],
   "client": [
     "client.LevelRendererFrustumAccessor",
