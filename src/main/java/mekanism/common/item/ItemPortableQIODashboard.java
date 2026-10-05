@@ -7,6 +7,7 @@ import mekanism.common.MekanismLang;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.item.PortableQIODashboardContainer;
 import mekanism.common.item.interfaces.IColoredItem;
+import mekanism.common.item.interfaces.IDestroyedItem;
 import mekanism.common.item.interfaces.IGuiItem;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.lib.frequency.Frequency;
@@ -31,7 +32,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemPortableQIODashboard extends CapabilityItem implements IFrequencyItem, IGuiItem, IItemSustainedInventory, IColoredItem {
+public class ItemPortableQIODashboard extends CapabilityItem implements IDestroyedItem, IFrequencyItem, IGuiItem, IItemSustainedInventory, IColoredItem {
 
     public ItemPortableQIODashboard(Properties properties) {
         super(properties.stacksTo(1).rarity(Rarity.RARE));

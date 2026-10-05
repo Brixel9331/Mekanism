@@ -14,6 +14,7 @@ import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.entity.EntityRobit;
+import mekanism.common.item.interfaces.IDestroyedItem;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.network.to_client.PacketSecurityUpdate;
 import mekanism.common.registries.MekanismRobitSkins;
@@ -42,7 +43,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemRobit extends ItemEnergized implements IItemSustainedInventory {
+public class ItemRobit extends ItemEnergized implements IDestroyedItem, IItemSustainedInventory {
 
     public ItemRobit(Properties properties) {
         super(() -> EntityRobit.MAX_ENERGY.multiply(0.005), () -> EntityRobit.MAX_ENERGY, properties.rarity(Rarity.RARE));

@@ -12,6 +12,7 @@ import mekanism.common.block.attribute.AttributeHasBounding;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.attribute.Attributes.AttributeInventory;
 import mekanism.common.block.interfaces.IHasDescription;
+import mekanism.common.item.interfaces.IDestroyedItem;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.MekanismUtils;
@@ -31,7 +32,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemBlockTooltip<BLOCK extends Block & IHasDescription> extends ItemBlockMekanism<BLOCK> {
+public class ItemBlockTooltip<BLOCK extends Block & IHasDescription> extends ItemBlockMekanism<BLOCK> implements IDestroyedItem {
 
     private final boolean hasDetails;
 
