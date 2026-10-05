@@ -85,11 +85,10 @@ public class ItemElectricBow extends BowItem implements IItemEnchantments, IMode
                 if (ammo.isEmpty()) {
                     ammo = new ItemStack(Items.ARROW);
                 }
-                boolean noConsume = player.isCreative() || (ammo.getItem() instanceof ArrowItem arrow && arrow.isInfinite(ammo, stack, player));
+                boolean noConsume = player.isCreative() || infinity && ammo.is(Items.ARROW);
                 if (!world.isClientSide) {
                     ArrowItem arrowitem = (ArrowItem) (ammo.getItem() instanceof ArrowItem ? ammo.getItem() : Items.ARROW);
                     AbstractArrow arrowEntity = arrowitem.createArrow(world, ammo, player);
-                    arrowEntity = customArrow(arrowEntity);
                     arrowEntity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 3 * velocity, 1);
                     if (velocity == 1) {
                         arrowEntity.setCritArrow(true);
