@@ -3,13 +3,11 @@ package mekanism.api.inventory;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.INBTSerializable;
 import mekanism.api.annotations.NothingNullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import mekanism.api.INBTSerializable;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -76,7 +74,7 @@ public interface IInventorySlot extends INBTSerializable<CompoundTag>, IContents
             return stack;
         }
         boolean sameType = false;
-        if (isEmpty() || (sameType = ItemHandlerHelper.canItemStacksStack(getStack(), stack))) {
+        if (isEmpty() || (sameType = ItemStack.isSameItemSameTags(getStack(), stack))) {
             int toAdd = Math.min(stack.getCount(), needed);
             if (action.execute()) {
                 //If we want to actually insert the item, then update the current item
@@ -232,7 +230,7 @@ public interface IInventorySlot extends INBTSerializable<CompoundTag>, IContents
         int current = getCount();
         if (amount > 0) {
             //Cap adding amount at how much we need, so that we don't risk integer overflow
-            amount = Math.min(amount, getLimit(getStack()));
+            amount = Math.min(amount, Math.max(0, getLimit(getStack()) - current));
         }
         int newSize = setStackSize(current + amount, action);
         return newSize - current;
