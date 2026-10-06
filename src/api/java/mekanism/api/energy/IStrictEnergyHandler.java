@@ -4,10 +4,8 @@ import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.FloatingLongTransferUtils;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
 @NothingNullByDefault
-@AutoRegisterCapability
 public interface IStrictEnergyHandler {
 
     /**
