@@ -8,14 +8,14 @@ import mekanism.api.gear.ICustomModule;
 import mekanism.api.gear.ModuleData.ModuleDataBuilder;
 import mekanism.api.gear.ModuleData;
 import mekanism.api.providers.IItemProvider;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-public class ModuleDeferredRegister extends WrappedDeferredRegister<ModuleData<?>> {
+public class ModuleDeferredRegister extends DeferredRegister<ModuleData<?>> {
 
     public ModuleDeferredRegister(String modid) {
-        super(modid, MekanismAPI.MODULE_REGISTRY_NAME);
+        super(modid, MekanismAPI.MODULE_REGISTRY_NAME, MekanismAPI::moduleRegistry);
     }
 
     public ModuleRegistryObject<?> registerMarker(String name, IItemProvider itemProvider, UnaryOperator<ModuleDataBuilder<?>> builderModifier) {

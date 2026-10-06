@@ -41,7 +41,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -58,35 +57,28 @@ public class ModuleHelper implements IModuleHelper {
     private final Map<ModuleData<?>, Set<Item>> supportedContainers = new IdentityHashMap<>();
     private final Map<ModuleData<?>, Set<ModuleData<?>>> conflictingModules = new IdentityHashMap<>();
 
-    public void processIMC(InterModProcessEvent event) {
+    public void processIMC() {
+        supportedModules.clear();
+        supportedContainers.clear();
+        conflictingModules.clear();
         Map<ModuleData<?>, ImmutableSet.Builder<Item>> supportedContainersBuilderMap = new IdentityHashMap<>();
-        mapSupportedModules(event, MekanismIMC.ADD_MEKA_TOOL_MODULES, MekanismItems.MEKA_TOOL, supportedContainersBuilderMap);
-        mapSupportedModules(event, MekanismIMC.ADD_MEKA_SUIT_HELMET_MODULES, MekanismItems.MEKASUIT_HELMET, supportedContainersBuilderMap);
-        mapSupportedModules(event, MekanismIMC.ADD_MEKA_SUIT_BODYARMOR_MODULES, MekanismItems.MEKASUIT_BODYARMOR, supportedContainersBuilderMap);
-        mapSupportedModules(event, MekanismIMC.ADD_MEKA_SUIT_PANTS_MODULES, MekanismItems.MEKASUIT_PANTS, supportedContainersBuilderMap);
-        mapSupportedModules(event, MekanismIMC.ADD_MEKA_SUIT_BOOTS_MODULES, MekanismItems.MEKASUIT_BOOTS, supportedContainersBuilderMap);
+        mapSupportedModules(MekanismIMC.ADD_MEKA_TOOL_MODULES, MekanismItems.MEKA_TOOL, supportedContainersBuilderMap);
+        mapSupportedModules(MekanismIMC.ADD_MEKA_SUIT_HELMET_MODULES, MekanismItems.MEKASUIT_HELMET, supportedContainersBuilderMap);
+        mapSupportedModules(MekanismIMC.ADD_MEKA_SUIT_BODYARMOR_MODULES, MekanismItems.MEKASUIT_BODYARMOR, supportedContainersBuilderMap);
+        mapSupportedModules(MekanismIMC.ADD_MEKA_SUIT_PANTS_MODULES, MekanismItems.MEKASUIT_PANTS, supportedContainersBuilderMap);
+        mapSupportedModules(MekanismIMC.ADD_MEKA_SUIT_BOOTS_MODULES, MekanismItems.MEKASUIT_BOOTS, supportedContainersBuilderMap);
         for (Map.Entry<ModuleData<?>, ImmutableSet.Builder<Item>> entry : supportedContainersBuilderMap.entrySet()) {
             supportedContainers.put(entry.getKey(), entry.getValue().build());
         }
     }
 
-    private void mapSupportedModules(InterModProcessEvent event, String imcMethod, IItemProvider moduleContainer,
+    private void mapSupportedModules(String imcMethod, IItemProvider moduleContainer,
           Map<ModuleData<?>, ImmutableSet.Builder<Item>> supportedContainersBuilderMap) {
         ImmutableSet.Builder<ModuleData<?>> supportedModulesBuilder = ImmutableSet.builder();
-        event.getIMCStream(imcMethod::equals).forEach(message -> {
-            Object body = message.messageSupplier().get();
-            if (body instanceof IModuleDataProvider<?> moduleDataProvider) {
-                supportedModulesBuilder.add(moduleDataProvider.getModuleData());
-                logDebugReceivedIMC(imcMethod, message.senderModId(), moduleDataProvider);
-            } else if (body instanceof IModuleDataProvider<?>[] providers) {
-                for (IModuleDataProvider<?> moduleDataProvider : providers) {
-                    supportedModulesBuilder.add(moduleDataProvider.getModuleData());
-                    logDebugReceivedIMC(imcMethod, message.senderModId(), moduleDataProvider);
-                }
-            } else {
-                Mekanism.logger.warn("Received IMC message for '{}' from mod '{}' with an invalid body.", imcMethod, message.senderModId());
-            }
-        });
+        for (IModuleDataProvider<?> provider : MekanismIMC.getModulesFor(imcMethod)) {
+            supportedModulesBuilder.add(provider.getModuleData());
+            logDebugReceivedIMC(imcMethod, provider.getRegistryName().getNamespace(), provider);
+        }
         Set<ModuleData<?>> supported = supportedModulesBuilder.build();
         if (!supported.isEmpty()) {
             Item item = moduleContainer.asItem();

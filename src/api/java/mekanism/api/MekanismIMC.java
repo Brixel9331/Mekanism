@@ -1,12 +1,18 @@
 package mekanism.api;
 
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import mekanism.api.providers.IModuleDataProvider;
-import net.minecraftforge.fml.InterModComms;
 
 /**
  * Class containing various helpers for sending IMC messages to Mekanism.
  */
 public class MekanismIMC {
+
+    private static final Map<String, Set<IModuleDataProvider<?>>> MODULE_SUPPORT = new HashMap<>();
 
     private MekanismIMC() {
     }
@@ -119,10 +125,15 @@ public class MekanismIMC {
         sendModuleIMC(ADD_MEKA_SUIT_BOOTS_MODULES, moduleDataProviders);
     }
 
-    private static void sendModuleIMC(String method, IModuleDataProvider<?>... moduleDataProviders) {
+    public static synchronized List<IModuleDataProvider<?>> getModulesFor(String method) {
+        return List.copyOf(MODULE_SUPPORT.getOrDefault(method, Set.of()));
+    }
+
+    private static synchronized void sendModuleIMC(String method, IModuleDataProvider<?>... moduleDataProviders) {
         if (moduleDataProviders == null || moduleDataProviders.length == 0) {
             throw new IllegalArgumentException("No module data providers given.");
         }
-        InterModComms.sendTo(MekanismAPI.MEKANISM_MODID, method, () -> moduleDataProviders);
+        List<IModuleDataProvider<?>> providers = List.of(moduleDataProviders);
+        MODULE_SUPPORT.computeIfAbsent(method, key -> new LinkedHashSet<>()).addAll(providers);
     }
 }
