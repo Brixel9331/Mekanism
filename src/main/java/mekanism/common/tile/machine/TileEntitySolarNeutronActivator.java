@@ -35,6 +35,7 @@ import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.ISingleRecipeLookupHandler.ChemicalRecipeLookupHandler;
 import mekanism.common.recipe.lookup.cache.InputRecipeCache.SingleChemical;
 import mekanism.common.registries.MekanismBlocks;
+import mekanism.common.mixin.BiomeClimateAccessor;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.TileComponentEjector;
@@ -134,7 +135,7 @@ public class TileEntitySolarNeutronActivator extends TileEntityRecipeMachine<Gas
         // As with temperature, we scale it so that it doesn't overwhelm production. Note the signedness
         // on the scaling factor. Also note that we only use rainfall as a proxy if it CAN rain; some dimensions
         // (like the End) have rainfall set, but can't actually support rain.
-        float humidityEff = needsRainCheck ? -0.3F * b.getModifiedClimateSettings().downfall() : 0.0F;
+        float humidityEff = needsRainCheck ? -0.3F * ((BiomeClimateAccessor) (Object) b).mekanism$getClimateSettings().downfall() : 0.0F;
         peakProductionRate = MekanismConfig.general.maxSolarNeutronActivatorRate.get() * (1.0F + tempEff + humidityEff);
         settingsChecked = true;
     }

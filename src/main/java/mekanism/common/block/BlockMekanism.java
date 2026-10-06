@@ -19,6 +19,7 @@ import mekanism.common.block.attribute.AttributeMultiblock;
 import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.attribute.Attributes.AttributeComparator;
 import mekanism.common.block.interfaces.IExplosionBlock;
+import mekanism.common.block.interfaces.IPistonReactionBlock;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
@@ -73,7 +74,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockMekanism extends Block implements IExplosionBlock {
+public abstract class BlockMekanism extends Block implements IPistonReactionBlock, IExplosionBlock {
 
     protected BlockMekanism(BlockBehaviour.Properties properties) {
         super(BlockStateHelper.applyLightLevelAdjustments(properties));
@@ -82,14 +83,14 @@ public abstract class BlockMekanism extends Block implements IExplosionBlock {
 
     @Nullable
     @Override
-    public PushReaction getPistonPushReaction(@NotNull BlockState state) {
+    public PushReaction getPistonPushReaction(@NotNull BlockState state, PushReaction original) {
         if (state.hasBlockEntity()) {
             //Protect against mods like Quark that allow blocks with TEs to be moved
             //TODO: Eventually it would be nice to go through this and maybe even allow some TEs to be moved if they don't strongly
             // care about the world, but for now it is safer to just block them from being moved
             return PushReaction.BLOCK;
         }
-        return super.getPistonPushReaction(state);
+        return original;
     }
 
     @NotNull
@@ -327,11 +328,6 @@ public abstract class BlockMekanism extends Block implements IExplosionBlock {
                 }
             }
         }
-    }
-
-    @Override
-    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
-        return AttributeStateFacing.rotate(state, world, pos, rotation);
     }
 
     @NotNull

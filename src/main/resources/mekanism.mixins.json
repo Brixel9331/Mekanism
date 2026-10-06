@@ -45,7 +45,10 @@
     "BeehiveToolActionMixin",
     "TripWireToolActionMixin",
     "PiglinCurrencyMixin",
-    "ItemEntityDestructionMixin"
+    "ItemEntityDestructionMixin",
+    "PistonReactionMixin",
+    "PortalFrameMixin",
+    "BiomeClimateAccessor"
   ],
   "client": [
     "client.LevelRendererFrustumAccessor",
