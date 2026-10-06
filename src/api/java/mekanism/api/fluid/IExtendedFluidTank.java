@@ -3,15 +3,21 @@ package mekanism.api.fluid;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.INBTSerializable;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import mekanism.api.INBTSerializable;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 @NothingNullByDefault
-public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<CompoundTag>, IContentsListener {
+public interface IExtendedFluidTank extends INBTSerializable<CompoundTag>, IContentsListener {
+
+    FluidStack getFluid();
+
+    int getFluidAmount();
+
+    int getCapacity();
+
+    boolean isFluidValid(FluidStack stack);
 
     /**
      * Overrides the stack in this {@link IExtendedFluidTank}.
@@ -237,41 +243,5 @@ public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<Compoun
             nbt.put(NBTConstants.STORED, getFluid().writeToNBT(new CompoundTag()));
         }
         return nbt;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default int fill(FluidStack stack, FluidAction action) {
-        return stack.getAmount() - insert(stack, Action.fromFluidAction(action), AutomationType.EXTERNAL).getAmount();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default FluidStack drain(FluidStack stack, FluidAction action) {
-        if (!isEmpty() && getFluid().isFluidEqual(stack)) {
-            return extract(stack.getAmount(), Action.fromFluidAction(action), AutomationType.EXTERNAL);
-        }
-        return FluidStack.EMPTY;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default FluidStack drain(int amount, FluidAction action) {
-        return extract(amount, Action.fromFluidAction(action), AutomationType.EXTERNAL);
     }
 }

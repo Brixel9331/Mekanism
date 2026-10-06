@@ -11,9 +11,9 @@ import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.functions.ConstantPredicates;
-import mekanism.common.util.NBTUtils;
-import mekanism.common.util.RegistryUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,7 +169,7 @@ public class BasicFluidTank implements IExtendedFluidTank {
         } else {
             //Throws a RuntimeException as specified is allowed when something unexpected happens
             // As setStack is more meant to be used as an internal method
-            throw new RuntimeException("Invalid fluid for tank: " + RegistryUtils.getName(stack.getFluid()) + " " + stack.getAmount());
+            throw new RuntimeException("Invalid fluid for tank: " + BuiltInRegistries.FLUID.getKey(stack.getFluid()) + " " + stack.getAmount());
         }
         onContentsChanged();
     }
@@ -331,6 +331,8 @@ public class BasicFluidTank implements IExtendedFluidTank {
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        NBTUtils.setFluidStackIfPresent(nbt, NBTConstants.STORED, this::setStackUnchecked);
+        if (nbt.contains(NBTConstants.STORED, Tag.TAG_COMPOUND)) {
+            setStackUnchecked(FluidStack.loadFluidStackFromNBT(nbt.getCompound(NBTConstants.STORED)));
+        }
     }
 }

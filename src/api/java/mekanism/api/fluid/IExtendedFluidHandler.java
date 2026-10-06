@@ -2,13 +2,20 @@ package mekanism.api.fluid;
 
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 /**
  * Extended version of {@link IFluidHandler} to make it easier to integrate with Mekanism
  */
 @NothingNullByDefault
-public interface IExtendedFluidHandler extends IFluidHandler {
+public interface IExtendedFluidHandler {
+
+    int getTanks();
+
+    FluidStack getFluidInTank(int tank);
+
+    int getTankCapacity(int tank);
+
+    boolean isFluidValid(int tank, FluidStack stack);
 
     /**
      * Overrides the stack in the given tank. This method may throw an error if it is called unexpectedly.
@@ -108,38 +115,5 @@ public interface IExtendedFluidHandler extends IFluidHandler {
      */
     default FluidStack extractFluid(FluidStack stack, Action action) {
         return ExtendedFluidHandlerUtils.extract(stack, action, this::getTanks, this::getFluidInTank, this::extractFluid);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default int fill(FluidStack stack, FluidAction action) {
-        return stack.getAmount() - insertFluid(stack, Action.fromFluidAction(action)).getAmount();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default FluidStack drain(FluidStack stack, FluidAction action) {
-        return extractFluid(stack, Action.fromFluidAction(action));
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Wrapped to properly use our method declarations
-     */
-    @Override
-    @Deprecated
-    default FluidStack drain(int amount, FluidAction action) {
-        return extractFluid(amount, Action.fromFluidAction(action));
     }
 }
