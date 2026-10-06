@@ -49,7 +49,7 @@ public class MekanismTools implements IModModule {
         modEventBus.addListener(this::onConfigLoad);
         ToolsItems.ITEMS.register(modEventBus);
         ToolsCreativeTabs.CREATIVE_TABS.register(modEventBus);
-        ToolsRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+        ToolsRecipeSerializers.RECIPE_SERIALIZERS.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
         versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
     }

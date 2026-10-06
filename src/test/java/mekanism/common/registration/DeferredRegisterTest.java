@@ -26,7 +26,7 @@ class DeferredRegisterTest {
         Registry<String> registry = registry("deferred");
         AtomicInteger evaluations = new AtomicInteger();
         DeferredRegister<String> entries = new DeferredRegister<>("test", registry.key(), () -> registry);
-        RegistryObject<String> entry = entries.register("first", () -> {
+        RegistryObject<String> entry = entries.registerEntry("first", () -> {
             evaluations.incrementAndGet();
             return "first";
         });
@@ -50,21 +50,21 @@ class DeferredRegisterTest {
     void registrationPreservesDeclarationOrderAndEarlierReferences() {
         Registry<String> registry = registry("ordered");
         DeferredRegister<String> entries = new DeferredRegister<>("test", registry.key(), () -> registry);
-        RegistryObject<String> first = entries.register("first", () -> "first");
-        RegistryObject<String> second = entries.register("second", () -> first.get() + ":second");
+        RegistryObject<String> first = entries.registerEntry("first", () -> "first");
+        RegistryObject<String> second = entries.registerEntry("second", () -> first.get() + ":second");
         entries.register();
         assertEquals("first:second", second.get());
         assertEquals(0, registry.getId(first.get()));
         assertEquals(1, registry.getId(second.get()));
-        assertThrows(IllegalStateException.class, () -> entries.register("late", () -> "late"));
+        assertThrows(IllegalStateException.class, () -> entries.registerEntry("late", () -> "late"));
     }
 
     @Test
     void duplicateDeclarationsDoNotReplaceTheFirstSupplier() {
         Registry<String> registry = registry("duplicates");
         DeferredRegister<String> entries = new DeferredRegister<>("test", registry.key(), () -> registry);
-        RegistryObject<String> first = entries.register("entry", () -> "first");
-        assertThrows(IllegalArgumentException.class, () -> entries.register("entry", () -> "second"));
+        RegistryObject<String> first = entries.registerEntry("entry", () -> "first");
+        assertThrows(IllegalArgumentException.class, () -> entries.registerEntry("entry", () -> "second"));
         entries.register();
         assertEquals("first", first.get());
     }
@@ -75,11 +75,11 @@ class DeferredRegisterTest {
         Registry.register(registry, new ResourceLocation("test", "existing"), "original");
         AtomicInteger evaluations = new AtomicInteger();
         DeferredRegister<String> entries = new DeferredRegister<>("test", registry.key(), () -> registry);
-        RegistryObject<String> first = entries.register("new", () -> {
+        RegistryObject<String> first = entries.registerEntry("new", () -> {
             evaluations.incrementAndGet();
             return "new";
         });
-        entries.register("existing", () -> "replacement");
+        entries.registerEntry("existing", () -> "replacement");
         assertThrows(IllegalStateException.class, entries::register);
         assertEquals(0, evaluations.get());
         assertThrows(IllegalStateException.class, first::get);
@@ -91,15 +91,15 @@ class DeferredRegisterTest {
     void supplierFailuresCannotBeRetriedAsSuccessfulRegistration() {
         Registry<String> registry = registry("failure");
         DeferredRegister<String> entries = new DeferredRegister<>("test", registry.key(), () -> registry);
-        RegistryObject<String> first = entries.register("first", () -> "first");
-        RegistryObject<String> broken = entries.register("broken", () -> {
+        RegistryObject<String> first = entries.registerEntry("first", () -> "first");
+        RegistryObject<String> broken = entries.registerEntry("broken", () -> {
             throw new IllegalArgumentException("broken supplier");
         });
         assertThrows(IllegalArgumentException.class, entries::register);
         assertEquals("first", first.get());
         assertThrows(IllegalStateException.class, broken::get);
         assertThrows(IllegalStateException.class, entries::register);
-        assertThrows(IllegalStateException.class, () -> entries.register("later", () -> "later"));
+        assertThrows(IllegalStateException.class, () -> entries.registerEntry("later", () -> "later"));
     }
 
     @Test
@@ -107,7 +107,7 @@ class DeferredRegisterTest {
         Registry<String> registry = registry("actual");
         Registry<String> other = registry("wrong");
         DeferredRegister<String> entries = new DeferredRegister<>("test", other.key(), () -> registry);
-        entries.register("entry", () -> "value");
+        entries.registerEntry("entry", () -> "value");
         assertThrows(IllegalArgumentException.class, entries::register);
         assertEquals(0, registry.size());
     }
@@ -117,8 +117,8 @@ class DeferredRegisterTest {
         ResourceKey<Registry<Number>> key = ResourceKey.createRegistryKey(new ResourceLocation("test", "numbers"));
         Registry<Number> registry = new MappedRegistry<>(key, Lifecycle.stable(), false);
         DeferredRegister<Number> entries = new DeferredRegister<>("test", key, () -> registry);
-        RegistryObject<Integer> integer = entries.register("integer", () -> 123);
-        RegistryObject<Double> decimal = entries.register("decimal", () -> 1.5);
+        RegistryObject<Integer> integer = entries.registerEntry("integer", () -> 123);
+        RegistryObject<Double> decimal = entries.registerEntry("decimal", () -> 1.5);
         entries.register();
         assertEquals(123, integer.get());
         assertEquals(1.5, decimal.get());

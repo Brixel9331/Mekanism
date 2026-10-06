@@ -1,15 +1,16 @@
 package mekanism.common.registration.impl;
 
 import java.util.function.Supplier;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public class FeatureDeferredRegister extends WrappedDeferredRegister<Feature<?>> {
+public class FeatureDeferredRegister extends DeferredRegister<Feature<?>> {
 
     public FeatureDeferredRegister(String modid) {
-        super(modid, ForgeRegistries.FEATURES);
+        super(modid, Registries.FEATURE, () -> BuiltInRegistries.FEATURE);
     }
 
     public <CONFIG extends FeatureConfiguration, FEATURE extends Feature<CONFIG>> FeatureRegistryObject<CONFIG, FEATURE> register(String name, Supplier<FEATURE> sup) {

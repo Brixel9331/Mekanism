@@ -24,7 +24,7 @@ public class DeferredRegister<T> {
         this.registrySupplier = Objects.requireNonNull(registrySupplier);
     }
 
-    public <I extends T> RegistryObject<I> register(String name, Supplier<? extends I> supplier) {
+    public <I extends T> RegistryObject<I> registerEntry(String name, Supplier<? extends I> supplier) {
         return createEntry(name, supplier);
     }
 
