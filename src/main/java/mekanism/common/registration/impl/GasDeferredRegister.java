@@ -6,12 +6,12 @@ import mekanism.api.chemical.attribute.ChemicalAttribute;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasBuilder;
 import mekanism.common.base.IChemicalConstant;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
 
-public class GasDeferredRegister extends WrappedDeferredRegister<Gas> {
+public class GasDeferredRegister extends DeferredRegister<Gas> {
 
     public GasDeferredRegister(String modid) {
-        super(modid, MekanismAPI.GAS_REGISTRY_NAME);
+        super(modid, MekanismAPI.GAS_REGISTRY_NAME, MekanismAPI::gasRegistry);
     }
 
     public GasRegistryObject<Gas> register(IChemicalConstant constants, ChemicalAttribute... attributes) {

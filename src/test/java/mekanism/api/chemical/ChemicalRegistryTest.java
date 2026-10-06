@@ -28,6 +28,14 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryBuilder;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.recipe.ingredient.creator.GasStackIngredientCreator;
+import mekanism.common.registration.impl.GasDeferredRegister;
+import mekanism.common.registration.impl.GasRegistryObject;
+import mekanism.common.registration.impl.InfuseTypeDeferredRegister;
+import mekanism.common.registration.impl.InfuseTypeRegistryObject;
+import mekanism.common.registration.impl.PigmentDeferredRegister;
+import mekanism.common.registration.impl.PigmentRegistryObject;
+import mekanism.common.registration.impl.SlurryDeferredRegister;
+import mekanism.common.registration.impl.SlurryRegistryObject;
 import mekanism.common.tags.LazyTagLookup;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
@@ -50,11 +58,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class ChemicalRegistryTest {
 
     private static List<Fixture<?>> fixtures;
+    private static GasRegistryObject<Gas> declaredGas;
+    private static InfuseTypeRegistryObject<InfuseType> declaredInfusion;
+    private static PigmentRegistryObject<Pigment> declaredPigment;
+    private static SlurryRegistryObject<Slurry, Slurry> declaredSlurries;
 
     @BeforeAll
     static void bootstrap() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        GasDeferredRegister gases = new GasDeferredRegister("test");
+        InfuseTypeDeferredRegister infusions = new InfuseTypeDeferredRegister("test");
+        PigmentDeferredRegister pigments = new PigmentDeferredRegister("test");
+        SlurryDeferredRegister slurries = new SlurryDeferredRegister("test");
+        declaredGas = gases.register("declared_gas", 0x123456);
+        declaredInfusion = infusions.register("declared_infusion", new ResourceLocation("test", "infusion_texture"), 0x654321);
+        declaredPigment = pigments.register("declared_pigment", 0xABCDEF);
+        declaredSlurries = slurries.register("declared_ore", builder -> builder.tint(0x102030));
+        gases.register();
+        infusions.register();
+        pigments.register();
+        slurries.register();
         fixtures = List.of(
               fixture(ChemicalTags.GAS, MekanismAPI.EMPTY_GAS, () -> new Gas(GasBuilder.builder()), GasStack::new,
                     GasStack::readFromNBT, GasStack::readFromPacket, NBTConstants.GAS_NAME),
@@ -325,6 +349,22 @@ class ChemicalRegistryTest {
         }
         BoxedChemicalStack stack = BoxedChemicalStack.box(fixture.stackFactory.apply(fixture.first, Long.MAX_VALUE));
         assertEquals(stack, BoxedChemicalStack.read(stack.write(new CompoundTag())));
+    }
+
+    @Test
+    void chemicalDefinitionWrappersResolveNativeEntriesAndRetainVisualProperties() {
+        assertSame(declaredGas.get(), MekanismAPI.gasRegistry().get(declaredGas.getId()));
+        assertEquals(declaredGas.key(), MekanismAPI.gasRegistry().getResourceKey(declaredGas.get()).orElseThrow());
+        assertEquals(0x123456, declaredGas.get().getTint());
+        assertEquals(0x654321, declaredInfusion.get().getColorRepresentation());
+        assertEquals(new ResourceLocation("test", "infusion_texture"), declaredInfusion.get().getIcon());
+        assertEquals(0xABCDEF, declaredPigment.get().getTint());
+        assertEquals(new ResourceLocation("test", "dirty_declared_ore"), declaredSlurries.getDirtySlurry().getRegistryName());
+        assertEquals(new ResourceLocation("test", "clean_declared_ore"), declaredSlurries.getCleanSlurry().getRegistryName());
+        assertEquals(0x102030, declaredSlurries.getDirtySlurry().getTint());
+        assertEquals(0x102030, declaredSlurries.getCleanSlurry().getTint());
+        assertSame(declaredSlurries.getDirtySlurry(), declaredSlurries.getPrimary());
+        assertSame(declaredSlurries.getCleanSlurry(), declaredSlurries.getSecondary());
     }
 
     private record Fixture<C extends Chemical<C>>(ChemicalTags<C> tags, C empty, C first, C second, Supplier<C> factory,
