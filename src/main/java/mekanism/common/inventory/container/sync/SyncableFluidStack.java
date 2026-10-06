@@ -2,11 +2,11 @@ package mekanism.common.inventory.container.sync;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.network.to_client.container.property.FluidStackPropertyData;
 import mekanism.common.network.to_client.container.property.IntPropertyData;
 import mekanism.common.network.to_client.container.property.PropertyData;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 /**

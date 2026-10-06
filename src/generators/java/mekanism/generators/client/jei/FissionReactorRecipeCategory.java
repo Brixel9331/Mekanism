@@ -6,6 +6,7 @@ import java.util.List;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.attribute.GasAttributes.CooledCoolant;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.heat.HeatAPI;
 import mekanism.api.math.MathUtils;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -36,7 +37,6 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
@@ -13,7 +14,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import mekanism.api.functions.TriPredicate;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

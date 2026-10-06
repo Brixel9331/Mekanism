@@ -7,7 +7,6 @@ import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import mekanism.api.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 

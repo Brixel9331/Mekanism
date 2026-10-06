@@ -2,7 +2,6 @@ package mekanism.api.fluid;
 
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 /**

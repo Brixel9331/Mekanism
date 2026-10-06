@@ -2,6 +2,9 @@ package mekanism.api.text;
 
 import java.util.ArrayList;
 import java.util.List;
+import mekanism.api.fluid.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.ClickEvent;
@@ -14,7 +17,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 
 public class TextComponentUtil {
 
@@ -80,7 +82,7 @@ public class TextComponentUtil {
             } else if (component instanceof FluidStack stack) {
                 current = stack.getDisplayName().copy();
             } else if (component instanceof Fluid fluid) {
-                current = translate(fluid.getFluidType().getDescriptionId());
+                current = FluidVariantAttributes.getName(FluidVariant.of(fluid)).copy();
             } else if (component instanceof Direction direction) {
                 current = getTranslatedDirection(direction);
             } else if (component instanceof Boolean bool) {
@@ -199,7 +201,7 @@ public class TextComponentUtil {
             } else if (component instanceof FluidStack stack) {
                 current = stack.getDisplayName().copy();
             } else if (component instanceof Fluid fluid) {
-                current = translate(fluid.getFluidType().getDescriptionId());
+                current = FluidVariantAttributes.getName(FluidVariant.of(fluid)).copy();
             } else if (component instanceof Direction direction) {
                 current = getTranslatedDirection(direction);
             } else if (component instanceof Boolean bool) {

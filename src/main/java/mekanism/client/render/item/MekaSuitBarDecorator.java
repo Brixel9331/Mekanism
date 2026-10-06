@@ -7,6 +7,7 @@ import java.util.Optional;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.GenericTankSpec;
 import mekanism.common.capabilities.chemical.item.ChemicalTankSpec;
@@ -19,7 +20,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 

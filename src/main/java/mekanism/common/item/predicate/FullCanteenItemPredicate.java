@@ -1,5 +1,6 @@
 package mekanism.common.item.predicate;
 
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.gear.ItemCanteen;
@@ -7,7 +8,6 @@ import mekanism.common.registries.MekanismFluids;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class FullCanteenItemPredicate extends CustomItemPredicate {

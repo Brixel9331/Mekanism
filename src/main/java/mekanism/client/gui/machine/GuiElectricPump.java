@@ -2,6 +2,7 @@ package mekanism.client.gui.machine;
 
 import java.util.ArrayList;
 import java.util.List;
+import mekanism.api.fluid.FluidStack;
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.element.GuiDownArrow;
 import mekanism.client.gui.element.GuiInnerScreen;
@@ -19,7 +20,6 @@ import mekanism.common.util.text.TextUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class GuiElectricPump extends GuiMekanismTile<TileEntityElectricPump, MekanismTileContainer<TileEntityElectricPump>> {

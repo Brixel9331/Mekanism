@@ -1,6 +1,6 @@
 package mekanism.api.recipes.ingredients;
 
-import net.minecraftforge.fluids.FluidStack;
+import mekanism.api.fluid.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 /**

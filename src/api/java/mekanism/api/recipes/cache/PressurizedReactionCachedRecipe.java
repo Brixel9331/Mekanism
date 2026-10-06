@@ -4,12 +4,12 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.PressurizedReactionRecipe;
 import mekanism.api.recipes.PressurizedReactionRecipe.PressurizedReactionRecipeOutput;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.outputs.IOutputHandler;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

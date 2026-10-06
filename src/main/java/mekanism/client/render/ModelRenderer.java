@@ -6,12 +6,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
+import mekanism.api.fluid.FluidStack;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.data.RenderData;
 import mekanism.client.render.data.ValveRenderData;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 public final class ModelRenderer {

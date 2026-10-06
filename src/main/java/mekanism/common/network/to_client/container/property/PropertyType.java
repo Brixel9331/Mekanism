@@ -10,6 +10,7 @@ import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.inventory.container.sync.ISyncableData;
 import mekanism.common.inventory.container.sync.SyncableBlockPos;
@@ -39,7 +40,6 @@ import mekanism.common.network.to_client.container.property.list.ListPropertyDat
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public enum PropertyType {

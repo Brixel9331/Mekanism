@@ -21,6 +21,7 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.FloatingLongConsumer;
 import net.minecraft.core.BlockPos;
@@ -32,7 +33,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.IForgeRegistry;
 
 @ParametersAreNotNullByDefault

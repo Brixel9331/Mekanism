@@ -3,6 +3,7 @@ package mekanism.common.tile.transmitter;
 import java.util.Collections;
 import java.util.List;
 import mekanism.api.NBTConstants;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.tier.BaseTier;
@@ -24,7 +25,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

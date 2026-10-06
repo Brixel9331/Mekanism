@@ -1,11 +1,11 @@
 package mekanism.common.content.network.distribution;
 
 import java.util.Collection;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.MathUtils;
 import mekanism.common.content.network.transmitter.MechanicalPipe;
 import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 //TODO: Improve handling for fluid storage as longs

@@ -2,11 +2,11 @@ package mekanism.common.capabilities.proxy;
 
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidHandler;
 import mekanism.api.fluid.ISidedFluidHandler;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.core.Direction;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault

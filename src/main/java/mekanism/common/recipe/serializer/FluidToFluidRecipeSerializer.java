@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.FluidToFluidRecipe;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -13,7 +14,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class FluidToFluidRecipeSerializer<RECIPE extends FluidToFluidRecipe> implements RecipeSerializer<RECIPE> {

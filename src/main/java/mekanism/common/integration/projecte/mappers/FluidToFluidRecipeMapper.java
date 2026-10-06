@@ -1,5 +1,6 @@
 package mekanism.common.integration.projecte.mappers;
 
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.FluidToFluidRecipe;
 import mekanism.common.integration.projecte.IngredientHelper;
 import mekanism.common.recipe.MekanismRecipeType;
@@ -11,7 +12,6 @@ import moze_intel.projecte.api.nss.NormalizedSimpleStack;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.fluids.FluidStack;
 
 @RecipeTypeMapper
 public class FluidToFluidRecipeMapper implements IRecipeTypeMapper {

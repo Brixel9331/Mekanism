@@ -13,6 +13,7 @@ import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.MathUtils;
 import mekanism.api.recipes.ElectrolysisRecipe;
@@ -72,7 +73,6 @@ import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

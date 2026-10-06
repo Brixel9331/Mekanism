@@ -15,6 +15,7 @@ import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.Mekanism;
 import mekanism.common.inventory.container.slot.ArmorSlot;
@@ -62,7 +63,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

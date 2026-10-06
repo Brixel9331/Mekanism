@@ -15,6 +15,7 @@ import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IMekanismStrictEnergyHandler;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.api.heat.HeatAPI;
@@ -38,7 +39,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import mekanism.api.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

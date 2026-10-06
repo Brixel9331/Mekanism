@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.chemical.ChemicalChemicalToChemicalRecipe;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
@@ -17,7 +18,6 @@ import mekanism.common.recipe.lookup.cache.type.FluidInputCache;
 import mekanism.common.recipe.lookup.cache.type.ItemInputCache;
 import net.minecraft.world.item.ItemStack;
 import mekanism.api.functions.TriPredicate;
-import net.minecraftforge.fluids.FluidStack;
 
 public class InputRecipeCache {
 

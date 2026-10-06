@@ -2,13 +2,13 @@ package mekanism.common.integration.computer;
 
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.integration.computer.annotation.WrappingComputerMethod.WrappingComputerMethodHelp;
 import mekanism.common.integration.computer.annotation.WrappingComputerMethod.WrappingComputerMethodIndex;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 
 /**
  * Helper class to hold classes that then can wrap one return type into multiple methods. Everything in this class must be public, static, and exist on both server and

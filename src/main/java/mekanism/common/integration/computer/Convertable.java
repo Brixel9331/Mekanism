@@ -1,9 +1,9 @@
 package mekanism.common.integration.computer;
 
 import mekanism.api.chemical.ChemicalStack;
-import net.minecraftforge.fluids.FluidStack;
 
 import java.util.function.BiFunction;
+import mekanism.api.fluid.FluidStack;
 
 /**
  * Wrapper type for a method which may return a different static type at runtime.

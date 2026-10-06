@@ -7,6 +7,7 @@ import mekanism.api.IContentsListener;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
@@ -31,7 +32,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

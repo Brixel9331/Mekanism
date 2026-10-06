@@ -10,6 +10,7 @@ import com.blamejared.crafttweaker.api.util.Many;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import java.util.List;
 import java.util.stream.Collectors;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.creator.IFluidStackIngredientCreator;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -21,7 +22,6 @@ import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.Tag
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenRegister

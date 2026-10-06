@@ -3,7 +3,6 @@ package mekanism.api.fluid;
 import mekanism.api.Action;
 import mekanism.api.annotations.NothingNullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 /**

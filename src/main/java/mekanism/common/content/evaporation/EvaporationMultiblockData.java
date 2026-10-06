@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import mekanism.api.IEvaporationSolar;
 import mekanism.api.NBTConstants;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.heat.HeatAPI;
 import mekanism.api.recipes.FluidToFluidRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
@@ -51,7 +52,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

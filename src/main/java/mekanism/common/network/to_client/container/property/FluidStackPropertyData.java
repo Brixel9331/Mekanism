@@ -1,8 +1,8 @@
 package mekanism.common.network.to_client.container.property;
 
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.inventory.container.MekanismContainer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 public class FluidStackPropertyData extends PropertyData {

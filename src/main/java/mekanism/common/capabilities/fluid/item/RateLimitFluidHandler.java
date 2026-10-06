@@ -11,11 +11,11 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.fluid.FluidStack;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.fluid.VariableCapacityFluidTank;
 import mekanism.common.tier.FluidTankTier;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,9 +1,9 @@
 package mekanism.common.content.network.distribution;
 
 import java.util.Collection;
+import mekanism.api.fluid.FluidStack;
 import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.jetbrains.annotations.NotNull;
