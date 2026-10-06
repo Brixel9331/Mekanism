@@ -10,7 +10,6 @@ import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.common.recipe.ingredient.chemical.ChemicalIngredientDeserializer.IngredientType;
-import mekanism.common.util.ChemicalUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +25,7 @@ public abstract class SingleChemicalStackIngredient<CHEMICAL extends Chemical<CH
         this.chemicalInstance = chemicalInstance;
         //Note: While callers of getRepresentations aren't supposed to mutate it we copy it anyway so that in case they do
         // then nothing bad happens to the actual recipe
-        this.representations = Collections.singletonList(ChemicalUtil.copy(this.chemicalInstance));
+        this.representations = Collections.singletonList(getIngredientInfo().createStack(this.chemicalInstance, this.chemicalInstance.getAmount()));
     }
 
     protected abstract ChemicalIngredientInfo<CHEMICAL, STACK> getIngredientInfo();

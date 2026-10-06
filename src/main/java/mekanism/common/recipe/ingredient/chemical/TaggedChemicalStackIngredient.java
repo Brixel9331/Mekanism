@@ -6,30 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import mekanism.api.JsonConstants;
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
-import mekanism.common.Mekanism;
 import mekanism.common.recipe.ingredient.chemical.ChemicalIngredientDeserializer.IngredientType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.registries.tags.ITag;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>>
       implements ChemicalStackIngredient<CHEMICAL, STACK> {
 
     @NotNull
-    private final ITag<CHEMICAL> tag;
+    private final TagKey<CHEMICAL> tag;
+    private final ChemicalTags<CHEMICAL> tags;
     private final long amount;
 
     protected TaggedChemicalStackIngredient(@NotNull ChemicalTags<CHEMICAL> tags, @NotNull TagKey<CHEMICAL> tag, long amount) {
-        this(tags.getManager().map(manager -> manager.getTag(tag)).orElseThrow(), amount);
-    }
-
-    protected TaggedChemicalStackIngredient(@NotNull ITag<CHEMICAL> tag, long amount) {
-        this.tag = tag;
+        this.tags = Objects.requireNonNull(tags);
+        this.tag = Objects.requireNonNull(tag);
         this.amount = amount;
     }
 
@@ -47,7 +44,7 @@ public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CH
 
     @Override
     public boolean testType(@NotNull CHEMICAL chemical) {
-        return tag.contains(Objects.requireNonNull(chemical));
+        return Objects.requireNonNull(chemical).is(tag);
     }
 
     @NotNull
@@ -67,13 +64,13 @@ public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CH
 
     @Override
     public boolean hasNoMatchingInstances() {
-        return tag.isEmpty();
+        return tags.getTagContents(tag).findAny().isEmpty();
     }
 
     @Override
     public void logMissingTags() {
-        if (tag.isEmpty()) {
-            Mekanism.logger.error("Empty tag: {}", tag.getKey());
+        if (hasNoMatchingInstances()) {
+            MekanismAPI.logger.error("Empty tag: {}", tag);
         }
     }
 
@@ -83,7 +80,7 @@ public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CH
         ChemicalIngredientInfo<CHEMICAL, STACK> ingredientInfo = getIngredientInfo();
         //TODO: Can this be cached somehow
         List<@NotNull STACK> representations = new ArrayList<>();
-        for (CHEMICAL chemical : tag) {
+        for (CHEMICAL chemical : getRawInput()) {
             representations.add(ingredientInfo.createStack(chemical, amount));
         }
         return representations;
@@ -93,13 +90,13 @@ public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CH
      * For use in recipe input caching.
      */
     public Iterable<CHEMICAL> getRawInput() {
-        return tag;
+        return tags.getTagContents(tag).toList();
     }
 
     @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeEnum(IngredientType.TAGGED);
-        buffer.writeResourceLocation(tag.getKey().location());
+        buffer.writeResourceLocation(tag.location());
         buffer.writeVarLong(amount);
     }
 
@@ -108,7 +105,7 @@ public abstract class TaggedChemicalStackIngredient<CHEMICAL extends Chemical<CH
     public JsonElement serialize() {
         JsonObject json = new JsonObject();
         json.addProperty(JsonConstants.AMOUNT, amount);
-        json.addProperty(JsonConstants.TAG, tag.getKey().location().toString());
+        json.addProperty(JsonConstants.TAG, tag.location().toString());
         return json;
     }
 

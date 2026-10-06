@@ -1,31 +1,34 @@
 package mekanism.common.tags;
 
+import java.util.List;
+import java.util.function.Supplier;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalTags;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITag;
 
-public record LazyTagLookup<TYPE>(TagKey<TYPE> key, Lazy<ITag<TYPE>> lazyTag) {
+public record LazyTagLookup<TYPE>(TagKey<TYPE> key, Supplier<Registry<TYPE>> registry) {
 
-    public static <TYPE> LazyTagLookup<TYPE> create(IForgeRegistry<TYPE> registry, TagKey<TYPE> key) {
-        return new LazyTagLookup<>(key, Lazy.of(() -> TagUtils.manager(registry).getTag(key)));
+    public static <TYPE> LazyTagLookup<TYPE> create(Registry<TYPE> registry, TagKey<TYPE> key) {
+        return new LazyTagLookup<>(key, () -> registry);
     }
 
     public static <CHEMICAL extends Chemical<CHEMICAL>> LazyTagLookup<CHEMICAL> create(ChemicalTags<CHEMICAL> registry, TagKey<CHEMICAL> key) {
-        return new LazyTagLookup<>(key, Lazy.of(() -> registry.getManager().orElseThrow().getTag(key)));
+        return new LazyTagLookup<>(key, registry::getRegistry);
     }
 
-    public ITag<TYPE> tag() {
-        return lazyTag.get();
+    public List<TYPE> tag() {
+        return registry.get().getTag(key).stream().flatMap(HolderSet::stream).map(Holder::value).toList();
     }
 
     public boolean contains(TYPE element) {
-        return tag().contains(element);
+        Registry<TYPE> registry = this.registry.get();
+        return registry.getResourceKey(element).flatMap(registry::getHolder).map(holder -> holder.is(key)).orElse(false);
     }
 
     public boolean isEmpty() {
-        return tag().isEmpty();
+        return registry.get().getTag(key).map(tag -> tag.size() == 0).orElse(true);
     }
 }
