@@ -7,6 +7,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.ParametersAreNonnullByDefault;
+import mekanism.api.gear.ToolAction;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
 import mekanism.tools.common.IHasRepairType;
@@ -25,8 +26,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
@@ -41,8 +42,6 @@ import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,9 +53,9 @@ public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttri
 
     static {
         PAXEL_ACTIONS.add(PAXEL_DIG);
-        PAXEL_ACTIONS.addAll(ToolActions.DEFAULT_PICKAXE_ACTIONS);
-        PAXEL_ACTIONS.addAll(ToolActions.DEFAULT_SHOVEL_ACTIONS);
-        PAXEL_ACTIONS.addAll(ToolActions.DEFAULT_AXE_ACTIONS);
+        PAXEL_ACTIONS.addAll(ToolAction.DEFAULT_PICKAXE_ACTIONS);
+        PAXEL_ACTIONS.addAll(ToolAction.DEFAULT_SHOVEL_ACTIONS);
+        PAXEL_ACTIONS.addAll(ToolAction.DEFAULT_AXE_ACTIONS);
     }
 
     private final IPaxelMaterial material;
@@ -119,7 +118,7 @@ public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttri
         if (context.getClickedFace() == Direction.DOWN) {
             return InteractionResult.PASS;
         }
-        BlockState foundResult = blockstate.getToolModifiedState(context, ToolActions.SHOVEL_FLATTEN, false);
+        BlockState foundResult = blockstate.getToolModifiedState(context, ToolAction.SHOVEL_FLATTEN, false);
         if (foundResult != null && world.isEmptyBlock(blockpos.above())) {
             //We can flatten the item as a shovel
             world.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
