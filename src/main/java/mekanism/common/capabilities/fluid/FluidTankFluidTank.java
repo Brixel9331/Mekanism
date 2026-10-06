@@ -56,7 +56,7 @@ public class FluidTankFluidTank extends BasicFluidTank {
             TileEntityFluidTank tileAbove = WorldUtils.getTileEntity(TileEntityFluidTank.class, this.tile.getLevel(), this.tile.getBlockPos().above());
             if (tileAbove != null) {
                 //Note: We do external so that it is not limited by the internal rate limits
-                remainder = tileAbove.fluidTank.insert(remainder, action, AutomationType.EXTERNAL);
+                remainder = insertInto(tileAbove.fluidTank, remainder, action, AutomationType.EXTERNAL);
             }
         }
         return remainder;

@@ -9,8 +9,10 @@ import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.FluidStack;
-import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.fluid.ITransactionalFluidTank;
 import mekanism.api.functions.ConstantPredicates;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -18,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class BasicFluidTank implements IExtendedFluidTank {
+public class BasicFluidTank extends SnapshotParticipant<BasicFluidTank.FluidSnapshot> implements ITransactionalFluidTank {
 
     public static final Predicate<@NotNull FluidStack> alwaysTrue = ConstantPredicates.alwaysTrue();
     public static final Predicate<@NotNull FluidStack> alwaysFalse = ConstantPredicates.alwaysFalse();
@@ -97,6 +99,9 @@ public class BasicFluidTank implements IExtendedFluidTank {
      * instead.
      */
     protected FluidStack stored = FluidStack.EMPTY;
+    @Nullable
+    private TransactionContext currentTransaction;
+    private boolean pendingChange;
     private final Predicate<@NotNull FluidStack> validator;
     protected final BiPredicate<@NotNull FluidStack, @NotNull AutomationType> canExtract;
     protected final BiPredicate<@NotNull FluidStack, @NotNull AutomationType> canInsert;
@@ -121,9 +126,62 @@ public class BasicFluidTank implements IExtendedFluidTank {
 
     @Override
     public void onContentsChanged() {
-        if (listener != null) {
+        if (currentTransaction != null) {
+            pendingChange = true;
+        } else if (listener != null) {
             listener.onContentsChanged();
         }
+    }
+
+    @Override
+    public FluidStack insert(FluidStack stack, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        TransactionContext previous = currentTransaction;
+        currentTransaction = transaction;
+        try {
+            return insert(stack, Action.EXECUTE, automationType);
+        } finally {
+            currentTransaction = previous;
+        }
+    }
+
+    @Override
+    public FluidStack extract(int amount, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        TransactionContext previous = currentTransaction;
+        currentTransaction = transaction;
+        try {
+            return extract(amount, Action.EXECUTE, automationType);
+        } finally {
+            currentTransaction = previous;
+        }
+    }
+
+    protected FluidStack insertInto(ITransactionalFluidTank target, FluidStack stack, Action action, AutomationType automationType) {
+        return currentTransaction == null || action.simulate() ? target.insert(stack, action, automationType)
+              : target.insert(stack, currentTransaction, automationType);
+    }
+
+    @Override
+    protected FluidSnapshot createSnapshot() {
+        return new FluidSnapshot(stored.copy(), pendingChange);
+    }
+
+    @Override
+    protected void readSnapshot(FluidSnapshot snapshot) {
+        stored = snapshot.stack.copy();
+        pendingChange = snapshot.changed;
+    }
+
+    @Override
+    protected void onFinalCommit() {
+        if (pendingChange) {
+            pendingChange = false;
+            onContentsChanged();
+        }
+    }
+
+    protected record FluidSnapshot(FluidStack stack, boolean changed) {
     }
 
     @NotNull
