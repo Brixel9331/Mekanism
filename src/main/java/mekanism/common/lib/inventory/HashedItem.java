@@ -4,10 +4,8 @@ import java.util.Objects;
 import java.util.UUID;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.inventory.IHashedItem;
-import mekanism.common.util.StackUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +61,7 @@ public class HashedItem implements IHashedItem {
 
     @Override
     public ItemStack createStack(int size) {
-        return StackUtils.size(itemStack, size);
+        return itemStack.isEmpty() || size <= 0 ? ItemStack.EMPTY : itemStack.copyWithCount(size);
     }
 
     /**
@@ -79,7 +77,7 @@ public class HashedItem implements IHashedItem {
      */
     @NotNull
     public CompoundTag internalToNBT() {
-        return itemStack.serializeNBT();
+        return itemStack.save(new CompoundTag());
     }
 
     @Override
@@ -87,7 +85,7 @@ public class HashedItem implements IHashedItem {
         if (obj == this) {
             return true;
         }
-        return obj instanceof IHashedItem other && ItemHandlerHelper.canItemStacksStack(itemStack, other.getInternalStack());
+        return obj instanceof IHashedItem other && ItemStack.isSameItemSameTags(itemStack, other.getInternalStack());
     }
 
     @Override
