@@ -11,6 +11,7 @@ import mekanism.api.chemical.gas.IGasTank;
 import mekanism.api.chemical.gas.attribute.GasAttributes;
 import mekanism.api.radiation.IRadiationManager;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.block.attribute.Attribute;
@@ -22,7 +23,6 @@ import mekanism.common.block.attribute.Attributes.AttributeComparator;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
-import mekanism.common.capabilities.Capabilities;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.lib.multiblock.MultiblockData;
 import mekanism.common.lib.radiation.Meltdown.MeltdownExplosion;
@@ -116,9 +116,9 @@ public abstract class BlockMekanism extends Block {
             tile.getFrequencyComponent().write(lazyDataMap.get());
         }
         if (tile.hasSecurity()) {
-            itemStack.getCapability(Capabilities.OWNER_OBJECT).ifPresent(ownerObject -> {
+            SecurityLookup.OWNER.find(itemStack).ifPresent(ownerObject -> {
                 ownerObject.setOwnerUUID(tile.getOwnerUUID());
-                itemStack.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(securityObject -> securityObject.setSecurityMode(tile.getSecurityMode()));
+                SecurityLookup.SECURITY.find(itemStack).ifPresent(securityObject -> securityObject.setSecurityMode(tile.getSecurityMode()));
             });
         }
         if (tile.supportsUpgrades()) {
@@ -286,7 +286,7 @@ public abstract class BlockMekanism extends Block {
             tile.getFrequencyComponent().read(dataMap);
         }
         if (tile.hasSecurity()) {
-            stack.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> tile.setSecurityMode(security.getSecurityMode()));
+            SecurityLookup.SECURITY.find(stack).ifPresent(security -> tile.setSecurityMode(security.getSecurityMode()));
             UUID ownerUUID = ISecurityUtils.INSTANCE.getOwnerUUID(stack);
             if (ownerUUID != null) {
                 tile.setOwnerUUID(ownerUUID);

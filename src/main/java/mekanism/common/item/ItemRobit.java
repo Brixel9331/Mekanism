@@ -8,13 +8,11 @@ import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.robit.RobitSkin;
 import mekanism.api.security.ISecurityObject;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.api.security.SecurityMode;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
-import mekanism.common.capabilities.security.item.ItemStackSecurityObject;
 import mekanism.common.entity.EntityRobit;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.network.to_client.PacketSecurityUpdate;
@@ -28,7 +26,6 @@ import mekanism.common.util.WorldUtils;
 import mekanism.common.util.text.BooleanStateDisplay.YesNo;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -98,7 +95,7 @@ public class ItemRobit extends ItemEnergized implements IItemSustainedInventory 
                 }
                 robit.setSustainedInventory(getSustainedInventory(stack));
                 robit.setCustomName(getRobitName(stack));
-                robit.setSecurityMode(stack.getCapability(Capabilities.SECURITY_OBJECT).map(ISecurityObject::getSecurityMode).orElse(SecurityMode.PUBLIC));
+                robit.setSecurityMode(SecurityLookup.SECURITY.find(stack).map(ISecurityObject::getSecurityMode).orElse(SecurityMode.PUBLIC));
                 robit.setSkin(getRobitSkin(stack), player);
                 world.addFreshEntity(robit);
                 world.gameEvent(player, GameEvent.ENTITY_PLACE, robit.blockPosition());
@@ -132,11 +129,5 @@ public class ItemRobit extends ItemEnergized implements IItemSustainedInventory 
             }
         }
         return MekanismRobitSkins.BASE;
-    }
-
-    @Override
-    protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
-        capabilities.add(new ItemStackSecurityObject());
-        super.gatherCapabilities(capabilities, stack, nbt);
     }
 }

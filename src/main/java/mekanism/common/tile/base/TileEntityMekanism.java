@@ -56,7 +56,6 @@ import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.capabilities.holder.fluid.IFluidTankHolder;
 import mekanism.common.capabilities.holder.heat.IHeatCapacitorHolder;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
-import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
 import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager.GasHandlerManager;
 import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager.InfusionHandlerManager;
 import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager.PigmentHandlerManager;
@@ -285,7 +284,6 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
         }
         if (hasSecurity()) {
             securityComponent = new TileComponentSecurity(this);
-            addCapabilityResolver(BasicCapabilityResolver.security(this));
         }
         soundEvent = hasSound() ? Attribute.get(block, AttributeSound.class).getSoundEvent() : null;
         ComputerCapabilityHelper.addComputerCapabilities(this, this::addCapabilityResolver);

@@ -11,13 +11,14 @@ import mekanism.api.NBTConstants;
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import mekanism.api.security.ISecurityObject;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.api.security.SecurityMode;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.content.qio.IQIODriveItem;
 import mekanism.common.content.qio.IQIODriveItem.DriveMetadata;
+import mekanism.common.content.qio.IQIODriveItem;
 import mekanism.common.inventory.BinMekanismInventory;
 import mekanism.common.item.block.ItemBlockBin;
 import mekanism.common.item.block.ItemBlockPersonalStorage;
@@ -101,7 +102,7 @@ public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {
         if (item instanceof IItemSustainedInventory || tile != null && tile.persistInventory()) {
             supportedTypes.add(RecipeUpgradeType.ITEM);
         }
-        if (stack.getCapability(Capabilities.OWNER_OBJECT).isPresent() || tile != null && tile.hasSecurity()) {
+        if (SecurityLookup.OWNER.find(stack).isPresent() || tile != null && tile.hasSecurity()) {
             //Note: We only check if it has the owner capability as there is a contract that if there is a security capability
             // there will be an owner one so given our security upgrade supports owner or security we only have to check for owner
             supportedTypes.add(RecipeUpgradeType.SECURITY);
@@ -162,7 +163,7 @@ public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {
                 }
                 //Treat owner items as public even though they are private as we don't want to lower the output
                 // item's security just because it has one item that is owned
-                SecurityMode securityMode = stack.getCapability(Capabilities.SECURITY_OBJECT).map(ISecurityObject::getSecurityMode).orElse(SecurityMode.PUBLIC);
+                SecurityMode securityMode = SecurityLookup.SECURITY.find(stack).map(ISecurityObject::getSecurityMode).orElse(SecurityMode.PUBLIC);
                 yield new SecurityRecipeData(ownerUUID, securityMode);
             }
             case SORTING -> {

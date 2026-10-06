@@ -14,11 +14,10 @@ import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.attribute.Attributes.AttributeSecurity;
-import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
+import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.energy.item.RateLimitEnergyHandler;
-import mekanism.common.capabilities.security.item.ItemStackSecurityObject;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
@@ -88,9 +87,6 @@ public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem {
     }
 
     protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
-        if (Attribute.has(block, AttributeSecurity.class)) {
-            capabilities.add(new ItemStackSecurityObject());
-        }
         if (exposesEnergyCap(stack)) {
             AttributeEnergy attributeEnergy = Attribute.get(block, AttributeEnergy.class);
             FloatingLongSupplier maxEnergy;

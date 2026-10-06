@@ -4,8 +4,6 @@ import java.util.List;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
-import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
-import mekanism.common.capabilities.security.item.ItemStackOwnerObject;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.item.PortableQIODashboardContainer;
 import mekanism.common.item.interfaces.IColoredItem;
@@ -20,7 +18,6 @@ import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.SecurityUtils;
 import mekanism.common.util.text.BooleanStateDisplay.YesNo;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -85,11 +82,5 @@ public class ItemPortableQIODashboard extends CapabilityItem implements IFrequen
                 setColor(stack, frequencyColor);
             }
         }
-    }
-
-    @Override
-    protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
-        capabilities.add(new ItemStackOwnerObject());
-        super.gatherCapabilities(capabilities, stack, nbt);
     }
 }

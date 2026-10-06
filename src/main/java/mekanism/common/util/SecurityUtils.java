@@ -11,13 +11,13 @@ import mekanism.api.functions.TriConsumer;
 import mekanism.api.security.IOwnerObject;
 import mekanism.api.security.ISecurityObject;
 import mekanism.api.security.ISecurityUtils;
+import mekanism.api.security.SecurityLookup;
 import mekanism.api.security.SecurityMode;
 import mekanism.api.text.EnumColor;
 import mekanism.client.MekanismClient;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.base.MekanismPermissions;
-import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.security.SecurityData;
@@ -31,7 +31,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.server.permission.PermissionAPI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,13 +60,13 @@ public final class SecurityUtils implements ISecurityUtils {
 
     @Nullable
     @Override
-    public UUID getOwnerUUID(ICapabilityProvider provider) {
+    public UUID getOwnerUUID(Object provider) {
         Objects.requireNonNull(provider, "Capability provider may not be null.");
-        return provider.getCapability(Capabilities.OWNER_OBJECT).resolve().map(IOwnerObject::getOwnerUUID).orElse(null);
+        return SecurityLookup.OWNER.find(provider).map(IOwnerObject::getOwnerUUID).orElse(null);
     }
 
     @Override
-    public boolean canAccess(Player player, @Nullable ICapabilityProvider provider) {
+    public boolean canAccess(Player player, @Nullable Object provider) {
         //If the player is an op allow bypassing any restrictions
         return isOp(player) || canAccess(player.getUUID(), provider, player.level().isClientSide);
     }
@@ -79,16 +78,16 @@ public final class SecurityUtils implements ISecurityUtils {
     }
 
     @Override
-    public boolean canAccess(@Nullable UUID player, @Nullable ICapabilityProvider provider, boolean isClient) {
+    public boolean canAccess(@Nullable UUID player, @Nullable Object provider, boolean isClient) {
         if (!MekanismConfig.general.allowProtection.get() || provider == null) {
             //If protection is disabled, access is always granted
             return true;
         }
         //Note: We don't just use getSecurityObject here as we support checking access to things that are only owned and don't have security
-        Optional<ISecurityObject> securityCapability = provider.getCapability(Capabilities.SECURITY_OBJECT).resolve();
+        Optional<ISecurityObject> securityCapability = SecurityLookup.SECURITY.find(provider);
         if (securityCapability.isEmpty()) {
             //If it is an owner item but not a security item make sure the owner matches
-            Optional<IOwnerObject> ownerCapability = provider.getCapability(Capabilities.OWNER_OBJECT).resolve();
+            Optional<IOwnerObject> ownerCapability = SecurityLookup.OWNER.find(provider);
             if (ownerCapability.isPresent()) {
                 //If it is an owner object but not a security object make sure the owner matches
                 UUID owner = ownerCapability.get().getOwnerUUID();
@@ -170,12 +169,12 @@ public final class SecurityUtils implements ISecurityUtils {
     }
 
     @Override
-    public SecurityMode getSecurityMode(@Nullable ICapabilityProvider provider, boolean isClient) {
+    public SecurityMode getSecurityMode(@Nullable Object provider, boolean isClient) {
         if (provider == null || !MekanismConfig.general.allowProtection.get()) {
             return SecurityMode.PUBLIC;
         }
-        return provider.getCapability(Capabilities.SECURITY_OBJECT).map(security -> getEffectiveSecurityMode(security, isClient))
-              .orElseGet(() -> provider.getCapability(Capabilities.OWNER_OBJECT).isPresent() ? SecurityMode.PRIVATE : SecurityMode.PUBLIC);
+        return SecurityLookup.SECURITY.find(provider).map(security -> getEffectiveSecurityMode(security, isClient))
+              .orElseGet(() -> SecurityLookup.OWNER.find(provider).isPresent() ? SecurityMode.PRIVATE : SecurityMode.PUBLIC);
     }
 
     @Override
@@ -184,16 +183,16 @@ public final class SecurityUtils implements ISecurityUtils {
         return getFinalData(securityObject, isClient).mode();
     }
 
-    public void incrementSecurityMode(Player player, ICapabilityProvider provider) {
-        provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+    public void incrementSecurityMode(Player player, Object provider) {
+        SecurityLookup.SECURITY.find(provider).ifPresent(security -> {
             if (security.ownerMatches(player)) {
                 security.setSecurityMode(security.getSecurityMode().getNext());
             }
         });
     }
 
-    public void decrementSecurityMode(Player player, ICapabilityProvider provider) {
-        provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+    public void decrementSecurityMode(Player player, Object provider) {
+        SecurityLookup.SECURITY.find(provider).ifPresent(security -> {
             if (security.ownerMatches(player)) {
                 security.setSecurityMode(security.getSecurityMode().getPrevious());
             }
@@ -214,7 +213,7 @@ public final class SecurityUtils implements ISecurityUtils {
     }
 
     public boolean tryClaimItem(Level level, Player player, ItemStack stack) {
-        Optional<IOwnerObject> capability = stack.getCapability(Capabilities.OWNER_OBJECT).resolve();
+        Optional<IOwnerObject> capability = SecurityLookup.OWNER.find(stack);
         if (capability.isPresent()) {
             IOwnerObject ownerObject = capability.get();
             if (ownerObject.getOwnerUUID() == null) {
@@ -236,7 +235,7 @@ public final class SecurityUtils implements ISecurityUtils {
     }
 
     public void addOwnerTooltip(ItemStack stack, List<Component> tooltip) {
-        stack.getCapability(Capabilities.OWNER_OBJECT).ifPresent(ownerObject ->
+        SecurityLookup.OWNER.find(stack).ifPresent(ownerObject ->
               tooltip.add(OwnerDisplay.of(MekanismUtils.tryGetClientPlayer(), ownerObject.getOwnerUUID()).getTextComponent()));
     }
 
@@ -245,7 +244,7 @@ public final class SecurityUtils implements ISecurityUtils {
         Objects.requireNonNull(stack, "Stack to add tooltip for may not be null.");
         Objects.requireNonNull(tooltip, "List of tooltips to add to may not be null.");
         addOwnerTooltip(stack, tooltip);
-        stack.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+        SecurityLookup.SECURITY.find(stack).ifPresent(security -> {
             SecurityData data = getFinalData(security, true);
             tooltip.add(MekanismLang.SECURITY.translateColored(EnumColor.GRAY, data.mode()));
             if (data.override()) {
@@ -254,7 +253,7 @@ public final class SecurityUtils implements ISecurityUtils {
         });
     }
 
-    public void securityChanged(Set<Player> playersUsing, ICapabilityProvider target, SecurityMode old, SecurityMode mode) {
+    public void securityChanged(Set<Player> playersUsing, Object target, SecurityMode old, SecurityMode mode) {
         //If the mode changed and the new security mode is more restrictive than the old one
         // and there are players using the security object
         if (moreRestrictive(old, mode) && !playersUsing.isEmpty()) {

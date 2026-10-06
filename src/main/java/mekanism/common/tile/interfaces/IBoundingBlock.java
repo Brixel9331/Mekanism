@@ -19,9 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public interface IBoundingBlock extends ICapabilityProvider, IComparatorSupport, IOffsetCapability, IUpgradeTile {
 
     Set<Capability<?>> ALWAYS_PROXY = Set.of(
-          Capabilities.CONFIG_CARD,
-          Capabilities.OWNER_OBJECT,
-          Capabilities.SECURITY_OBJECT
+          Capabilities.CONFIG_CARD
     );
 
     default void onBoundingBlockPowerChange(BlockPos boundingPos, int oldLevel, int newLevel) {
