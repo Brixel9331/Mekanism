@@ -205,6 +205,7 @@ public class Mekanism {
         MekanismFluids.FLUIDS.register(modEventBus);
         MekanismContainerTypes.CONTAINER_TYPES.register(modEventBus);
         MekanismCreativeTabs.CREATIVE_TABS.register(modEventBus);
+        MekanismDataSerializers.DATA_SERIALIZERS.register();
         MekanismEntityTypes.ENTITY_TYPES.register();
         MekanismTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         MekanismGameEvents.GAME_EVENTS.register();
@@ -216,7 +217,6 @@ public class Mekanism {
         MekanismFeatures.FEATURES.register();
         MekanismRecipeType.RECIPE_TYPES.register(modEventBus);
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register();
-        MekanismDataSerializers.DATA_SERIALIZERS.register(modEventBus);
         MekanismLootFunctions.REGISTER.register(modEventBus);
         MekanismGases.GASES.register();
         MekanismInfuseTypes.INFUSE_TYPES.register();
