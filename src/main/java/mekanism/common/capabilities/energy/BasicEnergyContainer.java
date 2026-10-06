@@ -7,16 +7,18 @@ import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
-import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.energy.ITransactionalEnergyContainer;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.util.NBTUtils;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
-public class BasicEnergyContainer implements IEnergyContainer {
+public class BasicEnergyContainer extends SnapshotParticipant<FloatingLong> implements ITransactionalEnergyContainer {
 
     public static final Predicate<@NotNull AutomationType> alwaysTrue = ConstantPredicates.alwaysTrue();
     public static final Predicate<@NotNull AutomationType> alwaysFalse = ConstantPredicates.alwaysFalse();
@@ -48,6 +50,7 @@ public class BasicEnergyContainer implements IEnergyContainer {
     }
 
     private FloatingLong stored = FloatingLong.ZERO;
+    private boolean transactionalChange;
     protected final Predicate<@NotNull AutomationType> canExtract;
     protected final Predicate<@NotNull AutomationType> canInsert;
     private final FloatingLong maxEnergy;
@@ -64,7 +67,7 @@ public class BasicEnergyContainer implements IEnergyContainer {
 
     @Override
     public void onContentsChanged() {
-        if (listener != null) {
+        if (!transactionalChange && listener != null) {
             listener.onContentsChanged();
         }
     }
@@ -162,6 +165,51 @@ public class BasicEnergyContainer implements IEnergyContainer {
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        NBTUtils.setFloatingLongIfPresent(nbt, NBTConstants.STORED, this::setEnergy);
+        if (nbt.contains(NBTConstants.STORED, Tag.TAG_STRING)) {
+            try {
+                setEnergy(FloatingLong.parseFloatingLong(nbt.getString(NBTConstants.STORED)));
+            } catch (NumberFormatException e) {
+                setEnergy(FloatingLong.ZERO);
+            }
+        }
+    }
+
+    @Override
+    public FloatingLong insert(FloatingLong amount, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        boolean previous = transactionalChange;
+        transactionalChange = true;
+        try {
+            return insert(amount, Action.EXECUTE, automationType);
+        } finally {
+            transactionalChange = previous;
+        }
+    }
+
+    @Override
+    public FloatingLong extract(FloatingLong amount, TransactionContext transaction, AutomationType automationType) {
+        updateSnapshots(transaction);
+        boolean previous = transactionalChange;
+        transactionalChange = true;
+        try {
+            return extract(amount, Action.EXECUTE, automationType);
+        } finally {
+            transactionalChange = previous;
+        }
+    }
+
+    @Override
+    protected FloatingLong createSnapshot() {
+        return stored.copy();
+    }
+
+    @Override
+    protected void readSnapshot(FloatingLong snapshot) {
+        stored = snapshot.copy();
+    }
+
+    @Override
+    protected void onFinalCommit() {
+        onContentsChanged();
     }
 }
