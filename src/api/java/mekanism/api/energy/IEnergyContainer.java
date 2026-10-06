@@ -7,7 +7,7 @@ import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.FloatingLong;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.util.INBTSerializable;
+import mekanism.api.INBTSerializable;
 
 @NothingNullByDefault
 public interface IEnergyContainer extends INBTSerializable<CompoundTag>, IContentsListener {
