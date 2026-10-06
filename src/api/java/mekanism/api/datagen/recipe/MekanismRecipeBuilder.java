@@ -13,13 +13,13 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,7 +119,7 @@ public abstract class MekanismRecipeBuilder<BUILDER extends MekanismRecipeBuilde
      * @param output   Output to base the recipe name off of.
      */
     protected void build(Consumer<FinishedRecipe> consumer, ItemLike output) {
-        ResourceLocation registryName = ForgeRegistries.ITEMS.getKey(output.asItem());
+        ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(output.asItem());
         if (registryName == null) {
             throw new IllegalStateException("Could not retrieve registry name for output.");
         }
@@ -158,7 +158,7 @@ public abstract class MekanismRecipeBuilder<BUILDER extends MekanismRecipeBuilde
             //Note: This may be null if something is screwed up but this method isn't actually used, so it shouldn't matter
             // and in fact it will probably be null if only the API is included. But again, as we manually just use
             // the serializer's name this should not affect us
-            return ForgeRegistries.RECIPE_SERIALIZERS.getValue(serializerName);
+            return BuiltInRegistries.RECIPE_SERIALIZER.get(serializerName);
         }
 
         @NotNull

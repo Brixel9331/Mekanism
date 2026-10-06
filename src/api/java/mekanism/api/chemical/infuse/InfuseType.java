@@ -8,9 +8,9 @@ import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IInfuseTypeProvider;
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -48,8 +48,8 @@ public class InfuseType extends Chemical<InfuseType> implements IInfuseTypeProvi
     @SuppressWarnings("ConstantConditions")
     public final ResourceLocation getRegistryName() {
         //May be null if called before the object is registered
-        IForgeRegistry<InfuseType> registry = MekanismAPI.infuseTypeRegistry();
-        return registry == null ? null : registry.getKey(this);
+        Registry<InfuseType> registry = MekanismAPI.infuseTypeRegistry();
+        return registry.getResourceKey(this).map(net.minecraft.resources.ResourceKey::location).orElse(null);
     }
 
     @Override

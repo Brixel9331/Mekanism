@@ -10,11 +10,11 @@ import mekanism.api.chemical.attribute.ChemicalAttribute;
 import mekanism.api.chemical.attribute.IChemicalAttributeContainer;
 import mekanism.api.providers.IChemicalProvider;
 import mekanism.api.text.TextComponentUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.registries.tags.IReverseTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,7 +149,7 @@ public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> implements I
      * @return {@code true} if the chemical is in the tag, {@code false} otherwise.
      */
     public boolean is(TagKey<CHEMICAL> tag) {
-        return getReverseTag().map(reverseTag -> reverseTag.containsTag(tag))
+        return getReverseTag().map(reverseTag -> reverseTag.is(tag))
               .orElse(false);
     }
 
@@ -159,7 +159,7 @@ public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> implements I
      * @return All the tags this chemical is a part of.
      */
     public Stream<TagKey<CHEMICAL>> getTags() {
-        return getReverseTag().map(IReverseTag::getTagKeys).orElseGet(Stream::empty);
+        return getReverseTag().map(Holder::tags).orElseGet(Stream::empty);
     }
 
     /**
@@ -167,8 +167,8 @@ public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> implements I
      *
      * @return Corresponding reverse tag or empty.
      */
-    protected Optional<IReverseTag<CHEMICAL>> getReverseTag() {
-        return chemicalTags.getManager().flatMap(manager -> manager.getReverseTag(getChemical()));
+    protected Optional<Holder.Reference<CHEMICAL>> getReverseTag() {
+        return chemicalTags.getHolder(getChemical());
     }
 
     /**

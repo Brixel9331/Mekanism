@@ -1,5 +1,6 @@
 package mekanism.api.chemical;
 
+import io.netty.handler.codec.DecoderException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -11,10 +12,10 @@ import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,7 +112,7 @@ public class ChemicalUtils {
         if (nbtTags == null || nbtTags.isEmpty()) {
             return empty;
         }
-        return registryLookup.apply(new ResourceLocation(nbtTags.getString(nbtName)));
+        return registryLookup.apply(ResourceLocation.tryParse(nbtTags.getString(nbtName)));
     }
 
     /**
@@ -124,11 +125,11 @@ public class ChemicalUtils {
      * @return Chemical.
      */
     public static <CHEMICAL extends Chemical<CHEMICAL>> CHEMICAL readChemicalFromRegistry(@Nullable ResourceLocation name, CHEMICAL empty,
-          IForgeRegistry<CHEMICAL> registry) {
+          Registry<CHEMICAL> registry) {
         if (name == null) {
             return empty;
         }
-        CHEMICAL chemical = registry.getValue(name);
+        CHEMICAL chemical = registry.get(name);
         if (chemical == null) {
             return empty;
         }
@@ -248,6 +249,10 @@ public class ChemicalUtils {
             }
         }
         return extracted;
+    }
+
+    public static <CHEMICAL extends Chemical<CHEMICAL>> CHEMICAL readChemicalFromPacket(FriendlyByteBuf buffer, Registry<CHEMICAL> registry) {
+        return registry.getHolder(buffer.readVarInt()).orElseThrow(() -> new DecoderException("Unknown chemical registry id")).value();
     }
 
     @FunctionalInterface

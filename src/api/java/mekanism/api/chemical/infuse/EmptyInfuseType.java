@@ -1,7 +1,7 @@
 package mekanism.api.chemical.infuse;
 
 import java.util.Optional;
-import net.minecraftforge.registries.tags.IReverseTag;
+import net.minecraft.core.Holder;
 import org.jetbrains.annotations.NotNull;
 
 public final class EmptyInfuseType extends InfuseType {
@@ -12,7 +12,7 @@ public final class EmptyInfuseType extends InfuseType {
 
     @NotNull
     @Override
-    protected Optional<IReverseTag<InfuseType>> getReverseTag() {
+    protected Optional<Holder.Reference<InfuseType>> getReverseTag() {
         //Empty infuse type is in no tags
         return Optional.empty();
     }

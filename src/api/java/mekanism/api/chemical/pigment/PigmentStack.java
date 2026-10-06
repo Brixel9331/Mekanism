@@ -4,10 +4,11 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IPigmentProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -33,7 +34,7 @@ public final class PigmentStack extends ChemicalStack<Pigment> {
     }
 
     @Override
-    protected IForgeRegistry<Pigment> getRegistry() {
+    protected Registry<Pigment> getRegistry() {
         return MekanismAPI.pigmentRegistry();
     }
 
@@ -65,7 +66,7 @@ public final class PigmentStack extends ChemicalStack<Pigment> {
     }
 
     public static PigmentStack readFromPacket(FriendlyByteBuf buf) {
-        Pigment pigment = buf.readRegistryIdSafe(Pigment.class);
+        Pigment pigment = ChemicalUtils.readChemicalFromPacket(buf, MekanismAPI.pigmentRegistry());
         if (pigment.isEmptyType()) {
             return EMPTY;
         }

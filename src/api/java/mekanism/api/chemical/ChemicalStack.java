@@ -10,11 +10,11 @@ import mekanism.api.chemical.attribute.IChemicalAttributeContainer;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.IHasTranslationKey;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 @NothingNullByDefault
@@ -25,13 +25,13 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
     private final Holder.Reference<CHEMICAL> chemicalDelegate;
 
     protected ChemicalStack(CHEMICAL chemical, long amount) {
-        IForgeRegistry<CHEMICAL> registry = getRegistry();
-        if (registry.getKey(chemical) == null) {
+        Registry<CHEMICAL> registry = getRegistry();
+        if (registry.getResourceKey(chemical).isEmpty()) {
             MekanismAPI.logger.error(LogUtils.FATAL_MARKER, "Failed attempt to create a ChemicalStack for an unregistered Chemical {} (type {})",
                   chemical.getRegistryName(), chemical.getClass().getName());
             throw new IllegalArgumentException("Cannot create a ChemicalStack from an unregistered Chemical");
         }
-        this.chemicalDelegate = registry.getDelegateOrThrow(chemical);
+        this.chemicalDelegate = registry.getHolder(registry.getResourceKey(chemical).orElseThrow()).orElseThrow();
         this.amount = amount;
         updateEmpty();
     }
@@ -39,7 +39,7 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
     /**
      * Registry the chemical is a part of.
      */
-    protected abstract IForgeRegistry<CHEMICAL> getRegistry();
+    protected abstract Registry<CHEMICAL> getRegistry();
 
     /**
      * Helper ot get the empty version of this chemical.
@@ -115,7 +115,7 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
     }
 
     public final CHEMICAL getRaw() {
-        return chemicalDelegate.get();
+        return chemicalDelegate.value();
     }
 
     /**
@@ -273,7 +273,7 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
      * @param buffer - Buffer to write to.
      */
     public void writeToPacket(FriendlyByteBuf buffer) {
-        buffer.writeRegistryId(getRegistry(), getType());
+        buffer.writeId(getRegistry(), getType());
         if (!isEmpty()) {
             buffer.writeVarLong(getAmount());
         }

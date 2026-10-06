@@ -13,13 +13,12 @@ import mekanism.api.chemical.slurry.EmptySlurry;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.gear.ModuleData;
 import mekanism.api.robit.RobitSkin;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 @NothingNullByDefault
@@ -109,19 +108,6 @@ public class MekanismAPI {
      */
     public static final ResourceKey<Registry<Codec<? extends RobitSkin>>> ROBIT_SKIN_SERIALIZER_REGISTRY_NAME = codecRegistryKey(RobitSkin.class, "robit_skin_serializer");
 
-    @Nullable
-    private static IForgeRegistry<Gas> GAS_REGISTRY;
-    @Nullable
-    private static IForgeRegistry<InfuseType> INFUSE_TYPE_REGISTRY;
-    @Nullable
-    private static IForgeRegistry<Pigment> PIGMENT_REGISTRY;
-    @Nullable
-    private static IForgeRegistry<Slurry> SLURRY_REGISTRY;
-    @Nullable
-    private static IForgeRegistry<ModuleData<?>> MODULE_REGISTRY;
-    @Nullable
-    private static IForgeRegistry<Codec<? extends RobitSkin>> ROBIT_SKIN_SERIALIZER_REGISTRY;
-
     //Note: None of the empty variants support registry replacement
     //TODO: Potentially define these with ObjectHolder for purposes of fully defining them outside of the API
     // would have some minor issues with how the empty stacks are declared
@@ -151,11 +137,8 @@ public class MekanismAPI {
      * have been fired. This method is marked as {@link NotNull} just because except for when this is being called super early it is never {@code null}.
      * @see #GAS_REGISTRY_NAME
      */
-    public static IForgeRegistry<Gas> gasRegistry() {
-        if (GAS_REGISTRY == null) {
-            GAS_REGISTRY = RegistryManager.ACTIVE.getRegistry(GAS_REGISTRY_NAME);
-        }
-        return GAS_REGISTRY;
+    public static Registry<Gas> gasRegistry() {
+        return Registries.GAS_REGISTRY;
     }
 
     /**
@@ -168,11 +151,8 @@ public class MekanismAPI {
      * called super early it is never {@code null}.
      * @see #INFUSE_TYPE_REGISTRY_NAME
      */
-    public static IForgeRegistry<InfuseType> infuseTypeRegistry() {
-        if (INFUSE_TYPE_REGISTRY == null) {
-            INFUSE_TYPE_REGISTRY = RegistryManager.ACTIVE.getRegistry(INFUSE_TYPE_REGISTRY_NAME);
-        }
-        return INFUSE_TYPE_REGISTRY;
+    public static Registry<InfuseType> infuseTypeRegistry() {
+        return Registries.INFUSE_TYPE_REGISTRY;
     }
 
     /**
@@ -184,11 +164,8 @@ public class MekanismAPI {
      * have been fired. This method is marked as {@link NotNull} just because except for when this is being called super early it is never {@code null}.
      * @see #PIGMENT_REGISTRY_NAME
      */
-    public static IForgeRegistry<Pigment> pigmentRegistry() {
-        if (PIGMENT_REGISTRY == null) {
-            PIGMENT_REGISTRY = RegistryManager.ACTIVE.getRegistry(PIGMENT_REGISTRY_NAME);
-        }
-        return PIGMENT_REGISTRY;
+    public static Registry<Pigment> pigmentRegistry() {
+        return Registries.PIGMENT_REGISTRY;
     }
 
     /**
@@ -200,11 +177,8 @@ public class MekanismAPI {
      * have been fired. This method is marked as {@link NotNull} just because except for when this is being called super early it is never {@code null}.
      * @see #SLURRY_REGISTRY_NAME
      */
-    public static IForgeRegistry<Slurry> slurryRegistry() {
-        if (SLURRY_REGISTRY == null) {
-            SLURRY_REGISTRY = RegistryManager.ACTIVE.getRegistry(SLURRY_REGISTRY_NAME);
-        }
-        return SLURRY_REGISTRY;
+    public static Registry<Slurry> slurryRegistry() {
+        return Registries.SLURRY_REGISTRY;
     }
 
     /**
@@ -217,11 +191,8 @@ public class MekanismAPI {
      * called super early it is never {@code null}.
      * @see #MODULE_REGISTRY_NAME
      */
-    public static IForgeRegistry<ModuleData<?>> moduleRegistry() {
-        if (MODULE_REGISTRY == null) {
-            MODULE_REGISTRY = RegistryManager.ACTIVE.getRegistry(MODULE_REGISTRY_NAME);
-        }
-        return MODULE_REGISTRY;
+    public static Registry<ModuleData<?>> moduleRegistry() {
+        return Registries.MODULE_REGISTRY;
     }
 
     /**
@@ -235,10 +206,28 @@ public class MekanismAPI {
      * @see #ROBIT_SKIN_SERIALIZER_REGISTRY_NAME
      * @since 10.4.0
      */
-    public static IForgeRegistry<Codec<? extends RobitSkin>> robitSkinSerializerRegistry() {
-        if (ROBIT_SKIN_SERIALIZER_REGISTRY == null) {
-            ROBIT_SKIN_SERIALIZER_REGISTRY = RegistryManager.ACTIVE.getRegistry(ROBIT_SKIN_SERIALIZER_REGISTRY_NAME);
+    public static Registry<Codec<? extends RobitSkin>> robitSkinSerializerRegistry() {
+        return Registries.ROBIT_SKIN_SERIALIZER_REGISTRY;
+    }
+
+    private static final class Registries {
+
+        private static final Registry<Gas> GAS_REGISTRY = createChemicalRegistry(GAS_REGISTRY_NAME, EMPTY_GAS);
+        private static final Registry<InfuseType> INFUSE_TYPE_REGISTRY = createChemicalRegistry(INFUSE_TYPE_REGISTRY_NAME, EMPTY_INFUSE_TYPE);
+        private static final Registry<Pigment> PIGMENT_REGISTRY = createChemicalRegistry(PIGMENT_REGISTRY_NAME, EMPTY_PIGMENT);
+        private static final Registry<Slurry> SLURRY_REGISTRY = createChemicalRegistry(SLURRY_REGISTRY_NAME, EMPTY_SLURRY);
+        private static final Registry<ModuleData<?>> MODULE_REGISTRY = createRegistry(MODULE_REGISTRY_NAME);
+        private static final Registry<Codec<? extends RobitSkin>> ROBIT_SKIN_SERIALIZER_REGISTRY = createRegistry(ROBIT_SKIN_SERIALIZER_REGISTRY_NAME);
+
+        private static <T> Registry<T> createRegistry(ResourceKey<Registry<T>> key) {
+            return FabricRegistryBuilder.createSimple(key).attribute(RegistryAttribute.SYNCED).buildAndRegister();
         }
-        return ROBIT_SKIN_SERIALIZER_REGISTRY;
+
+        private static <T> Registry<T> createChemicalRegistry(ResourceKey<Registry<T>> key, T empty) {
+            ResourceLocation emptyId = new ResourceLocation(MEKANISM_MODID, "empty");
+            Registry<T> registry = FabricRegistryBuilder.createDefaulted(key, emptyId).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+            Registry.register(registry, emptyId, empty);
+            return registry;
+        }
     }
 }

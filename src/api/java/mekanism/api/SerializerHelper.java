@@ -22,6 +22,7 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 @NothingNullByDefault
@@ -214,7 +214,7 @@ public class SerializerHelper {
             throw new JsonSyntaxException("Expected amount to be greater than zero.");
         }
         ResourceLocation resourceLocation = new ResourceLocation(GsonHelper.getAsString(json, JsonConstants.FLUID));
-        Fluid fluid = ForgeRegistries.FLUIDS.getValue(resourceLocation);
+        Fluid fluid = BuiltInRegistries.FLUID.get(resourceLocation);
         if (fluid == null || fluid == Fluids.EMPTY) {
             throw new JsonSyntaxException("Invalid fluid type '" + resourceLocation + "'");
         }
@@ -309,7 +309,7 @@ public class SerializerHelper {
      */
     public static JsonElement serializeItemStack(@NotNull ItemStack stack) {
         JsonObject json = new JsonObject();
-        json.addProperty(JsonConstants.ITEM, ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+        json.addProperty(JsonConstants.ITEM, BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
         if (stack.getCount() > 1) {
             json.addProperty(JsonConstants.COUNT, stack.getCount());
         }
@@ -328,7 +328,7 @@ public class SerializerHelper {
      */
     public static JsonElement serializeFluidStack(@NotNull FluidStack stack) {
         JsonObject json = new JsonObject();
-        json.addProperty(JsonConstants.FLUID, ForgeRegistries.FLUIDS.getKey(stack.getFluid()).toString());
+        json.addProperty(JsonConstants.FLUID, BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
         json.addProperty(JsonConstants.AMOUNT, stack.getAmount());
         if (stack.hasTag()) {
             json.addProperty(JsonConstants.NBT, stack.getTag().toString());
