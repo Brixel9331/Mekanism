@@ -117,6 +117,12 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
     modImplementation include("teamreborn:energy:${team_reborn_energy_version}")
+    modImplementation("me.lucko:fabric-permissions-api:0.3.1") {
+        transitive = false
+    }
+    include("me.lucko:fabric-permissions-api:0.3.1") {
+        transitive = false
+    }
     modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     modCompileOnly "mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}"
     modLocalRuntime "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
