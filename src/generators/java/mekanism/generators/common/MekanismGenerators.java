@@ -78,13 +78,13 @@ public class MekanismGenerators implements IModModule {
         modEventBus.addListener(this::onConfigLoad);
         modEventBus.addListener(this::imcQueue);
 
-        GeneratorsItems.ITEMS.register(modEventBus);
-        GeneratorsBlocks.BLOCKS.register(modEventBus);
+        GeneratorsItems.ITEMS.register();
+        GeneratorsBlocks.BLOCKS.register();
         GeneratorsFluids.FLUIDS.register(modEventBus);
         GeneratorsCreativeTabs.CREATIVE_TABS.register(modEventBus);
         GeneratorsSounds.SOUND_EVENTS.register();
         GeneratorsContainerTypes.CONTAINER_TYPES.register(modEventBus);
-        GeneratorsTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
+        GeneratorsTileEntityTypes.TILE_ENTITY_TYPES.register();
         GeneratorsGases.GASES.register();
         GeneratorsModules.MODULES.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle

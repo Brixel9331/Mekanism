@@ -67,10 +67,10 @@ public class MekanismAdditions implements IModModule {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::onConfigLoad);
-        AdditionsItems.ITEMS.register(modEventBus);
-        AdditionsBlocks.BLOCKS.register(modEventBus);
-        AdditionsCreativeTabs.CREATIVE_TABS.register(modEventBus);
         AdditionsEntityTypes.ENTITY_TYPES.register();
+        AdditionsItems.ITEMS.register();
+        AdditionsBlocks.BLOCKS.register();
+        AdditionsCreativeTabs.CREATIVE_TABS.register(modEventBus);
         AdditionsSounds.SOUND_EVENTS.register();
         AdditionsBiomeModifierSerializers.BIOME_MODIFIER_SERIALIZERS.register(modEventBus);
         AdditionsStructureModifierSerializers.STRUCTURE_MODIFIER_SERIALIZERS.register(modEventBus);

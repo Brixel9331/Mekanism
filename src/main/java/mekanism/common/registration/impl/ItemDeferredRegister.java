@@ -10,22 +10,23 @@ import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.common.content.gear.ModuleHelper;
 import mekanism.common.item.ItemModule;
-import mekanism.common.registration.WrappedDeferredRegister;
+import mekanism.common.registration.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemDeferredRegister extends WrappedDeferredRegister<Item> {
+public class ItemDeferredRegister extends DeferredRegister<Item> {
 
     private final List<IItemProvider> allItems = new ArrayList<>();
 
     public ItemDeferredRegister(String modid) {
-        super(modid, ForgeRegistries.ITEMS);
+        super(modid, Registries.ITEM, () -> BuiltInRegistries.ITEM);
     }
 
     public ItemRegistryObject<Item> register(String name) {
@@ -69,9 +70,9 @@ public class ItemDeferredRegister extends WrappedDeferredRegister<Item> {
         return registeredItem;
     }
 
-    public <ENTITY extends Mob> ItemRegistryObject<ForgeSpawnEggItem> registerSpawnEgg(EntityTypeRegistryObject<ENTITY> entityTypeProvider,
+    public <ENTITY extends Mob> ItemRegistryObject<SpawnEggItem> registerSpawnEgg(EntityTypeRegistryObject<ENTITY> entityTypeProvider,
           int primaryColor, int secondaryColor) {
-        return register(entityTypeProvider.getInternalRegistryName() + "_spawn_egg", props -> new ForgeSpawnEggItem(entityTypeProvider, primaryColor,
+        return register(entityTypeProvider.getInternalRegistryName() + "_spawn_egg", props -> new SpawnEggItem(entityTypeProvider.get(), primaryColor,
               secondaryColor, props));
     }
 
