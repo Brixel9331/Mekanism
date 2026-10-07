@@ -16,7 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.DifferenceIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 @NothingNullByDefault
@@ -65,6 +65,6 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
     }
 
     public static Ingredient difference(TagKey<Item> base, ItemLike subtracted) {
-        return DifferenceIngredient.of(Ingredient.of(base), Ingredient.of(subtracted));
+        return DefaultCustomIngredients.difference(Ingredient.of(base), Ingredient.of(subtracted));
     }
 }
