@@ -1,5 +1,19 @@
 {
   "values": [
-    "#forge:tools/wrench"
+    "#forge:tools/wrench",
+    "#forge:tools/bows",
+    "#forge:tools/crossbows",
+    "#forge:tools/fishing_rods",
+    "#forge:tools/tridents",
+    "#forge:tools/shields",
+    "#minecraft:swords",
+    "#minecraft:axes",
+    "#minecraft:pickaxes",
+    "#minecraft:shovels",
+    "#minecraft:hoes",
+    {
+      "id": "#c:tools",
+      "required": false
+    }
   ]
 }

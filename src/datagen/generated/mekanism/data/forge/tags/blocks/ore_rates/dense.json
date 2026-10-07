@@ -1,6 +1,16 @@
 {
   "values": [
     "mekanism:fluorite_ore",
-    "mekanism:deepslate_fluorite_ore"
+    "mekanism:deepslate_fluorite_ore",
+    "minecraft:copper_ore",
+    "minecraft:deepslate_copper_ore",
+    "minecraft:redstone_ore",
+    "minecraft:deepslate_redstone_ore",
+    "minecraft:lapis_ore",
+    "minecraft:deepslate_lapis_ore",
+    {
+      "id": "#c:ore_rates/dense",
+      "required": false
+    }
   ]
 }

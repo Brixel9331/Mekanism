@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:hazmat_boots"
+    "mekanism:hazmat_boots",
+    {
+      "id": "#c:armors/boots/hazmat",
+      "required": false
+    }
   ]
 }

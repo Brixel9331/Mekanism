@@ -1,0 +1,25 @@
+{
+  "values": [
+    "#forge:glass/colorless",
+    "#forge:glass/white",
+    "#forge:glass/orange",
+    "#forge:glass/magenta",
+    "#forge:glass/light_blue",
+    "#forge:glass/yellow",
+    "#forge:glass/lime",
+    "#forge:glass/pink",
+    "#forge:glass/gray",
+    "#forge:glass/light_gray",
+    "#forge:glass/cyan",
+    "#forge:glass/purple",
+    "#forge:glass/blue",
+    "#forge:glass/brown",
+    "#forge:glass/green",
+    "#forge:glass/red",
+    "#forge:glass/black",
+    {
+      "id": "#c:silica_glass_blocks",
+      "required": false
+    }
+  ]
+}

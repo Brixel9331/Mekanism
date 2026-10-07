@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:hydrogen",
-    "mekanism:flowing_hydrogen"
+    "mekanism:flowing_hydrogen",
+    {
+      "id": "#c:hydrogen",
+      "required": false
+    }
   ]
 }

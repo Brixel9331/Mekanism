@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:sulfur_dioxide",
-    "mekanism:flowing_sulfur_dioxide"
+    "mekanism:flowing_sulfur_dioxide",
+    {
+      "id": "#c:sulfur_dioxide",
+      "required": false
+    }
   ]
 }

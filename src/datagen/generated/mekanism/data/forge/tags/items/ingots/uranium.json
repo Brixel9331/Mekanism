@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_uranium"
+    "mekanism:ingot_uranium",
+    {
+      "id": "#c:uranium_ingots",
+      "required": false
+    }
   ]
 }

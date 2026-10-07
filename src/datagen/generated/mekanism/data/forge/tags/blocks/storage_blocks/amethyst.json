@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:amethyst_block",
+    {
+      "id": "#c:amethyst_blocks",
+      "required": false
+    }
+  ]
+}

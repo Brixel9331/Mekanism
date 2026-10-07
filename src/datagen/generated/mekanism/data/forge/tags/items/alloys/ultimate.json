@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:alloy_atomic"
+    "mekanism:alloy_atomic",
+    {
+      "id": "#c:alloys/ultimate",
+      "required": false
+    }
   ]
 }

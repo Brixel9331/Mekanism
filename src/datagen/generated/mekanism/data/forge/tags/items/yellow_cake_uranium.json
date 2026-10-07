@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:yellow_cake_uranium"
+    "mekanism:yellow_cake_uranium",
+    {
+      "id": "#c:yellow_cake_uranium",
+      "required": false
+    }
   ]
 }

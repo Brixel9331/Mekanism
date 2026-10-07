@@ -9,18 +9,18 @@ import mekanism.tools.common.item.ItemMekanismPaxel;
 import mekanism.tools.common.item.ItemMekanismPickaxe;
 import mekanism.tools.common.registries.ToolsItems;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 public class ToolsTagProvider extends BaseTagProvider {
 
-    public ToolsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, MekanismTools.MODID, existingFileHelper);
+    public ToolsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, MekanismTools.MODID);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addPaxels() {
-        getItemBuilder(Tags.Items.TOOLS).add(ToolsTags.Items.TOOLS_PAXELS);
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "tools"))).add(ToolsTags.Items.TOOLS_PAXELS);
         getItemBuilder(ItemTags.TOOLS).add(ToolsTags.Items.TOOLS_PAXELS);
         getItemBuilder(ToolsTags.Items.TOOLS_PAXELS).add(
               //Vanilla Paxels
@@ -196,7 +196,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addShields() {
-        getItemBuilder(Tags.Items.TOOLS_SHIELDS).add(
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "tools/shields"))).add(
               ToolsTags.Items.TOOLS_SHIELDS_BRONZE,
               ToolsTags.Items.TOOLS_SHIELDS_LAPIS_LAZULI,
               ToolsTags.Items.TOOLS_SHIELDS_OSMIUM,
@@ -213,7 +213,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addHelmets() {
-        getItemBuilder(Tags.Items.ARMORS_HELMETS).add(
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "armors/helmets"))).add(
               ToolsTags.Items.ARMORS_HELMETS_BRONZE,
               ToolsTags.Items.ARMORS_HELMETS_LAPIS_LAZULI,
               ToolsTags.Items.ARMORS_HELMETS_OSMIUM,
@@ -230,7 +230,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addChestplates() {
-        getItemBuilder(Tags.Items.ARMORS_CHESTPLATES).add(
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "armors/chestplates"))).add(
               ToolsTags.Items.ARMORS_CHESTPLATES_BRONZE,
               ToolsTags.Items.ARMORS_CHESTPLATES_LAPIS_LAZULI,
               ToolsTags.Items.ARMORS_CHESTPLATES_OSMIUM,
@@ -247,7 +247,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addLeggings() {
-        getItemBuilder(Tags.Items.ARMORS_LEGGINGS).add(
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "armors/leggings"))).add(
               ToolsTags.Items.ARMORS_LEGGINGS_BRONZE,
               ToolsTags.Items.ARMORS_LEGGINGS_LAPIS_LAZULI,
               ToolsTags.Items.ARMORS_LEGGINGS_OSMIUM,
@@ -264,7 +264,7 @@ public class ToolsTagProvider extends BaseTagProvider {
     }
 
     private void addBoots() {
-        getItemBuilder(Tags.Items.ARMORS_BOOTS).add(
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "armors/boots"))).add(
               ToolsTags.Items.ARMORS_BOOTS_BRONZE,
               ToolsTags.Items.ARMORS_BOOTS_LAPIS_LAZULI,
               ToolsTags.Items.ARMORS_BOOTS_OSMIUM,

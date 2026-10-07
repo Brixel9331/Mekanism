@@ -1,6 +1,12 @@
 {
   "values": [
     "#forge:chests/electric",
-    "#forge:chests/personal"
+    "#forge:chests/personal",
+    "#forge:chests/wooden",
+    "#forge:chests/ender",
+    {
+      "id": "#c:chests",
+      "required": false
+    }
   ]
 }

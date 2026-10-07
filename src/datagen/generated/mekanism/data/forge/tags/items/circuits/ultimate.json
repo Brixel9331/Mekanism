@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ultimate_control_circuit"
+    "mekanism:ultimate_control_circuit",
+    {
+      "id": "#c:circuits/ultimate",
+      "required": false
+    }
   ]
 }

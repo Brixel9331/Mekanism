@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:oxygen",
-    "mekanism:flowing_oxygen"
+    "mekanism:flowing_oxygen",
+    {
+      "id": "#c:oxygen",
+      "required": false
+    }
   ]
 }

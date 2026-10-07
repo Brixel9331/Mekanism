@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_fence_gate",
     "mekanismadditions:white_plastic_fence_gate",
     "mekanismadditions:brown_plastic_fence_gate",
-    "mekanismadditions:pink_plastic_fence_gate"
+    "mekanismadditions:pink_plastic_fence_gate",
+    {
+      "id": "#c:plastic_fence_gates",
+      "required": false
+    }
   ]
 }

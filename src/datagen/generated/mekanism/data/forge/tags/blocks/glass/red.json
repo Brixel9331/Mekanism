@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:red_stained_glass",
+    {
+      "id": "#c:red_glass_blocks",
+      "required": false
+    }
+  ]
+}

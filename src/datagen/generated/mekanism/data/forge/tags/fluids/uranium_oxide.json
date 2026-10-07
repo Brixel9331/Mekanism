@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:uranium_oxide",
-    "mekanism:flowing_uranium_oxide"
+    "mekanism:flowing_uranium_oxide",
+    {
+      "id": "#c:uranium_oxide",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:personal_chest"
+    "mekanism:personal_chest",
+    {
+      "id": "#c:personal_chests",
+      "required": false
+    }
   ]
 }

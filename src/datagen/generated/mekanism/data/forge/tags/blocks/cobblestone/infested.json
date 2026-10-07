@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:infested_cobblestone",
+    {
+      "id": "#c:cobblestone/infested",
+      "required": false
+    }
+  ]
+}

@@ -64,7 +64,7 @@ public class MekanismDataGenerator {
         gen.addProvider(event.includeClient(), new MekanismItemModelProvider(output, existingFileHelper));
         gen.addProvider(event.includeClient(), new MekanismBlockStateProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new MekanismTagProvider(output, lookupProvider, existingFileHelper));
+        gen.addProvider(event.includeServer(), new MekanismTagProvider(output, lookupProvider));
         addProvider(gen, event.includeServer(), MekanismLootProvider::new);
         gen.addProvider(event.includeServer(), drProvider);
         MekanismRecipeProvider recipeProvider = new MekanismRecipeProvider(output, existingFileHelper);

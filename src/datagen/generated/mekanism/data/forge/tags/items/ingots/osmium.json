@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_osmium"
+    "mekanism:ingot_osmium",
+    {
+      "id": "#c:osmium_ingots",
+      "required": false
+    }
   ]
 }

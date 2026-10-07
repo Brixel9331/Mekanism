@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#forge:glass/silica",
+    "#forge:glass/tinted",
+    {
+      "id": "#c:glass_blocks",
+      "required": false
+    }
+  ]
+}

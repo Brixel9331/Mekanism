@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:elite_control_circuit"
+    "mekanism:elite_control_circuit",
+    {
+      "id": "#c:circuits/elite",
+      "required": false
+    }
   ]
 }

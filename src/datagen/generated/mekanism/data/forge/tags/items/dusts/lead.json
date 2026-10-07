@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_lead"
+    "mekanism:dust_lead",
+    {
+      "id": "#c:lead_dusts",
+      "required": false
+    }
   ]
 }

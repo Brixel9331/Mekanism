@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#c:raw_osmium_ores",
+    "#c:raw_tin_ores",
+    "#c:raw_lead_ores",
+    "#c:raw_uranium_ores",
+    "#c:raw_iron_ores",
+    "#c:raw_gold_ores",
+    "#c:raw_copper_ores"
+  ]
+}

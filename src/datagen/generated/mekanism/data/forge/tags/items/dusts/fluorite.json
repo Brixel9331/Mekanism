@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_fluorite"
+    "mekanism:dust_fluorite",
+    {
+      "id": "#c:fluorite_dusts",
+      "required": false
+    }
   ]
 }

@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_transparent_stairs",
     "mekanismadditions:white_plastic_transparent_stairs",
     "mekanismadditions:brown_plastic_transparent_stairs",
-    "mekanismadditions:pink_plastic_transparent_stairs"
+    "mekanismadditions:pink_plastic_transparent_stairs",
+    {
+      "id": "#c:stairs/plastic/transparent",
+      "required": false
+    }
   ]
 }

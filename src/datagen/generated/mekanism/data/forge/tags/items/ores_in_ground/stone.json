@@ -4,6 +4,18 @@
     "mekanism:osmium_ore",
     "mekanism:uranium_ore",
     "mekanism:fluorite_ore",
-    "mekanism:lead_ore"
+    "mekanism:lead_ore",
+    "minecraft:iron_ore",
+    "minecraft:gold_ore",
+    "minecraft:copper_ore",
+    "minecraft:redstone_ore",
+    "minecraft:lapis_ore",
+    "minecraft:coal_ore",
+    "minecraft:diamond_ore",
+    "minecraft:emerald_ore",
+    {
+      "id": "#c:ores_in_ground/stone",
+      "required": false
+    }
   ]
 }

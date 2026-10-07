@@ -3,6 +3,13 @@
     "#forge:raw_materials/osmium",
     "#forge:raw_materials/tin",
     "#forge:raw_materials/lead",
-    "#forge:raw_materials/uranium"
+    "#forge:raw_materials/uranium",
+    "#forge:raw_materials/iron",
+    "#forge:raw_materials/gold",
+    "#forge:raw_materials/copper",
+    {
+      "id": "#c:raw_ores",
+      "required": false
+    }
   ]
 }

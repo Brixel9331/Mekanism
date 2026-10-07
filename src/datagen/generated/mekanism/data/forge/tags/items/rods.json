@@ -1,5 +1,11 @@
 {
   "values": [
-    "#forge:rods/plastic"
+    "#forge:rods/plastic",
+    "#forge:rods/wooden",
+    "#forge:rods/blaze",
+    {
+      "id": "#c:rods",
+      "required": false
+    }
   ]
 }

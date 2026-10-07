@@ -1,5 +1,9 @@
 {
   "values": [
-    "#forge:dusts/wood"
+    "#forge:dusts/wood",
+    {
+      "id": "#c:sawdust",
+      "required": false
+    }
   ]
 }

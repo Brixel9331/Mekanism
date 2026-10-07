@@ -1,5 +1,9 @@
 {
   "values": [
-    "#forge:dusts/salt"
+    "#forge:dusts/salt",
+    {
+      "id": "#c:salt",
+      "required": false
+    }
   ]
 }

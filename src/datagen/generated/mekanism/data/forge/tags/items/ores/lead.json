@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:lead_ore",
-    "mekanism:deepslate_lead_ore"
+    "mekanism:deepslate_lead_ore",
+    {
+      "id": "#c:lead_ores",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_steel"
+    "mekanism:block_steel",
+    {
+      "id": "#c:steel_blocks",
+      "required": false
+    }
   ]
 }

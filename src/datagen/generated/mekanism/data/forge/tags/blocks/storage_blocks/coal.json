@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:coal_block",
+    {
+      "id": "#c:coal_blocks",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "values": [
+    "#c:bronze_blocks",
+    "#c:charcoal_blocks",
+    "#c:refined_glowstone_blocks",
+    "#c:refined_obsidian_blocks",
+    "#c:steel_blocks",
+    "#c:fluorite_blocks",
+    "#c:osmium_blocks",
+    "#c:raw_osmium_blocks",
+    "#c:tin_blocks",
+    "#c:raw_tin_blocks",
+    "#c:lead_blocks",
+    "#c:raw_lead_blocks",
+    "#c:uranium_blocks",
+    "#c:raw_uranium_blocks",
+    "#c:iron_blocks",
+    "#c:gold_blocks",
+    "#c:copper_blocks",
+    "#c:netherite_blocks",
+    "#c:redstone_blocks",
+    "#c:lapis_blocks",
+    "#c:coal_blocks",
+    "#c:diamond_blocks",
+    "#c:emerald_blocks",
+    "#c:quartz_blocks",
+    "#c:amethyst_blocks",
+    "#c:raw_iron_blocks",
+    "#c:raw_gold_blocks",
+    "#c:raw_copper_blocks"
+  ]
+}

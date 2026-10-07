@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:hazmat_gown"
+    "mekanism:hazmat_gown",
+    {
+      "id": "#c:armors/chestplates/hazmat",
+      "required": false
+    }
   ]
 }

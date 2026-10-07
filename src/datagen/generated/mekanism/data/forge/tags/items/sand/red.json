@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:red_sand",
+    {
+      "id": "#c:sand/red",
+      "required": false
+    }
+  ]
+}

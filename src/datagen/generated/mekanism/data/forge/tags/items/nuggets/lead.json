@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:nugget_lead"
+    "mekanism:nugget_lead",
+    {
+      "id": "#c:lead_nuggets",
+      "required": false
+    }
   ]
 }

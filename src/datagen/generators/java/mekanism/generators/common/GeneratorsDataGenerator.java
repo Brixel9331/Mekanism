@@ -39,7 +39,7 @@ public class GeneratorsDataGenerator {
         gen.addProvider(event.includeClient(), new GeneratorsItemModelProvider(output, existingFileHelper));
         gen.addProvider(event.includeClient(), new GeneratorsBlockStateProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new GeneratorsTagProvider(output, lookupProvider, existingFileHelper));
+        gen.addProvider(event.includeServer(), new GeneratorsTagProvider(output, lookupProvider));
         MekanismDataGenerator.addProvider(gen, event.includeServer(), GeneratorsLootProvider::new);
         gen.addProvider(event.includeServer(), new GeneratorsRecipeProvider(output, existingFileHelper));
         gen.addProvider(event.includeServer(), new GeneratorsAdvancementProvider(output, existingFileHelper));

@@ -1,0 +1,12 @@
+{
+  "values": [
+    "#forge:cobblestone/normal",
+    "#forge:cobblestone/deepslate",
+    "#forge:cobblestone/mossy",
+    "#forge:cobblestone/infested",
+    {
+      "id": "#c:cobblestone",
+      "required": false
+    }
+  ]
+}

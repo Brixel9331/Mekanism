@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:alloy_reinforced"
+    "mekanism:alloy_reinforced",
+    {
+      "id": "#c:alloys/elite",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:pellet_antimatter"
+    "mekanism:pellet_antimatter",
+    {
+      "id": "#c:pellets/antimatter",
+      "required": false
+    }
   ]
 }

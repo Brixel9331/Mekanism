@@ -3,6 +3,10 @@
     "#forge:circuits/basic",
     "#forge:circuits/advanced",
     "#forge:circuits/elite",
-    "#forge:circuits/ultimate"
+    "#forge:circuits/ultimate",
+    {
+      "id": "#c:circuits",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_refined_glowstone"
+    "mekanism:ingot_refined_glowstone",
+    {
+      "id": "#c:refined_glowstone_ingots",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:raw_uranium"
+    "mekanism:raw_uranium",
+    {
+      "id": "#c:raw_uranium_ores",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_tin"
+    "mekanism:ingot_tin",
+    {
+      "id": "#c:tin_ingots",
+      "required": false
+    }
   ]
 }

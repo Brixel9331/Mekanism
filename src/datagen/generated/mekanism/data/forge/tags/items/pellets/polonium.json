@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:pellet_polonium"
+    "mekanism:pellet_polonium",
+    {
+      "id": "#c:pellets/polonium",
+      "required": false
+    }
   ]
 }

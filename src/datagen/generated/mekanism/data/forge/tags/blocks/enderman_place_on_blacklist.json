@@ -14,6 +14,10 @@
     "mekanism:structural_glass",
     "mekanism:sps_casing",
     "mekanism:sps_port",
-    "mekanism:supercharged_coil"
+    "mekanism:supercharged_coil",
+    {
+      "id": "#c:enderman_place_on_blacklist",
+      "required": false
+    }
   ]
 }

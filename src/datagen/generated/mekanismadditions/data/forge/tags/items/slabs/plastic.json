@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_slab",
     "mekanismadditions:white_plastic_slab",
     "mekanismadditions:brown_plastic_slab",
-    "mekanismadditions:pink_plastic_slab"
+    "mekanismadditions:pink_plastic_slab",
+    {
+      "id": "#c:slabs/plastic",
+      "required": false
+    }
   ]
 }

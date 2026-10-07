@@ -7,6 +7,12 @@
     "#forge:nuggets/bronze",
     "#forge:nuggets/refined_glowstone",
     "#forge:nuggets/refined_obsidian",
-    "#forge:nuggets/steel"
+    "#forge:nuggets/steel",
+    "#forge:nuggets/iron",
+    "#forge:nuggets/gold",
+    {
+      "id": "#c:nuggets",
+      "required": false
+    }
   ]
 }

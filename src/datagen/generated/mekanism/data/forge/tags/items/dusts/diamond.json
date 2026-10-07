@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_diamond"
+    "mekanism:dust_diamond",
+    {
+      "id": "#c:diamond_dusts",
+      "required": false
+    }
   ]
 }

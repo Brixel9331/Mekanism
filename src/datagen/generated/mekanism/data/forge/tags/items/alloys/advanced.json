@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:alloy_infused"
+    "mekanism:alloy_infused",
+    {
+      "id": "#c:alloys/advanced",
+      "required": false
+    }
   ]
 }

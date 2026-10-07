@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:raw_lead"
+    "mekanism:raw_lead",
+    {
+      "id": "#c:raw_lead_ores",
+      "required": false
+    }
   ]
 }

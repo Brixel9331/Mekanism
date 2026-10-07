@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_refined_obsidian"
+    "mekanism:block_refined_obsidian",
+    {
+      "id": "#c:refined_obsidian_blocks",
+      "required": false
+    }
   ]
 }

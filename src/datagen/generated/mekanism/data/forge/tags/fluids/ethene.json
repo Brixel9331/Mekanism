@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:ethene",
-    "mekanism:flowing_ethene"
+    "mekanism:flowing_ethene",
+    {
+      "id": "#c:ethene",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:advanced_control_circuit"
+    "mekanism:advanced_control_circuit",
+    {
+      "id": "#c:circuits/advanced",
+      "required": false
+    }
   ]
 }

@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_transparent_slab",
     "mekanismadditions:white_plastic_transparent_slab",
     "mekanismadditions:brown_plastic_transparent_slab",
-    "mekanismadditions:pink_plastic_transparent_slab"
+    "mekanismadditions:pink_plastic_transparent_slab",
+    {
+      "id": "#c:slabs/plastic/transparent",
+      "required": false
+    }
   ]
 }

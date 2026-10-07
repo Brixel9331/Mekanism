@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:personal_barrel"
+    "mekanism:personal_barrel",
+    {
+      "id": "#c:personal_barrels",
+      "required": false
+    }
   ]
 }

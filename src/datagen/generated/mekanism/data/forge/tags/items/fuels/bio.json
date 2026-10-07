@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:bio_fuel"
+    "mekanism:bio_fuel",
+    {
+      "id": "#c:fuels/bio",
+      "required": false
+    }
   ]
 }

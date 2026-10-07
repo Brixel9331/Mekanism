@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:chlorine",
-    "mekanism:flowing_chlorine"
+    "mekanism:flowing_chlorine",
+    {
+      "id": "#c:chlorine",
+      "required": false
+    }
   ]
 }

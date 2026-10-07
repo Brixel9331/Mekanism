@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:redstone_block",
+    {
+      "id": "#c:redstone_blocks",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:orange_stained_glass",
+    {
+      "id": "#c:orange_glass_blocks",
+      "required": false
+    }
+  ]
+}

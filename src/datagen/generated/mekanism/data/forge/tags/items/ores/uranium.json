@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:uranium_ore",
-    "mekanism:deepslate_uranium_ore"
+    "mekanism:deepslate_uranium_ore",
+    {
+      "id": "#c:uranium_ores",
+      "required": false
+    }
   ]
 }

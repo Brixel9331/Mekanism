@@ -4,6 +4,20 @@
     "#forge:ores/osmium",
     "#forge:ores/uranium",
     "#forge:ores/fluorite",
-    "#forge:ores/lead"
+    "#forge:ores/lead",
+    "#forge:ores/iron",
+    "#forge:ores/gold",
+    "#forge:ores/copper",
+    "#forge:ores/redstone",
+    "#forge:ores/lapis",
+    "#forge:ores/coal",
+    "#forge:ores/diamond",
+    "#forge:ores/emerald",
+    "#forge:ores/quartz",
+    "#forge:ores/netherite_scrap",
+    {
+      "id": "#c:ores",
+      "required": false
+    }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:iron_ingot",
+    {
+      "id": "#c:iron_ingots",
+      "required": false
+    }
+  ]
+}

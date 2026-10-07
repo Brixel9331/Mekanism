@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_tin"
+    "mekanism:block_tin",
+    {
+      "id": "#c:tin_blocks",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_netherite"
+    "mekanism:dust_netherite",
+    {
+      "id": "#c:netherite_dusts",
+      "required": false
+    }
   ]
 }

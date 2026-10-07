@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_bronze"
+    "mekanism:ingot_bronze",
+    {
+      "id": "#c:bronze_ingots",
+      "required": false
+    }
   ]
 }

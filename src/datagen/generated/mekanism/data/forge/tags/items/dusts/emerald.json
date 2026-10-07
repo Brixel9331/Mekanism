@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_emerald"
+    "mekanism:dust_emerald",
+    {
+      "id": "#c:emerald_dusts",
+      "required": false
+    }
   ]
 }

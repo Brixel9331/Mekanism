@@ -2,6 +2,10 @@
   "values": [
     "#forge:alloys/advanced",
     "#forge:alloys/elite",
-    "#forge:alloys/ultimate"
+    "#forge:alloys/ultimate",
+    {
+      "id": "#c:alloys",
+      "required": false
+    }
   ]
 }

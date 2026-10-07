@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_raw_uranium"
+    "mekanism:block_raw_uranium",
+    {
+      "id": "#c:raw_uranium_blocks",
+      "required": false
+    }
   ]
 }

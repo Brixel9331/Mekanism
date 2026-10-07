@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:netherite_block",
+    {
+      "id": "#c:netherite_blocks",
+      "required": false
+    }
+  ]
+}

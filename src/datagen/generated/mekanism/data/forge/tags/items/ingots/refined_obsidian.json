@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_refined_obsidian"
+    "mekanism:ingot_refined_obsidian",
+    {
+      "id": "#c:refined_obsidian_ingots",
+      "required": false
+    }
   ]
 }

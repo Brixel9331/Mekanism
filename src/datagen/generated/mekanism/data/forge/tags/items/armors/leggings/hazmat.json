@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:hazmat_pants"
+    "mekanism:hazmat_pants",
+    {
+      "id": "#c:armors/leggings/hazmat",
+      "required": false
+    }
   ]
 }

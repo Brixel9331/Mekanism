@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:crossbow",
+    {
+      "id": "#c:crossbows",
+      "required": false
+    }
+  ]
+}

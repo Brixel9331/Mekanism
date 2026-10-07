@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_osmium"
+    "mekanism:dust_osmium",
+    {
+      "id": "#c:osmium_dusts",
+      "required": false
+    }
   ]
 }

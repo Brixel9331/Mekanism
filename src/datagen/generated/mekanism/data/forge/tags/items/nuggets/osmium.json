@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:nugget_osmium"
+    "mekanism:nugget_osmium",
+    {
+      "id": "#c:osmium_nuggets",
+      "required": false
+    }
   ]
 }

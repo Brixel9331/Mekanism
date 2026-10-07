@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_lithium"
+    "mekanism:dust_lithium",
+    {
+      "id": "#c:lithium_dusts",
+      "required": false
+    }
   ]
 }

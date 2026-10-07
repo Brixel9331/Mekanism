@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_fluorite"
+    "mekanism:block_fluorite",
+    {
+      "id": "#c:fluorite_blocks",
+      "required": false
+    }
   ]
 }

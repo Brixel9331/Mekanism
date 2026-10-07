@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:configurator"
+    "mekanism:configurator",
+    {
+      "id": "#c:wrenches",
+      "required": false
+    }
   ]
 }

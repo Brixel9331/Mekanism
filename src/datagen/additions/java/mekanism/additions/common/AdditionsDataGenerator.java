@@ -41,7 +41,7 @@ public class AdditionsDataGenerator {
         gen.addProvider(event.includeClient(), new AdditionsItemModelProvider(output, existingFileHelper));
         gen.addProvider(event.includeClient(), new AdditionsBlockStateProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new AdditionsTagProvider(output, lookupProvider, existingFileHelper));
+        gen.addProvider(event.includeServer(), new AdditionsTagProvider(output, lookupProvider));
         MekanismDataGenerator.addProvider(gen, event.includeServer(), AdditionsLootProvider::new);
         gen.addProvider(event.includeServer(), drProvider);
         gen.addProvider(event.includeServer(), new AdditionsRecipeProvider(output, existingFileHelper));

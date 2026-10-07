@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:energy_tablet"
+    "mekanism:energy_tablet",
+    {
+      "id": "#c:batteries",
+      "required": false
+    }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:emerald_block",
+    {
+      "id": "#c:emerald_blocks",
+      "required": false
+    }
+  ]
+}

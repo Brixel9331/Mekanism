@@ -1,5 +1,15 @@
 {
   "values": [
-    "#forge:gems/fluorite"
+    "#forge:gems/fluorite",
+    "#forge:gems/diamond",
+    "#forge:gems/emerald",
+    "#forge:gems/quartz",
+    "#forge:gems/lapis",
+    "#forge:gems/amethyst",
+    "#forge:gems/prismarine",
+    {
+      "id": "#c:gems",
+      "required": false
+    }
   ]
 }

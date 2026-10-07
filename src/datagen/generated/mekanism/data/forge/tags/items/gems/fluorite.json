@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:fluorite_gem"
+    "mekanism:fluorite_gem",
+    {
+      "id": "#c:fluorite_gems",
+      "required": false
+    }
   ]
 }

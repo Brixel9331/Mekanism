@@ -7,6 +7,16 @@
     "#forge:ingots/bronze",
     "#forge:ingots/refined_glowstone",
     "#forge:ingots/refined_obsidian",
-    "#forge:ingots/steel"
+    "#forge:ingots/steel",
+    "#forge:ingots/iron",
+    "#forge:ingots/gold",
+    "#forge:ingots/copper",
+    "#forge:ingots/netherite",
+    "#forge:ingots/brick",
+    "#forge:ingots/nether_brick",
+    {
+      "id": "#c:ingots",
+      "required": false
+    }
   ]
 }

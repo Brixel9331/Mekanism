@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:nugget_tin"
+    "mekanism:nugget_tin",
+    {
+      "id": "#c:tin_nuggets",
+      "required": false
+    }
   ]
 }

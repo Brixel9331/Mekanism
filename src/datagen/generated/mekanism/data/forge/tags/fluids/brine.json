@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:brine",
-    "mekanism:flowing_brine"
+    "mekanism:flowing_brine",
+    {
+      "id": "#c:brine",
+      "required": false
+    }
   ]
 }

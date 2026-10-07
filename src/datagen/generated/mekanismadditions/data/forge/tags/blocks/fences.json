@@ -1,5 +1,9 @@
 {
   "values": [
-    "#forge:fences/plastic"
+    "#forge:fences/plastic",
+    {
+      "id": "#c:fences",
+      "required": false
+    }
   ]
 }

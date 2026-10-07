@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_glow_stairs",
     "mekanismadditions:white_plastic_glow_stairs",
     "mekanismadditions:brown_plastic_glow_stairs",
-    "mekanismadditions:pink_plastic_glow_stairs"
+    "mekanismadditions:pink_plastic_glow_stairs",
+    {
+      "id": "#c:stairs/plastic/glow",
+      "required": false
+    }
   ]
 }

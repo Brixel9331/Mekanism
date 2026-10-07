@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:block_raw_lead"
+    "mekanism:block_raw_lead",
+    {
+      "id": "#c:raw_lead_blocks",
+      "required": false
+    }
   ]
 }

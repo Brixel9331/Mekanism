@@ -4,6 +4,18 @@
     "mekanism:deepslate_osmium_ore",
     "mekanism:deepslate_uranium_ore",
     "mekanism:deepslate_fluorite_ore",
-    "mekanism:deepslate_lead_ore"
+    "mekanism:deepslate_lead_ore",
+    "minecraft:deepslate_iron_ore",
+    "minecraft:deepslate_gold_ore",
+    "minecraft:deepslate_copper_ore",
+    "minecraft:deepslate_redstone_ore",
+    "minecraft:deepslate_lapis_ore",
+    "minecraft:deepslate_coal_ore",
+    "minecraft:deepslate_diamond_ore",
+    "minecraft:deepslate_emerald_ore",
+    {
+      "id": "#c:ores_in_ground/deepslate",
+      "required": false
+    }
   ]
 }

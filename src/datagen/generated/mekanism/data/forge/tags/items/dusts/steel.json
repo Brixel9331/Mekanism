@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_steel"
+    "mekanism:dust_steel",
+    {
+      "id": "#c:steel_dusts",
+      "required": false
+    }
   ]
 }

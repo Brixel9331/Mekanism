@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_steel"
+    "mekanism:ingot_steel",
+    {
+      "id": "#c:steel_ingots",
+      "required": false
+    }
   ]
 }

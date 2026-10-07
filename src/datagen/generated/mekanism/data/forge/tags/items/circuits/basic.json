@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:basic_control_circuit"
+    "mekanism:basic_control_circuit",
+    {
+      "id": "#c:circuits/basic",
+      "required": false
+    }
   ]
 }

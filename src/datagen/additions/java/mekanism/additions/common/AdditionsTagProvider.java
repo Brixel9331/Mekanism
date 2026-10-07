@@ -11,7 +11,9 @@ import mekanism.api.providers.IItemProvider;
 import mekanism.common.tag.BaseTagProvider;
 import mekanism.common.tag.MekanismTagProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
@@ -21,14 +23,11 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 public class AdditionsTagProvider extends BaseTagProvider {
 
-    public AdditionsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, MekanismAdditions.MODID, existingFileHelper);
+    public AdditionsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, MekanismAdditions.MODID);
     }
 
     @Override
@@ -94,16 +93,16 @@ public class AdditionsTagProvider extends BaseTagProvider {
 
     private void addFences() {
         addToTags(AdditionsTags.Items.FENCES_PLASTIC, AdditionsTags.Blocks.FENCES_PLASTIC, AdditionsBlocks.PLASTIC_FENCES);
-        getItemBuilder(Tags.Items.FENCES).add(AdditionsTags.Items.FENCES_PLASTIC);
-        getBlockBuilder(Tags.Blocks.FENCES).add(AdditionsTags.Blocks.FENCES_PLASTIC);
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "fences"))).add(AdditionsTags.Items.FENCES_PLASTIC);
+        getBlockBuilder(TagKey.create(Registries.BLOCK, new ResourceLocation("forge", "fences"))).add(AdditionsTags.Blocks.FENCES_PLASTIC);
         getItemBuilder(ItemTags.FENCES).add(AdditionsTags.Items.FENCES_PLASTIC);
         getBlockBuilder(BlockTags.FENCES).add(AdditionsTags.Blocks.FENCES_PLASTIC);
     }
 
     private void addFenceGates() {
         addToTags(AdditionsTags.Items.FENCE_GATES_PLASTIC, AdditionsTags.Blocks.FENCE_GATES_PLASTIC, AdditionsBlocks.PLASTIC_FENCE_GATES);
-        getItemBuilder(Tags.Items.FENCE_GATES).add(AdditionsTags.Items.FENCE_GATES_PLASTIC);
-        getBlockBuilder(Tags.Blocks.FENCE_GATES).add(AdditionsTags.Blocks.FENCE_GATES_PLASTIC);
+        getItemBuilder(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "fence_gates"))).add(AdditionsTags.Items.FENCE_GATES_PLASTIC);
+        getBlockBuilder(TagKey.create(Registries.BLOCK, new ResourceLocation("forge", "fence_gates"))).add(AdditionsTags.Blocks.FENCE_GATES_PLASTIC);
         getItemBuilder(ItemTags.FENCE_GATES).add(AdditionsTags.Items.FENCE_GATES_PLASTIC);
         getBlockBuilder(BlockTags.FENCE_GATES).add(AdditionsTags.Blocks.FENCE_GATES_PLASTIC);
     }

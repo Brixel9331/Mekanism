@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:nugget_bronze"
+    "mekanism:nugget_bronze",
+    {
+      "id": "#c:bronze_nuggets",
+      "required": false
+    }
   ]
 }

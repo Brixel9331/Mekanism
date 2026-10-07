@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:dust_copper"
+    "mekanism:dust_copper",
+    {
+      "id": "#c:copper_dusts",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:ingot_lead"
+    "mekanism:ingot_lead",
+    {
+      "id": "#c:lead_ingots",
+      "required": false
+    }
   ]
 }

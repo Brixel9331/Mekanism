@@ -14,17 +14,17 @@ import mekanism.generators.common.registries.GeneratorsFluids;
 import mekanism.generators.common.registries.GeneratorsGases;
 import mekanism.generators.common.registries.GeneratorsTileEntityTypes;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 public class GeneratorsTagProvider extends BaseTagProvider {
 
-    public GeneratorsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, MekanismGenerators.MODID, existingFileHelper);
+    public GeneratorsTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, MekanismGenerators.MODID);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class GeneratorsTagProvider extends BaseTagProvider {
     }
 
     private void addEndermanBlacklist() {
-        addToTag(Tags.Blocks.ENDERMAN_PLACE_ON_BLACKLIST,
+        addToTag(TagKey.create(Registries.BLOCK, new ResourceLocation("forge", "enderman_place_on_blacklist")),
               GeneratorsBlocks.TURBINE_CASING,
               GeneratorsBlocks.TURBINE_VALVE,
               GeneratorsBlocks.TURBINE_VENT,

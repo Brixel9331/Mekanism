@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:ancient_debris",
+    {
+      "id": "#c:netherite_ores",
+      "required": false
+    }
+  ]
+}

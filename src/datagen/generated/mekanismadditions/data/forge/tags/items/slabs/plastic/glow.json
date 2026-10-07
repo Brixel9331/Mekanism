@@ -17,6 +17,10 @@
     "mekanismadditions:yellow_plastic_glow_slab",
     "mekanismadditions:white_plastic_glow_slab",
     "mekanismadditions:brown_plastic_glow_slab",
-    "mekanismadditions:pink_plastic_glow_slab"
+    "mekanismadditions:pink_plastic_glow_slab",
+    {
+      "id": "#c:slabs/plastic/glow",
+      "required": false
+    }
   ]
 }

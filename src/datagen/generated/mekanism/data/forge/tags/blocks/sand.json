@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#forge:sand/colorless",
+    "#forge:sand/red",
+    {
+      "id": "#c:sand",
+      "required": false
+    }
+  ]
+}

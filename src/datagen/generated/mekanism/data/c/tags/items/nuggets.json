@@ -1,0 +1,14 @@
+{
+  "values": [
+    "#c:osmium_nuggets",
+    "#c:tin_nuggets",
+    "#c:lead_nuggets",
+    "#c:uranium_nuggets",
+    "#c:bronze_nuggets",
+    "#c:refined_glowstone_nuggets",
+    "#c:refined_obsidian_nuggets",
+    "#c:steel_nuggets",
+    "#c:iron_nuggets",
+    "#c:gold_nuggets"
+  ]
+}

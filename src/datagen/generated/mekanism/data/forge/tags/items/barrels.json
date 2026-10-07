@@ -1,0 +1,9 @@
+{
+  "values": [
+    "#forge:barrels/wooden",
+    {
+      "id": "#c:barrels",
+      "required": false
+    }
+  ]
+}

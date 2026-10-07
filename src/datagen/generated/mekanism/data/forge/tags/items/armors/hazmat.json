@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanism:hazmat_mask"
+    "mekanism:hazmat_mask",
+    {
+      "id": "#c:armors/hazmat",
+      "required": false
+    }
   ]
 }

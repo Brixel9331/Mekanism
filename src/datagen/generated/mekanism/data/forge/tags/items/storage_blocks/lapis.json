@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:lapis_block",
+    {
+      "id": "#c:lapis_blocks",
+      "required": false
+    }
+  ]
+}

@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanism:steam",
-    "mekanism:flowing_steam"
+    "mekanism:flowing_steam",
+    {
+      "id": "#c:gaseous",
+      "required": false
+    }
   ]
 }
