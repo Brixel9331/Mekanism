@@ -49,14 +49,14 @@ sourceSets {
     }
 }
 
-for (String moduleName : modules) {
+modules.each { String moduleName ->
     def module = sourceSets.create(moduleName)
     module.resources.srcDir "src/datagen/generated/mekanism${moduleName}"
     module.compileClasspath += sourceSets.api.output + sourceSets.main.output
     module.runtimeClasspath += sourceSets.api.output + sourceSets.main.output
 }
 
-for (String moduleName : ['main'] + modules) {
+(['main'] + modules).each { String moduleName ->
     def module = sourceSets.getByName(moduleName)
     if (moduleName != 'main') {
         module.compileClasspath += sourceSets.main.compileClasspath
@@ -89,7 +89,7 @@ sourceSets.api.compileClasspath += configurations.compileClasspath
 sourceSets.api.runtimeClasspath += configurations.runtimeClasspath
 sourceSets.test.compileClasspath += sourceSets.api.output
 sourceSets.test.runtimeClasspath += sourceSets.api.output
-for (String moduleName : modules) {
+modules.each { String moduleName ->
     sourceSets.test.compileClasspath += sourceSets.getByName(moduleName).output
     sourceSets.test.runtimeClasspath += sourceSets.getByName(moduleName).output
 }
@@ -108,7 +108,7 @@ loom {
             sourceSet sourceSets.api
             sourceSet sourceSets.main
         }
-        for (String moduleName : modules) {
+        modules.each { String moduleName ->
             register("mekanism${moduleName}") {
                 sourceSet sourceSets.getByName(moduleName)
             }
@@ -195,7 +195,7 @@ tasks.named('jar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
-for (String moduleName : modules) {
+modules.each { String moduleName ->
     def module = sourceSets.getByName(moduleName)
     def moduleJar = tasks.register(module.jarTaskName, Jar) {
         from module.output
@@ -220,7 +220,7 @@ for (String moduleName : modules) {
 
 tasks.named('sourcesJar', Jar) {
     from sourceSets.api.allSource
-    for (String moduleName : modules) {
+    modules.each { String moduleName ->
         from sourceSets.getByName(moduleName).allSource
     }
 }
