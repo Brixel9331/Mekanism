@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "mekanism_datagen",
+  "version": "${version}",
+  "name": "mekanism data generation",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "mekanism.common.MekanismDataGenerator"
+    ]
+  },
+  "depends": {
+    "mekanism": "*",
+    "fabric-data-generation-api-v1": "*",
+    "porting_lib_data": "*",
+    "porting_lib_model_generators": "*"
+  }
+}

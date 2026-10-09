@@ -23,6 +23,10 @@ repositories {
         content { includeGroup 'io.github.fabricators_of_create.Porting-Lib' }
     }
     maven { url = 'https://maven.blamejared.com' }
+    maven {
+        url = 'https://maven.thiakil.com'
+        content { includeGroup 'com.thiakil' }
+    }
     maven { url = 'https://maven.shedaniel.me' }
     maven { url = 'https://maven.terraformersmc.com/releases' }
     maven {
@@ -68,8 +72,8 @@ modules.each { String moduleName ->
     data.compileClasspath += sourceSets.api.output + sourceSets.main.output + module.output + sourceSets.main.compileClasspath
     data.runtimeClasspath += sourceSets.api.output + sourceSets.main.output + module.output + sourceSets.main.runtimeClasspath
     if (moduleName != 'main') {
-        data.compileClasspath += sourceSets.datagenMain.output
-        data.runtimeClasspath += sourceSets.datagenMain.output
+        data.compileClasspath += sourceSets.datagenMain.output + sourceSets.datagenMain.compileClasspath
+        data.runtimeClasspath += sourceSets.datagenMain.output + sourceSets.datagenMain.runtimeClasspath
     }
     tasks.named(module.compileJavaTaskName, JavaCompile) {
         options.annotationProcessorPath = configurations.annotationProcessor
@@ -82,8 +86,18 @@ modules.each { String moduleName ->
     }
     configurations.named(data.implementationConfigurationName) {
         extendsFrom configurations.implementation
+        if (moduleName != 'main') {
+            extendsFrom configurations.datagenMainImplementation
+        }
     }
 }
+
+sourceSets.datagenMain.java.exclude(
+      'mekanism/common/recipe/compat/BYGRecipeProvider.java',
+      'mekanism/common/recipe/compat/ILikeWoodRecipeProvider.java',
+      'mekanism/common/recipe/compat/ILikeWoodBOPRecipeProvider.java',
+      'mekanism/common/recipe/compat/ILikeWoodBYGRecipeProvider.java'
+)
 
 sourceSets.api.compileClasspath += configurations.compileClasspath
 sourceSets.api.runtimeClasspath += configurations.runtimeClasspath
@@ -102,6 +116,9 @@ configurations {
 
 loom {
     createRemapConfigurations(sourceSets.test)
+    (['main'] + modules).each { String moduleName ->
+        createRemapConfigurations(sourceSets.getByName("datagen${moduleName.capitalize()}"))
+    }
     accessWidenerPath = file('src/main/resources/mekanism.accesswidener')
     mods {
         mekanism {
@@ -123,6 +140,22 @@ loom {
             programArg 'nogui'
         }
     }
+    (['main'] + modules).each { String moduleName ->
+        def data = sourceSets.getByName("datagen${moduleName.capitalize()}")
+        def modId = "mekanism${moduleName == 'main' ? '' : moduleName}"
+        mods.register("${modId}_datagen") { sourceSet data }
+        runs.register("datagen${moduleName.capitalize()}") {
+            client()
+            source data
+            property 'fabric-api.datagen'
+            property 'fabric-api.datagen.strict-validation'
+            property 'fabric-api.datagen.modid', "${modId}_datagen"
+            property 'fabric-api.datagen.output-dir', providers.gradleProperty('datagenOutput').getOrElse(file("src/datagen/generated/${modId}").absolutePath)
+            runDir project.relativePath(providers.gradleProperty('datagenRunDir').getOrElse(layout.buildDirectory.dir("datagen-runtime/${moduleName}").get().asFile.absolutePath))
+            ideConfigGenerated false
+        }
+    }
+
 }
 
 dependencies {
@@ -134,6 +167,20 @@ dependencies {
         modImplementation include("io.github.fabricators_of_create.Porting-Lib:${portingModule}:${porting_lib_version}") {
             transitive = false
         }
+    }
+    for (String portingModule : ['data', 'model_generators', 'model_materials', 'utility']) {
+        modDatagenMainImplementation("io.github.fabricators_of_create.Porting-Lib:${portingModule}:${porting_lib_version}") {
+            transitive = false
+        }
+    }
+    modDatagenMainRuntimeOnly("com.blamejared.crafttweaker:CraftTweaker-fabric-${minecraft_version}:${crafttweaker_version}") {
+        exclude group: 'org.ow2.asm'
+        exclude group: 'org.slf4j'
+        exclude group: 'net.fabricmc'
+        exclude group: 'net.fabricmc.fabric-api'
+    }
+    datagenMainImplementation("com.thiakil:yaml-ops:${yamlops_version}") {
+        exclude group: 'com.mojang', module: 'datafixerupper'
     }
     modImplementation include("teamreborn:energy:${team_reborn_energy_version}")
     modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:8.0.3") {
