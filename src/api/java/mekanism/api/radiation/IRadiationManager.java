@@ -51,7 +51,7 @@ public interface IRadiationManager {
      *
      * @since 10.4.0
      */
-    IRadiationManager INSTANCE = ServiceLoader.load(IRadiationManager.class).findFirst().orElseThrow(() -> new IllegalStateException("No valid ServiceImpl for IRadiationManager found"));
+    IRadiationManager INSTANCE = ServiceLoader.load(IRadiationManager.class, IRadiationManager.class.getClassLoader()).findFirst().orElseThrow(() -> new IllegalStateException("No valid ServiceImpl for IRadiationManager found"));
 
     /**
      * Helper to expose the ability to check if Mekanism's radiation system is enabled in the config.

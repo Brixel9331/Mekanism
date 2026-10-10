@@ -12,7 +12,7 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 @Internal
 public interface ITooltipHelper {
 
-    ITooltipHelper INSTANCE = ServiceLoader.load(ITooltipHelper.class).findFirst().orElseThrow(() -> new IllegalStateException("No valid ServiceImpl for ITooltipHelper found"));
+    ITooltipHelper INSTANCE = ServiceLoader.load(ITooltipHelper.class, ITooltipHelper.class.getClassLoader()).findFirst().orElseThrow(() -> new IllegalStateException("No valid ServiceImpl for ITooltipHelper found"));
 
     Component getEnergyPerMBDisplayShort(FloatingLong energy);
 
