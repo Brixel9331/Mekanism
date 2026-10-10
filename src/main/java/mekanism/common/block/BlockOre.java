@@ -6,18 +6,14 @@ import mekanism.common.block.interfaces.IHasDescription;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.resource.ore.OreType;
 import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockOre extends Block implements IHasDescription {
+public class BlockOre extends DropExperienceBlock implements IHasDescription {
 
     private final OreType ore;
     private String descriptionTranslationKey;
@@ -28,7 +24,7 @@ public class BlockOre extends Block implements IHasDescription {
     }
 
     public BlockOre(OreType ore, BlockBehaviour.Properties properties) {
-        super(properties);
+        super(properties, UniformInt.of(ore.getMinExp(), ore.getMaxExp()));
         this.ore = ore;
     }
 
@@ -46,11 +42,4 @@ public class BlockOre extends Block implements IHasDescription {
         return this::getDescriptionTranslationKey;
     }
 
-    @Override
-    public int getExpDrop(BlockState state, LevelReader reader, RandomSource random, BlockPos pos, int fortune, int silkTouch) {
-        if (ore.getMaxExp() > 0 && silkTouch == 0) {
-            return Mth.nextInt(random, ore.getMinExp(), ore.getMaxExp());
-        }
-        return super.getExpDrop(state, reader, random, pos, fortune, silkTouch);
-    }
 }
