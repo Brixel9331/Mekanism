@@ -5,15 +5,27 @@ import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.recipe.ISubRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 //TODO: Decide if we should have compat recipes go into their own data packs
 @NothingNullByDefault
 public abstract class CompatRecipeProvider implements ISubRecipeProvider {
+
+    protected Item item(String path) {
+        ResourceLocation id = new ResourceLocation(modid, path);
+        return BuiltInRegistries.ITEM.getOptional(id).orElseThrow(() -> new IllegalStateException("Missing compatibility item " + id));
+    }
+
+    protected Block block(String path) {
+        ResourceLocation id = new ResourceLocation(modid, path);
+        return BuiltInRegistries.BLOCK.getOptional(id).orElseThrow(() -> new IllegalStateException("Missing compatibility block " + id));
+    }
 
     protected final String modid;
     protected final ConditionJsonProvider modLoaded;
@@ -49,6 +61,6 @@ public abstract class CompatRecipeProvider implements ISubRecipeProvider {
     }
 
     protected TagKey<Item> tag(String path) {
-        return ItemTags.create(rl(path));
+        return TagKey.create(Registries.ITEM, rl(path));
     }
 }
