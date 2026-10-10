@@ -6,6 +6,10 @@ import net.minecraft.world.item.ItemStack;
 
 public interface IItemStackProperties {
 
+    default int getMaxDamage(ItemStack stack) {
+        return ((Item) this).getMaxDamage();
+    }
+
     default int getMaxStackSize(ItemStack stack) {
         return ((Item) this).getMaxStackSize();
     }
