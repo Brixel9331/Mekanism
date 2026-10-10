@@ -1,9 +1,9 @@
 package mekanism.tools.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.client.texture.BaseSpriteSourceProvider;
 import mekanism.tools.common.MekanismTools;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ToolsSpriteSourceProvider extends BaseSpriteSourceProvider {
 

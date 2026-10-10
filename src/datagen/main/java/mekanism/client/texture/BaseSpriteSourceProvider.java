@@ -1,5 +1,7 @@
 package mekanism.client.texture;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.data.SpriteSourceProvider;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -10,18 +12,16 @@ import mekanism.common.registration.impl.FluidDeferredRegister.MekanismFluidType
 import mekanism.common.registration.impl.FluidRegistryObject;
 import net.minecraft.client.renderer.texture.atlas.sources.DirectoryLister;
 import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
+import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.SpriteSourceProvider;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public abstract class BaseSpriteSourceProvider extends SpriteSourceProvider {
 
     private final Set<ResourceLocation> trackedSingles = new HashSet<>();
 
     protected BaseSpriteSourceProvider(PackOutput output, String modid, ExistingFileHelper fileHelper) {
-        super(output, fileHelper, modid);
+        super(output, modid);
     }
 
     protected void addFiles(SourceList atlas, ResourceLocation... resourceLocations) {
@@ -41,8 +41,8 @@ public abstract class BaseSpriteSourceProvider extends SpriteSourceProvider {
         addChemicalSprites(atlas, MekanismAPI.slurryRegistry());
     }
 
-    private <CHEMICAL extends Chemical<CHEMICAL>> void addChemicalSprites(SourceList atlas, IForgeRegistry<CHEMICAL> chemicalRegistry) {
-        for (Chemical<?> chemical : chemicalRegistry.getValues()) {
+    private <CHEMICAL extends Chemical<CHEMICAL>> void addChemicalSprites(SourceList atlas, Registry<CHEMICAL> chemicalRegistry) {
+        for (Chemical<?> chemical : chemicalRegistry) {
             //TODO - 1.20: Evaluate this
             if (chemical.getRegistryName().getNamespace().equals(modid)) {
                 addFiles(atlas, chemical.getIcon());

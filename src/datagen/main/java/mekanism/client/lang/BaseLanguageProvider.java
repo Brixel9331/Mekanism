@@ -1,5 +1,6 @@
 package mekanism.client.lang;
 
+import io.github.fabricators_of_create.porting_lib.data.LanguageProvider;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import mekanism.api.gear.ModuleData;
@@ -18,7 +19,6 @@ import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.data.LanguageProvider;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseLanguageProvider extends LanguageProvider {

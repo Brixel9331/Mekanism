@@ -1,5 +1,8 @@
 package mekanism.tools.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.models.generators.ModelFile.ExistingModelFile;
+import io.github.fabricators_of_create.porting_lib.models.generators.item.ItemModelBuilder;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.model.BaseItemModelProvider;
 import mekanism.common.Mekanism;
@@ -11,9 +14,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ModelFile.ExistingModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ToolsItemModelProvider extends BaseItemModelProvider {
 

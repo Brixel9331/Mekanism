@@ -3,6 +3,7 @@ package mekanism.client.texture;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -19,7 +20,6 @@ import net.minecraft.data.PackOutput.PathProvider;
 import net.minecraft.data.PackOutput.Target;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class PrideRobitTextureProvider implements DataProvider {

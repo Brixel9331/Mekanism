@@ -2,34 +2,39 @@ package mekanism.common.registries;
 
 import it.unimi.dsi.fastutil.booleans.Boolean2ObjectFunction;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import mekanism.common.world.modifier.BiomeModifier;
 import mekanism.common.world.modifier.StructureModifier;
 import mekanism.common.world.modifier.WorldgenModifiers;
-import net.minecraft.core.Holder.Reference;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BaseDatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
+public abstract class BaseDatapackRegistryProvider extends FabricDynamicRegistryProvider {
 
     private final String modid;
 
-    protected BaseDatapackRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, RegistrySetBuilder registrySetBuilder, String modid) {
-        super(output, registries, registrySetBuilder, Set.of(modid));
+    protected BaseDatapackRegistryProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries, String modid) {
+        super(output, registries);
         this.modid = modid;
+    }
+
+    @Override
+    protected void configure(HolderLookup.Provider registries, Entries entries) {
+        DynamicRegistries.getDynamicRegistries().forEach(registry ->
+              registries.lookup(registry.key()).ifPresent(entries::addAll));
     }
 
     @NotNull

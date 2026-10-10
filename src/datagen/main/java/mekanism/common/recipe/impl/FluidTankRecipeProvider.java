@@ -13,11 +13,11 @@ import mekanism.common.recipe.pattern.RecipePattern;
 import mekanism.common.recipe.pattern.RecipePattern.TripleLine;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.registries.MekanismBlocks;
+import mekanism.common.tag.MekanismDataTags;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.Tags;
 
 class FluidTankRecipeProvider implements ISubRecipeProvider {
 
@@ -35,7 +35,7 @@ class FluidTankRecipeProvider implements ISubRecipeProvider {
                     TripleLine.of(Pattern.ALLOY, Pattern.INGOT, Pattern.ALLOY),
                     TripleLine.of(Pattern.INGOT, Pattern.EMPTY, Pattern.INGOT),
                     TripleLine.of(Pattern.ALLOY, Pattern.INGOT, Pattern.ALLOY))
-              ).key(Pattern.INGOT, Tags.Items.INGOTS_IRON)
+              ).key(Pattern.INGOT, MekanismDataTags.Items.INGOTS_IRON)
               .key(Pattern.ALLOY, MekanismTags.Items.ALLOYS_BASIC)
               .build(consumer, Mekanism.rl(basePath + "basic"));
         addTieredFluidTank(consumer, basePath, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.BASIC_FLUID_TANK, MekanismTags.Items.ALLOYS_INFUSED);
@@ -49,7 +49,7 @@ class FluidTankRecipeProvider implements ISubRecipeProvider {
         MekDataShapedRecipeBuilder.shapedRecipe(tank)
               .pattern(FLUID_TANK_PATTERN)
               .key(Pattern.PREVIOUS, previousTank)
-              .key(Pattern.INGOT, Tags.Items.INGOTS_IRON)
+              .key(Pattern.INGOT, MekanismDataTags.Items.INGOTS_IRON)
               .key(Pattern.ALLOY, alloyTag)
               .build(consumer, Mekanism.rl(basePath + tierName));
     }

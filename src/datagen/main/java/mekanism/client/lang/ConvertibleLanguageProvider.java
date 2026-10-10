@@ -1,9 +1,9 @@
 package mekanism.client.lang;
 
+import io.github.fabricators_of_create.porting_lib.data.LanguageProvider;
 import java.util.List;
 import mekanism.client.lang.FormatSplitter.Component;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.LanguageProvider;
 
 public abstract class ConvertibleLanguageProvider extends LanguageProvider {
 

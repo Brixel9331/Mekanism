@@ -1,42 +1,39 @@
 package mekanism.tools.common;
 
-import java.util.concurrent.CompletableFuture;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.common.BasePackMetadataGenerator;
 import mekanism.common.MekanismDataGenerator;
 import mekanism.tools.client.ToolsItemModelProvider;
 import mekanism.tools.client.ToolsLangProvider;
 import mekanism.tools.client.ToolsSpriteSourceProvider;
 import mekanism.tools.common.recipe.ToolsRecipeProvider;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-@EventBusSubscriber(modid = MekanismTools.MODID, bus = Bus.MOD)
-public class ToolsDataGenerator {
+public class ToolsDataGenerator implements DataGeneratorEntrypoint {
 
-    private ToolsDataGenerator() {
+    public ToolsDataGenerator() {
+        MekanismDataGenerator.bootstrapConfigs(MekanismTools.MODID);
     }
 
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        MekanismDataGenerator.bootstrapConfigs(MekanismTools.MODID);
-        DataGenerator gen = event.getGenerator();
-        PackOutput output = gen.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+    @Override
+    public String getEffectiveModId() {
+        return MekanismTools.MODID;
+    }
+
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+        ExistingFileHelper existingFileHelper = MekanismDataGenerator.createFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        gen.addProvider(true, new BasePackMetadataGenerator(output, ToolsLang.PACK_DESCRIPTION));
+        pack.addProvider((output, registries) -> new BasePackMetadataGenerator(output, ToolsLang.PACK_DESCRIPTION));
         //Client side data generators
-        MekanismDataGenerator.addProvider(gen, event.includeClient(), ToolsLangProvider::new);
-        gen.addProvider(event.includeClient(), new ToolsSpriteSourceProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new ToolsItemModelProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new ToolsLangProvider(output));
+        pack.addProvider((output, registries) -> new ToolsSpriteSourceProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new ToolsItemModelProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new ToolsTagProvider(output, lookupProvider));
-        gen.addProvider(event.includeServer(), new ToolsRecipeProvider(output, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ToolsAdvancementProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new ToolsTagProvider(output, registries));
+        pack.addProvider((output, registries) -> new ToolsRecipeProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new ToolsAdvancementProvider(output, existingFileHelper));
     }
 }

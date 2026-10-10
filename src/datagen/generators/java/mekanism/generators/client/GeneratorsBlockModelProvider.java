@@ -1,9 +1,9 @@
 package mekanism.generators.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.client.model.BaseBlockModelProvider;
 import mekanism.generators.common.MekanismGenerators;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class GeneratorsBlockModelProvider extends BaseBlockModelProvider {
 

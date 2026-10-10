@@ -10,12 +10,12 @@ import mekanism.common.recipe.BaseRecipeProvider;
 import mekanism.common.recipe.ISubRecipeProvider;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.registries.MekanismItems;
+import mekanism.common.tag.MekanismDataTags;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
 
 class PressurizedReactionRecipeProvider implements ISubRecipeProvider {
 
@@ -31,7 +31,7 @@ class PressurizedReactionRecipeProvider implements ISubRecipeProvider {
         //Blocks
         PressurizedReactionRecipeBuilder.reaction(
               IngredientCreatorAccess.item().from(BaseRecipeProvider.createIngredient(List.of(
-                    Tags.Items.STORAGE_BLOCKS_COAL,
+                    MekanismDataTags.Items.STORAGE_BLOCKS_COAL,
                     MekanismTags.Items.STORAGE_BLOCKS_CHARCOAL
               ))),
               IngredientCreatorAccess.fluid().from(FluidTags.WATER, 1_000),
@@ -99,7 +99,7 @@ class PressurizedReactionRecipeProvider implements ISubRecipeProvider {
         ).build(consumer, Mekanism.rl(basePath + "planks"));
         //Rods, each worth a 30th of a log.
         PressurizedReactionRecipeBuilder.reaction(
-              IngredientCreatorAccess.item().from(Tags.Items.RODS_WOODEN, 3),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.RODS_WOODEN, 3),
               IngredientCreatorAccess.fluid().from(FluidTags.WATER, 10),
               IngredientCreatorAccess.gas().from(MekanismGases.OXYGEN, 10),
               15,

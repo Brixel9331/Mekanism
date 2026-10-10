@@ -1,5 +1,6 @@
 package mekanism.tools.common;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import mekanism.common.advancements.BaseAdvancementProvider;
@@ -18,7 +19,6 @@ import net.minecraft.advancements.FrameType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class ToolsAdvancementProvider extends BaseAdvancementProvider {

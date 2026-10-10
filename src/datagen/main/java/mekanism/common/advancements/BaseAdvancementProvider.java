@@ -2,10 +2,13 @@ package mekanism.common.advancements;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -24,7 +27,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseAdvancementProvider implements DataProvider {
@@ -49,9 +51,10 @@ public abstract class BaseAdvancementProvider implements DataProvider {
     @Override
     public CompletableFuture<?> run(@NotNull CachedOutput cache) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
+        Set<ResourceLocation> generated = new HashSet<>();
         registerAdvancements(advancement -> {
             ResourceLocation id = advancement.getId();
-            if (existingFileHelper.exists(id, PackType.SERVER_DATA, ".json", "advancements")) {
+            if (!generated.add(id)) {
                 throw new IllegalStateException("Duplicate advancement " + id);
             }
             Path path = this.pathProvider.json(id);

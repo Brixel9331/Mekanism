@@ -16,8 +16,8 @@ import mekanism.common.entity.RobitPrideSkinData;
 import mekanism.common.registration.impl.FeatureRegistryObject;
 import mekanism.common.registries.MekanismDamageTypes.MekanismDamageType;
 import mekanism.common.resource.ore.OreBlockType;
-import mekanism.common.resource.ore.OreType.OreVeinType;
 import mekanism.common.resource.ore.OreType;
+import mekanism.common.resource.ore.OreType.OreVeinType;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.world.ConfigurableConstantInt;
@@ -29,13 +29,13 @@ import mekanism.common.world.ResizableOreFeatureConfig;
 import mekanism.common.world.height.ConfigurableHeightProvider;
 import mekanism.common.world.modifier.AddFeaturesBiomeModifier;
 import mekanism.common.world.modifier.WorldgenModifiers;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -46,8 +46,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 import net.minecraft.world.level.levelgen.feature.stateproviders.RuleBasedBlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
@@ -61,8 +61,8 @@ import net.minecraft.world.level.material.Fluids;
 
 public class MekanismDatapackRegistryProvider extends BaseDatapackRegistryProvider {
 
-    public MekanismDatapackRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, BUILDER, Mekanism.MODID);
+    public MekanismDatapackRegistryProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, Mekanism.MODID);
     }
 
     private static final Map<OreType, List<TargetBlockState>> ORE_STONE_TARGETS = new EnumMap<>(OreType.class);
@@ -83,7 +83,8 @@ public class MekanismDatapackRegistryProvider extends BaseDatapackRegistryProvid
               oreVeinConfig.discardChanceOnAirExposure()));
     }
 
-    private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+    public static void buildRegistry(RegistrySetBuilder builder) {
+        builder
           .add(Registries.CONFIGURED_FEATURE, context -> {
               for (OreType type : EnumUtils.ORE_TYPES) {
                   int features = type.getBaseConfigs().size();
@@ -163,6 +164,7 @@ public class MekanismDatapackRegistryProvider extends BaseDatapackRegistryProvid
                   context.register(key, makeRobitSkin(key.location(), entry.getKey().getColor().length));
               }
           });
+    }
 
     private static RobitSkin makeRobitSkin(ResourceLocation name, int variants) {
         List<ResourceLocation> textures = new ArrayList<>(variants);

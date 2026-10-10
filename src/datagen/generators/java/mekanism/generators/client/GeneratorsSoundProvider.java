@@ -1,10 +1,10 @@
 package mekanism.generators.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.client.sound.BaseSoundProvider;
 import mekanism.generators.common.MekanismGenerators;
 import mekanism.generators.common.registries.GeneratorsSounds;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class GeneratorsSoundProvider extends BaseSoundProvider {
 

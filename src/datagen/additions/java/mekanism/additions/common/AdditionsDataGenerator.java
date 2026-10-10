@@ -1,6 +1,6 @@
 package mekanism.additions.common;
 
-import java.util.concurrent.CompletableFuture;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.additions.client.AdditionsBlockStateProvider;
 import mekanism.additions.client.AdditionsItemModelProvider;
 import mekanism.additions.client.AdditionsLangProvider;
@@ -10,41 +10,41 @@ import mekanism.additions.common.loot.AdditionsLootProvider;
 import mekanism.additions.common.recipe.AdditionsRecipeProvider;
 import mekanism.common.BasePackMetadataGenerator;
 import mekanism.common.MekanismDataGenerator;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-@EventBusSubscriber(modid = MekanismAdditions.MODID, bus = Bus.MOD)
-public class AdditionsDataGenerator {
+public class AdditionsDataGenerator implements DataGeneratorEntrypoint {
 
-    private AdditionsDataGenerator() {
+    public AdditionsDataGenerator() {
+        MekanismDataGenerator.bootstrapConfigs(MekanismAdditions.MODID);
     }
 
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        MekanismDataGenerator.bootstrapConfigs(MekanismAdditions.MODID);
-        DataGenerator gen = event.getGenerator();
-        PackOutput output = gen.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        AdditionsDatapackRegistryProvider drProvider = new AdditionsDatapackRegistryProvider(output, event.getLookupProvider());
-        CompletableFuture<HolderLookup.Provider> lookupProvider = drProvider.getRegistryProvider();
-        gen.addProvider(true, new BasePackMetadataGenerator(output, AdditionsLang.PACK_DESCRIPTION));
+    @Override
+    public String getEffectiveModId() {
+        return MekanismAdditions.MODID;
+    }
+
+    @Override
+    public void buildRegistry(net.minecraft.core.RegistrySetBuilder builder) {
+        AdditionsDatapackRegistryProvider.buildRegistry(builder);
+    }
+
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+        ExistingFileHelper existingFileHelper = MekanismDataGenerator.createFileHelper();
+        pack.addProvider((output, registries) -> new AdditionsDatapackRegistryProvider(output, registries));
+        pack.addProvider((output, registries) -> new BasePackMetadataGenerator(output, AdditionsLang.PACK_DESCRIPTION));
         //Client side data generators
-        MekanismDataGenerator.addProvider(gen, event.includeClient(), AdditionsLangProvider::new);
-        gen.addProvider(event.includeClient(), new AdditionsSoundProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new AdditionsSpriteSourceProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new AdditionsItemModelProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new AdditionsBlockStateProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsLangProvider(output));
+        pack.addProvider((output, registries) -> new AdditionsSoundProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsSpriteSourceProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsItemModelProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsBlockStateProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new AdditionsTagProvider(output, lookupProvider));
-        MekanismDataGenerator.addProvider(gen, event.includeServer(), AdditionsLootProvider::new);
-        gen.addProvider(event.includeServer(), drProvider);
-        gen.addProvider(event.includeServer(), new AdditionsRecipeProvider(output, existingFileHelper));
-        gen.addProvider(event.includeServer(), new AdditionsAdvancementProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsTagProvider(output, registries));
+        pack.addProvider((output, registries) -> new AdditionsLootProvider(output));
+        pack.addProvider((output, registries) -> new AdditionsRecipeProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new AdditionsAdvancementProvider(output, existingFileHelper));
     }
 }

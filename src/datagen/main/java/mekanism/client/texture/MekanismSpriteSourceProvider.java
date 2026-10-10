@@ -1,9 +1,9 @@
 package mekanism.client.texture;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.common.Mekanism;
 import mekanism.common.registries.MekanismFluids;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class MekanismSpriteSourceProvider extends BaseSpriteSourceProvider {
 

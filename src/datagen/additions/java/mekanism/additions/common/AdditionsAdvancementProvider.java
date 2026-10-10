@@ -1,5 +1,6 @@
 package mekanism.additions.common;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import mekanism.additions.common.advancements.AdditionsAdvancements;
 import mekanism.additions.common.registries.AdditionsBlocks;
@@ -18,7 +19,6 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.KilledTrigger;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class AdditionsAdvancementProvider extends BaseAdvancementProvider {

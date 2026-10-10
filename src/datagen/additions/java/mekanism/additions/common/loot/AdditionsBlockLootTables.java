@@ -14,7 +14,7 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 public class AdditionsBlockLootTables extends BaseBlockLootTables {
 
     @Override
-    protected void generate() {
+    public void generate() {
         //Obsidian TNT
         registerObsidianTNT();
         //Plastic slabs
@@ -28,7 +28,6 @@ public class AdditionsBlockLootTables extends BaseBlockLootTables {
     private void registerObsidianTNT() {
         Block tnt = AdditionsBlocks.OBSIDIAN_TNT.getBlock();
         add(tnt, LootTable.lootTable().withPool(applyExplosionCondition(tnt, LootPool.lootPool()
-                    .name("main")
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(tnt)
                           .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(tnt)

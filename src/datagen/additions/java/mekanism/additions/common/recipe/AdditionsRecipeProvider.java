@@ -1,5 +1,6 @@
 package mekanism.additions.common.recipe;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.List;
 import java.util.function.Consumer;
 import mekanism.additions.common.AdditionsTags;
@@ -28,6 +29,7 @@ import mekanism.common.registries.MekanismItems;
 import mekanism.common.registries.MekanismPigments;
 import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
+import mekanism.common.tag.MekanismDataTags;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -36,8 +38,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 @NothingNullByDefault
 public class AdditionsRecipeProvider extends BaseRecipeProvider {
@@ -76,7 +76,7 @@ public class AdditionsRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(OBSIDIAN_CHAR, OBSIDIAN_CHAR, OBSIDIAN_CHAR),
                     TripleLine.of(TNT_CHAR, TNT_CHAR, TNT_CHAR),
                     TripleLine.of(OBSIDIAN_CHAR, OBSIDIAN_CHAR, OBSIDIAN_CHAR))
-              ).key(OBSIDIAN_CHAR, Tags.Items.OBSIDIAN)
+              ).key(OBSIDIAN_CHAR, MekanismDataTags.Items.OBSIDIAN)
               .key(TNT_CHAR, Blocks.TNT)
               .category(RecipeCategory.REDSTONE)
               .build(consumer);
@@ -108,14 +108,14 @@ public class AdditionsRecipeProvider extends BaseRecipeProvider {
         DyeColor dye = color.getDyeColor();
         if (dye != null) {
             ExtendedShapelessRecipeBuilder.shapelessRecipe(result, 2)
-                  .addIngredient(Tags.Items.LEATHER)
-                  .addIngredient(Tags.Items.STRING)
-                  .addIngredient(dye.getTag())
+                  .addIngredient(MekanismDataTags.Items.LEATHER)
+                  .addIngredient(MekanismDataTags.Items.STRING)
+                  .addIngredient(MekanismDataTags.Items.dye(dye))
                   .category(RecipeCategory.DECORATIONS)
                   .build(consumer, MekanismAdditions.rl(basePath + colorString));
             ExtendedShapelessRecipeBuilder.shapelessRecipe(result)
                   .addIngredient(recolorInput)
-                  .addIngredient(dye.getTag())
+                  .addIngredient(MekanismDataTags.Items.dye(dye))
                   .category(RecipeCategory.DECORATIONS)
                   .build(consumer, MekanismAdditions.rl(basePath + "recolor/" + colorString));
         }
@@ -139,9 +139,9 @@ public class AdditionsRecipeProvider extends BaseRecipeProvider {
             ExtendedShapedRecipeBuilder.shapedRecipe(result, 2)
                   .pattern(GLOW_PANEL)
                   .key(PLASTIC_SHEET_CHAR, MekanismItems.HDPE_SHEET)
-                  .key(GLASS_PANES_CHAR, Tags.Items.GLASS_PANES)
-                  .key(Pattern.GLOWSTONE, Tags.Items.DUSTS_GLOWSTONE)
-                  .key(Pattern.DYE, dye.getTag())
+                  .key(GLASS_PANES_CHAR, MekanismDataTags.Items.GLASS_PANES)
+                  .key(Pattern.GLOWSTONE, MekanismDataTags.Items.DUSTS_GLOWSTONE)
+                  .key(Pattern.DYE, MekanismDataTags.Items.dye(dye))
                   .category(RecipeCategory.BUILDING_BLOCKS)
                   .build(consumer, MekanismAdditions.rl(basePath + color.getRegistryPrefix()));
         }

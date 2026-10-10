@@ -1,38 +1,35 @@
 package mekanism.defense.common;
 
-import java.util.concurrent.CompletableFuture;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.common.BasePackMetadataGenerator;
 import mekanism.common.MekanismDataGenerator;
 import mekanism.defense.client.DefenseLangProvider;
 import mekanism.defense.common.loot.DefenseLootProvider;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-@EventBusSubscriber(modid = MekanismDefense.MODID, bus = Bus.MOD)
-public class DefenseDataGenerator {
+public class DefenseDataGenerator implements DataGeneratorEntrypoint {
 
-    private DefenseDataGenerator() {
+    public DefenseDataGenerator() {
+        MekanismDataGenerator.bootstrapConfigs(MekanismDefense.MODID);
     }
 
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        MekanismDataGenerator.bootstrapConfigs(MekanismDefense.MODID);
-        DataGenerator gen = event.getGenerator();
-        PackOutput output = gen.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+    @Override
+    public String getEffectiveModId() {
+        return MekanismDefense.MODID;
+    }
+
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+        ExistingFileHelper existingFileHelper = MekanismDataGenerator.createFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        gen.addProvider(true, new BasePackMetadataGenerator(output, DefenseLang.PACK_DESCRIPTION));
+        pack.addProvider((output, registries) -> new BasePackMetadataGenerator(output, DefenseLang.PACK_DESCRIPTION));
         //Client side data generators
-        MekanismDataGenerator.addProvider(gen, event.includeClient(), DefenseLangProvider::new);
+        pack.addProvider((output, registries) -> new DefenseLangProvider(output));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new DefenseTagProvider(output, lookupProvider));
-        MekanismDataGenerator.addProvider(gen, event.includeServer(), DefenseLootProvider::new);
-        gen.addProvider(event.includeServer(), new DefenseRecipeProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new DefenseTagProvider(output, registries));
+        pack.addProvider((output, registries) -> new DefenseLootProvider(output));
+        pack.addProvider((output, registries) -> new DefenseRecipeProvider(output, existingFileHelper));
     }
 }

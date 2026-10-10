@@ -1,23 +1,22 @@
 package mekanism.common.recipe;
 
+import com.google.gson.JsonArray;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import mekanism.api.annotations.NothingNullByDefault;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 @NothingNullByDefault
 public abstract class BaseRecipeProvider extends RecipeProvider {
@@ -30,7 +29,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
     }
 
     @Override
-    protected final void buildRecipes(Consumer<FinishedRecipe> consumer) {
+    public final void buildRecipes(Consumer<FinishedRecipe> consumer) {
         Consumer<FinishedRecipe> trackingConsumer = consumer.andThen(recipe ->
               existingFileHelper.trackGenerated(recipe.getId(), PackType.SERVER_DATA, ".json", "recipes"));
         addRecipes(trackingConsumer);
@@ -53,15 +52,15 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
     }
 
     public static Ingredient createIngredient(Collection<TagKey<Item>> itemTags, ItemLike... items) {
-        return Ingredient.fromValues(Stream.concat(
-              itemTags.stream().map(Ingredient.TagValue::new),
-              Arrays.stream(items).map(item -> new Ingredient.ItemValue(new ItemStack(item)))
-        ));
+        JsonArray ingredients = new JsonArray();
+        itemTags.forEach(tag -> ingredients.add(Ingredient.of(tag).toJson()));
+        Arrays.stream(items).forEach(item -> ingredients.add(Ingredient.of(item).toJson()));
+        return ingredients.isEmpty() ? Ingredient.EMPTY : Ingredient.fromJson(ingredients);
     }
 
     @SafeVarargs
     public static Ingredient createIngredient(TagKey<Item>... tags) {
-        return Ingredient.fromValues(Arrays.stream(tags).map(Ingredient.TagValue::new));
+        return createIngredient(Arrays.asList(tags));
     }
 
     public static Ingredient difference(TagKey<Item> base, ItemLike subtracted) {

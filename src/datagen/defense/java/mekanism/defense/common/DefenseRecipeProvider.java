@@ -1,11 +1,11 @@
 package mekanism.defense.common;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.recipe.BaseRecipeProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 @NothingNullByDefault
 public class DefenseRecipeProvider extends BaseRecipeProvider {

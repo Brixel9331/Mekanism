@@ -1,13 +1,13 @@
 package mekanism.client.sound;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.data.SoundDefinition;
+import io.github.fabricators_of_create.porting_lib.data.SoundDefinitionsProvider;
 import java.util.function.UnaryOperator;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.registration.impl.SoundEventRegistryObject;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.SoundDefinition;
-import net.minecraftforge.common.data.SoundDefinitionsProvider;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseSoundProvider extends SoundDefinitionsProvider {

@@ -1,10 +1,10 @@
 package mekanism.generators.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.client.state.BaseBlockStateProvider;
 import mekanism.generators.common.MekanismGenerators;
 import mekanism.generators.common.registries.GeneratorsFluids;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class GeneratorsBlockStateProvider extends BaseBlockStateProvider<GeneratorsBlockModelProvider> {
 

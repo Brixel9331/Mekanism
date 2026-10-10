@@ -1,11 +1,13 @@
 package mekanism.common.integration.crafttweaker;
 
 import com.blamejared.crafttweaker.api.bracket.CommandStringDisplayable;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.Locale;
 import java.util.function.Function;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.slurry.Slurry;
+import mekanism.api.fluid.FluidAmounts;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.providers.IChemicalProvider;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -60,6 +62,7 @@ import mekanism.common.registries.MekanismPigments;
 import mekanism.common.registries.MekanismSlurries;
 import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
+import mekanism.common.tag.MekanismDataTags;
 import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.ChemicalUtil;
 import net.minecraft.data.PackOutput;
@@ -69,9 +72,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
 public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
@@ -138,7 +138,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment(imports -> descriptionSignature(imports, ICrTSlurryStack.class))
               .blankLine()
               .addComponent(imports -> () -> imports.addImport(EXPANSION_TARGET_JEITWEAKER) + ".addIngredientInformation(" +
-                                             new CrTGasStack(MekanismGases.HYDROGEN.getStack(FluidType.BUCKET_VOLUME)).getCommandString() +
+                                             new CrTGasStack(MekanismGases.HYDROGEN.getStack(FluidAmounts.MILLI_BUCKETS_PER_BUCKET)).getCommandString() +
                                              ", \"Hydrogen is a basic gas that is produced in an electrolytic separator\");")
         ;
     }
@@ -198,7 +198,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .recipe(CombinerRecipeManager.INSTANCE)
               .addExample("combining/bookshelf", IngredientCreatorAccess.item().from(Items.BOOK, 3), IngredientCreatorAccess.item().from(ItemTags.PLANKS, 6),
                     new ItemStack(Blocks.BOOKSHELF))
-              .addExample("combining/dark_prismarine", IngredientCreatorAccess.item().from(Items.PRISMARINE_SHARD, 8), IngredientCreatorAccess.item().from(Tags.Items.DYES_BLACK),
+              .addExample("combining/dark_prismarine", IngredientCreatorAccess.item().from(Items.PRISMARINE_SHARD, 8), IngredientCreatorAccess.item().from(MekanismDataTags.Items.DYES_BLACK),
                     new ItemStack(Blocks.DARK_PRISMARINE))
               .end()
               .comment("Removes two Combining Recipes:",
@@ -316,7 +316,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment("Adds a Painting Recipe that uses 256 mB Red Pigment to convert Clear Sand into Red Sand.")
               .blankLine()
               .recipe(PaintingRecipeManager.INSTANCE)
-              .addExample("paint_sand", IngredientCreatorAccess.item().from(Tags.Items.SAND_COLORLESS),
+              .addExample("paint_sand", IngredientCreatorAccess.item().from(MekanismDataTags.Items.SAND_COLORLESS),
                     IngredientCreatorAccess.pigment().from(MekanismPigments.PIGMENT_COLOR_LOOKUP.get(EnumColor.RED), 256),
                     new ItemStack(Blocks.RED_SAND))
               .end()
@@ -328,7 +328,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment("Adds an Energy Conversion Recipe that allows converting Redstone Ore into 45 kJ of power.")
               .blankLine()
               .recipe(EnergyConversionRecipeManager.INSTANCE)
-              .addExample("redstone_ore_to_power", IngredientCreatorAccess.item().from(Tags.Items.ORES_REDSTONE), FloatingLong.createConst(45_000))
+              .addExample("redstone_ore_to_power", IngredientCreatorAccess.item().from(MekanismDataTags.Items.ORES_REDSTONE), FloatingLong.createConst(45_000))
               .end()
               .comment("Removes the Energy Conversion Recipe that allows converting Redstone Blocks into Power.")
               .blankLine()
@@ -359,7 +359,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment("Adds an Infusion Conversion Recipe that allows converting Gold Ingots into 10 mB Gold Infuse Type.")
               .blankLine()
               .recipe(InfusionConversionRecipeManager.INSTANCE)
-              .addExample("infusion_conversion/gold/from_ingot", IngredientCreatorAccess.item().from(Tags.Items.INGOTS_GOLD), MekanismInfuseTypes.GOLD.getStack(10))
+              .addExample("infusion_conversion/gold/from_ingot", IngredientCreatorAccess.item().from(MekanismDataTags.Items.INGOTS_GOLD), MekanismInfuseTypes.GOLD.getStack(10))
               .end()
               .comment("Removes the Infusion Conversion Recipe that allows converting Bio Fuel into the Bio Infuse Type.")
               .blankLine()
@@ -396,7 +396,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment("Adds a Pigment Extracting Recipe that extracts 6,912 mB of Blue Pigment from a Lapis Lazuli Block.")
               .blankLine()
               .recipe(PigmentExtractingRecipeManager.INSTANCE)
-              .addExample("extract_lapis_block_pigment", IngredientCreatorAccess.item().from(Tags.Items.STORAGE_BLOCKS_LAPIS),
+              .addExample("extract_lapis_block_pigment", IngredientCreatorAccess.item().from(MekanismDataTags.Items.STORAGE_BLOCKS_LAPIS),
                     MekanismPigments.PIGMENT_COLOR_LOOKUP.get(EnumColor.DARK_BLUE).getStack(6_912))
               .end()
               .comment("Removes the Pigment Extracting Recipe that extracts Brown Pigment from Brown Dye.")
@@ -407,7 +407,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .comment("Adds a Nucleosynthesizing Recipe that converts a Block of Coal to a Block of Diamond in 9,000 ticks (7 minutes 30 seconds).")
               .blankLine()
               .recipe(NucleosynthesizingRecipeManager.INSTANCE)
-              .addExample("coal_block_to_diamond_block", IngredientCreatorAccess.item().from(Tags.Items.STORAGE_BLOCKS_COAL),
+              .addExample("coal_block_to_diamond_block", IngredientCreatorAccess.item().from(MekanismDataTags.Items.STORAGE_BLOCKS_COAL),
                     IngredientCreatorAccess.gas().from(MekanismGases.ANTIMATTER, 36), new ItemStack(Blocks.DIAMOND_BLOCK), 9_000)
               .end()
               .comment("Removes the Nucleosynthesizing Recipe that converts Tin Ingots into Iron Ingots.")
@@ -438,7 +438,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
               .recipe(PressurizedReactionRecipeManager.INSTANCE)
               .addExample("reaction/sawdust", IngredientCreatorAccess.item().from(MekanismTags.Items.SAWDUST), IngredientCreatorAccess.fluid().from(FluidTags.WATER, 350),
                     IngredientCreatorAccess.gas().from(MekanismGases.HYDROGEN_CHLORIDE, 50), 45, new ItemStack(Items.PAPER, 2), FloatingLong.createConst(25))
-              .addExample("reaction/sand", IngredientCreatorAccess.item().from(Tags.Items.SAND), IngredientCreatorAccess.fluid().from(MekanismTags.Fluids.CHLORINE, 100),
+              .addExample("reaction/sand", IngredientCreatorAccess.item().from(MekanismDataTags.Items.SAND), IngredientCreatorAccess.fluid().from(MekanismTags.Fluids.CHLORINE, 100),
                     IngredientCreatorAccess.gas().from(MekanismGases.HYDROGEN, 100), 300, MekanismBlocks.SALT_BLOCK.getItemStack())
               .addExample("reaction/wooden_buttons", IngredientCreatorAccess.item().from(ItemTags.WOODEN_BUTTONS, 8), IngredientCreatorAccess.fluid().from(FluidTags.WATER, 25),
                     IngredientCreatorAccess.gas().from(MekanismGases.OXYGEN, 25), 37, MekanismGases.HYDROGEN.getStack(25))
@@ -520,7 +520,7 @@ public class MekanismCrTExampleProvider extends BaseCrTExampleProvider {
         @Override
         public String asString() {
             return imports.addImport(EXPANSION_TARGET_JEITWEAKER) + ".hideIngredient(" +
-                   describer.apply(ChemicalUtil.withAmount(chemicalProvider, FluidType.BUCKET_VOLUME)).getCommandString() + ");";
+                   describer.apply(ChemicalUtil.withAmount(chemicalProvider, FluidAmounts.MILLI_BUCKETS_PER_BUCKET)).getCommandString() + ");";
         }
     }
 

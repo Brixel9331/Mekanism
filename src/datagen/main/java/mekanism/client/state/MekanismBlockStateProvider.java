@@ -1,5 +1,9 @@
 package mekanism.client.state;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.models.generators.ConfiguredModel;
+import io.github.fabricators_of_create.porting_lib.models.generators.ModelFile;
+import io.github.fabricators_of_create.porting_lib.models.generators.block.BlockModelBuilder;
 import java.util.Map;
 import mekanism.client.model.MekanismBlockModelProvider;
 import mekanism.common.Mekanism;
@@ -14,10 +18,6 @@ import mekanism.common.resource.ore.OreType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class MekanismBlockStateProvider extends BaseBlockStateProvider<MekanismBlockModelProvider> {
 

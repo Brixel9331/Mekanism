@@ -11,6 +11,7 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
+import mekanism.common.tag.MekanismDataTags;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.ItemTags;
@@ -20,7 +21,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WeatheringCopper;
-import net.minecraftforge.common.Tags;
 
 class EnrichingRecipeProvider implements ISubRecipeProvider {
 
@@ -85,17 +85,17 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
         ).build(consumer, Mekanism.rl(basePath + "purpur_pillar_from_block"));
         //Gravel -> flint
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.GRAVEL),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.GRAVEL),
               new ItemStack(Items.FLINT)
         ).build(consumer, Mekanism.rl(basePath + "gravel_to_flint"));
         //Gunpowder -> flint
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.GUNPOWDER),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.GUNPOWDER),
               new ItemStack(Items.FLINT)
         ).build(consumer, Mekanism.rl(basePath + "gunpowder_to_flint"));
         //Sand -> gravel
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.SAND),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.SAND),
               new ItemStack(Blocks.GRAVEL)
         ).build(consumer, Mekanism.rl(basePath + "sand_to_gravel"));
         //Soul Sand -> soul soil
@@ -110,7 +110,7 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
         ).build(consumer, Mekanism.rl(basePath + "sulfur_to_gunpowder"));
         //Obsidian -> obsidian dust
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.OBSIDIAN),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.OBSIDIAN),
               MekanismItems.OBSIDIAN_DUST.getItemStack(4)
         ).build(consumer, Mekanism.rl(basePath + "obsidian_to_obsidian_dust"));
         //Basalt or Smooth -> polished basalt
@@ -167,7 +167,7 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
     private void addEnrichingDeepslateConversionRecipes(Consumer<FinishedRecipe> consumer, String basePath) {
         //Cobbled Deepslate -> Deepslate
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.COBBLESTONE_DEEPSLATE),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.COBBLESTONE_DEEPSLATE),
               new ItemStack(Blocks.DEEPSLATE)
         ).build(consumer, Mekanism.rl(basePath + "from_cobbled"));
         //Cobbled Deepslate Stairs -> Polished Deepslate Stairs
@@ -326,7 +326,7 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
         //Quartz Block -> Quartz Item
         ItemStackToItemStackRecipeBuilder.enriching(
               IngredientCreatorAccess.item().from(BaseRecipeProvider.createIngredient(
-                    Tags.Items.STORAGE_BLOCKS_QUARTZ,
+                    MekanismDataTags.Items.STORAGE_BLOCKS_QUARTZ,
                     Blocks.QUARTZ_BRICKS,
                     Blocks.CHISELED_QUARTZ_BLOCK,
                     Blocks.QUARTZ_PILLAR
@@ -518,12 +518,12 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
         ).build(consumer, Mekanism.rl(basePath + "carbon"));
         //Diamond
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.GEMS_DIAMOND),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.GEMS_DIAMOND),
               MekanismItems.ENRICHED_DIAMOND.getItemStack()
         ).build(consumer, Mekanism.rl(basePath + "diamond"));
         //Redstone
         ItemStackToItemStackRecipeBuilder.enriching(
-              IngredientCreatorAccess.item().from(Tags.Items.DUSTS_REDSTONE),
+              IngredientCreatorAccess.item().from(MekanismDataTags.Items.DUSTS_REDSTONE),
               MekanismItems.ENRICHED_REDSTONE.getItemStack()
         ).build(consumer, Mekanism.rl(basePath + "redstone"));
         //Refined Obsidian

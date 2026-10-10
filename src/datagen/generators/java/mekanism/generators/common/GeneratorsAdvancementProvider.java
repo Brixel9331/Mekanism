@@ -1,5 +1,6 @@
 package mekanism.generators.common;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import mekanism.common.advancements.BaseAdvancementProvider;
 import mekanism.generators.common.advancements.GeneratorsAdvancements;
@@ -7,7 +8,6 @@ import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.FrameType;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class GeneratorsAdvancementProvider extends BaseAdvancementProvider {

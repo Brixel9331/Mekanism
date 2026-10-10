@@ -4,12 +4,15 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
 import com.google.gson.JsonElement;
-import com.mojang.logging.LogUtils;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import mekanism.client.lang.MekanismLangProvider;
 import mekanism.client.model.MekanismItemModelProvider;
 import mekanism.client.sound.MekanismSoundProvider;
@@ -24,61 +27,66 @@ import mekanism.common.loot.MekanismLootProvider;
 import mekanism.common.recipe.impl.MekanismRecipeProvider;
 import mekanism.common.registries.MekanismDatapackRegistryProvider;
 import mekanism.common.tag.MekanismTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
-import org.slf4j.Logger;
 
-@EventBusSubscriber(modid = Mekanism.MODID, bus = Bus.MOD)
-public class MekanismDataGenerator {
+public class MekanismDataGenerator implements DataGeneratorEntrypoint {
 
-    private MekanismDataGenerator() {
+    public MekanismDataGenerator() {
+        MekanismDataGenerator.bootstrapConfigs(Mekanism.MODID);
     }
 
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        bootstrapConfigs(Mekanism.MODID);
-        DataGenerator gen = event.getGenerator();
-        PackOutput output = gen.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        MekanismDatapackRegistryProvider drProvider = new MekanismDatapackRegistryProvider(output, event.getLookupProvider());
-        CompletableFuture<HolderLookup.Provider> lookupProvider = drProvider.getRegistryProvider();
+    @Override
+    public String getEffectiveModId() {
+        return Mekanism.MODID;
+    }
+
+    @Override
+    public void buildRegistry(net.minecraft.core.RegistrySetBuilder builder) {
+        MekanismDatapackRegistryProvider.buildRegistry(builder);
+    }
+
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+        ExistingFileHelper existingFileHelper = MekanismDataGenerator.createFileHelper();
+        pack.addProvider((output, registries) -> new MekanismDatapackRegistryProvider(output, registries));
         //Bootstrap our advancement triggers as common setup doesn't run
         MekanismCriteriaTriggers.init();
-        gen.addProvider(true, new BasePackMetadataGenerator(output, MekanismLang.PACK_DESCRIPTION));
+        pack.addProvider((output, registries) -> new BasePackMetadataGenerator(output, MekanismLang.PACK_DESCRIPTION));
         //Client side data generators
-        addProvider(gen, event.includeClient(), MekanismLangProvider::new);
-        gen.addProvider(event.includeClient(), new PrideRobitTextureProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new MekanismSoundProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new MekanismSpriteSourceProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new MekanismItemModelProvider(output, existingFileHelper));
-        gen.addProvider(event.includeClient(), new MekanismBlockStateProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismLangProvider(output));
+        pack.addProvider((output, registries) -> new PrideRobitTextureProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismSoundProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismSpriteSourceProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismItemModelProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismBlockStateProvider(output, existingFileHelper));
         //Server side data generators
-        gen.addProvider(event.includeServer(), new MekanismTagProvider(output, lookupProvider));
-        addProvider(gen, event.includeServer(), MekanismLootProvider::new);
-        gen.addProvider(event.includeServer(), drProvider);
-        MekanismRecipeProvider recipeProvider = new MekanismRecipeProvider(output, existingFileHelper);
-        gen.addProvider(event.includeServer(), recipeProvider);
-        gen.addProvider(event.includeServer(), new MekanismAdvancementProvider(output, existingFileHelper));
-        gen.addProvider(event.includeServer(), new MekanismCrTExampleProvider(output, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ComputerHelpProvider(output, Mekanism.MODID));
+        pack.addProvider((output, registries) -> new MekanismTagProvider(output, registries));
+        pack.addProvider((output, registries) -> new MekanismLootProvider(output));
+        MekanismRecipeProvider recipeProvider = pack.addProvider((output, registries) -> new MekanismRecipeProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismAdvancementProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new MekanismCrTExampleProvider(output, existingFileHelper));
+        pack.addProvider((output, registries) -> new ComputerHelpProvider(output, Mekanism.MODID));
         //Data generator to help with persisting data when porting across MC versions when optional deps aren't updated yet
         // DO NOT ADD OTHERS AFTER THIS ONE
-        gen.addProvider(true, new PersistingDisabledProvidersProvider(output, recipeProvider.getDisabledCompats()));
+        pack.addProvider((output, registries) -> new PersistingDisabledProvidersProvider(output, recipeProvider.getDisabledCompats()));
     }
 
-    public static <PROVIDER extends DataProvider> void addProvider(DataGenerator gen, boolean run, DataProvider.Factory<PROVIDER> factory) {
-        gen.addProvider(run, factory);
+    public static ExistingFileHelper createFileHelper() {
+        var mods = FabricLoader.getInstance().getAllMods();
+        Path[] roots = mods.stream().flatMap(mod -> mod.getRootPaths().stream())
+              .filter(path -> path.getFileSystem() == FileSystems.getDefault()).toArray(Path[]::new);
+        Set<String> packedMods = mods.stream()
+              .filter(mod -> mod.getRootPaths().stream().anyMatch(path -> path.getFileSystem() != FileSystems.getDefault()))
+              .map(mod -> mod.getMetadata().getId()).collect(Collectors.toSet());
+        return ExistingFileHelper.withResources(packedMods, roots);
     }
 
     /**

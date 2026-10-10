@@ -1,5 +1,6 @@
 package mekanism.common.advancements;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.RecipeCriterion;
 import mekanism.common.util.RegistryUtils;
@@ -15,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
 
 public class ExtendedAdvancementBuilder {
@@ -116,7 +116,14 @@ public class ExtendedAdvancementBuilder {
     }
 
     public Advancement save(Consumer<Advancement> consumer) {
-        Advancement built = internal.save(consumer, advancement.name(), existingFileHelper);
+        if (advancement.parent() != null) {
+            ResourceLocation parent = advancement.parent().name();
+            if (!existingFileHelper.exists(parent, PackType.SERVER_DATA, ".json", "advancements")) {
+                throw new IllegalStateException("Missing advancement parent " + parent);
+            }
+            internal.parent(Advancement.Builder.advancement().build(parent));
+        }
+        Advancement built = internal.save(consumer, advancement.name().toString());
         existingFileHelper.trackGenerated(built.getId(), PackType.SERVER_DATA, ".json", "advancements");
         return built;
     }

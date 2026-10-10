@@ -1,8 +1,8 @@
 package mekanism.client.model;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.common.Mekanism;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class MekanismBlockModelProvider extends BaseBlockModelProvider {
 

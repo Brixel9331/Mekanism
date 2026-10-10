@@ -1,5 +1,7 @@
 package mekanism.additions.client;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.models.generators.ModelFile;
 import java.util.Map;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.registries.AdditionsBlocks;
@@ -7,8 +9,6 @@ import mekanism.additions.common.registries.AdditionsItems;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.model.BaseItemModelProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class AdditionsItemModelProvider extends BaseItemModelProvider {
 

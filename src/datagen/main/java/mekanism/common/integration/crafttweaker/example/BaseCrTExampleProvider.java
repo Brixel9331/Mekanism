@@ -4,6 +4,7 @@ import com.blamejared.crafttweaker.api.bracket.CommandStringDisplayable;
 import com.blamejared.crafttweaker.api.fluid.IFluidStack;
 import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
+import com.blamejared.crafttweaker.api.tag.CraftTweakerTagRegistry;
 import com.blamejared.crafttweaker.api.tag.manager.type.KnownTagManager;
 import com.blamejared.crafttweaker.api.util.ItemStackUtil;
 import com.blamejared.crafttweaker.api.util.random.Percentaged;
@@ -11,6 +12,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,12 +30,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import mekanism.api.JsonConstants;
+import mekanism.api.MekanismAPI;
 import mekanism.api.SerializerHelper;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
+import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
+import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.math.FloatingLong;
@@ -46,7 +53,7 @@ import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.common.integration.crafttweaker.CrTConstants;
-import mekanism.common.integration.crafttweaker.CrTUtils;
+import mekanism.common.integration.crafttweaker.CrTFluidUtils;
 import mekanism.common.integration.crafttweaker.chemical.CrTChemicalStack.CrTGasStack;
 import mekanism.common.integration.crafttweaker.chemical.CrTChemicalStack.CrTInfusionStack;
 import mekanism.common.integration.crafttweaker.chemical.CrTChemicalStack.CrTPigmentStack;
@@ -69,18 +76,23 @@ import mekanism.common.recipe.ingredient.creator.FluidStackIngredientCreator.Tag
 import mekanism.common.recipe.ingredient.creator.ItemStackIngredientCreator.MultiItemStackIngredient;
 import mekanism.common.recipe.ingredient.creator.ItemStackIngredientCreator.SingleItemStackIngredient;
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.PathProvider;
 import net.minecraft.data.PackOutput.Target;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.tags.TagManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,11 +107,13 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
     private final ExistingFileHelper existingFileHelper;
     private final PackOutput output;
     private final String modid;
+    private final KnownTagManager<Fluid> fluidTags = createTagManager(Registries.FLUID, Fluid.class);
 
     protected BaseCrTExampleProvider(PackOutput output, ExistingFileHelper existingFileHelper, String modid) {
         this.output = output;
         this.existingFileHelper = existingFileHelper;
         this.modid = modid;
+        CraftTweakerTagRegistry.INSTANCE.addManager(createTagManager(Registries.ITEM, Item.class));
         addNameLookupOverride(String.class, "string");
         addPrimitiveInfo(Byte.TYPE, Byte.class, "byte");
         addPrimitiveInfo(Short.TYPE, Short.class, "short");
@@ -112,7 +126,7 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
         addNameLookupOverride(Character.class, "char");
         addSupportedConversion(Character.TYPE, Character.class, (imports, c) -> "'" + c + "'");
         addSupportedConversion(IItemStack.class, ItemStack.class, (imports, stack) -> ItemStackUtil.getCommandString(stack));
-        addSupportedConversion(IFluidStack.class, FluidStack.class, (imports, stack) -> IFluidStack.of(stack).getCommandString());
+        addSupportedConversion(IFluidStack.class, FluidStack.class, (imports, stack) -> CrTFluidUtils.toCraftTweaker(stack).getCommandString());
         addSupportedConversion(Percentaged.class, IItemStack.class, WeightedItemStack.class,
               (imports, stack) -> IItemStack.of(stack.stack).percent(stack.chance).getCommandString(),
               (imports, stack) -> {
@@ -139,13 +153,13 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
         addItemStackIngredientSupport();
         addFluidStackIngredientSupport();
         addSupportedChemical(GasStack.class, ICrTGasStack.class, GasStackIngredient.class, CrTConstants.CLASS_GAS_STACK_INGREDIENT, CrTGasStack::new,
-              CrTUtils.gasTags(), ChemicalIngredientDeserializer.GAS);
+              createTagManager(MekanismAPI.GAS_REGISTRY_NAME, Gas.class), ChemicalIngredientDeserializer.GAS);
         addSupportedChemical(InfusionStack.class, ICrTInfusionStack.class, InfusionStackIngredient.class, CrTConstants.CLASS_INFUSION_STACK_INGREDIENT,
-              CrTInfusionStack::new, CrTUtils.infuseTypeTags(), ChemicalIngredientDeserializer.INFUSION);
+              CrTInfusionStack::new, createTagManager(MekanismAPI.INFUSE_TYPE_REGISTRY_NAME, InfuseType.class), ChemicalIngredientDeserializer.INFUSION);
         addSupportedChemical(PigmentStack.class, ICrTPigmentStack.class, PigmentStackIngredient.class, CrTConstants.CLASS_PIGMENT_STACK_INGREDIENT,
-              CrTPigmentStack::new, CrTUtils.pigmentTags(), ChemicalIngredientDeserializer.PIGMENT);
+              CrTPigmentStack::new, createTagManager(MekanismAPI.PIGMENT_REGISTRY_NAME, Pigment.class), ChemicalIngredientDeserializer.PIGMENT);
         addSupportedChemical(SlurryStack.class, ICrTSlurryStack.class, SlurryStackIngredient.class, CrTConstants.CLASS_SLURRY_STACK_INGREDIENT,
-              CrTSlurryStack::new, CrTUtils.slurryTags(), ChemicalIngredientDeserializer.SLURRY);
+              CrTSlurryStack::new, createTagManager(MekanismAPI.SLURRY_REGISTRY_NAME, Slurry.class), ChemicalIngredientDeserializer.SLURRY);
         if (PARAMETER_NAMES == null) {
             //Lazy initialize the parameter names, ideally we would find a better time to do this and
             // support multiple instances better but for now this will work
@@ -160,6 +174,12 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static <T> KnownTagManager<T> createTagManager(ResourceKey<? extends Registry<T>> registry, Class<T> elementClass) {
+        KnownTagManager<T> manager = new KnownTagManager<>(registry, elementClass);
+        manager.bind(new TagManager.LoadResult<>(registry, new HashMap<>()));
+        return manager;
     }
 
     protected void addNameLookupOverride(Class<?> clazz, String name) {
@@ -259,7 +279,7 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
      */
     protected CrTExampleBuilder<?> exampleBuilder(String fileName) {
         Objects.requireNonNull(fileName, "Example Builder ID cannot be null.");
-        if (!ResourceLocation.isValidPath(fileName)) {
+        if (ResourceLocation.tryBuild("mekanism", fileName) == null) {
             throw new IllegalArgumentException("'" + fileName + "' is not a valid path, must be [a-z0-9/._-]");
         }
         if (examples.containsKey(fileName)) {
@@ -320,7 +340,10 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
                 }
             }
             if (representation == null) {
-                representation = IIngredient.fromIngredient(vanillaIngredient).getCommandString();
+                representation = MekanismRecipeHandler.basicImplicitIngredient(vanillaIngredient, 1, serialized.get(JsonConstants.INGREDIENT));
+                if (representation == null) {
+                    representation = IIngredient.fromIngredient(vanillaIngredient).getCommandString();
+                }
             }
             String path = imports.addImport(CrTConstants.CLASS_ITEM_STACK_INGREDIENT);
             if (amount == 1) {
@@ -338,10 +361,10 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
               (imports, ingredient) -> {
                   if (ingredient instanceof SingleFluidStackIngredient) {
                       JsonObject serialized = ingredient.serialize().getAsJsonObject();
-                      return IFluidStack.of(SerializerHelper.deserializeFluid(serialized)).getCommandString();
+                      return CrTFluidUtils.toCraftTweaker(SerializerHelper.deserializeFluid(serialized)).getCommandString();
                   } else if (ingredient instanceof TaggedFluidStackIngredient) {
                       JsonObject serialized = ingredient.serialize().getAsJsonObject();
-                      return CrTUtils.fluidTags().tag(serialized.get(JsonConstants.TAG).getAsString())
+                      return fluidTags.tag(serialized.get(JsonConstants.TAG).getAsString())
                             .withAmount(serialized.getAsJsonPrimitive(JsonConstants.AMOUNT).getAsInt()).getCommandString();
                   }
                   return null;
@@ -352,11 +375,11 @@ public abstract class BaseCrTExampleProvider implements DataProvider {
     private String getIngredientRepresentation(CrTImportsComponent imports, FluidStackIngredient ingredient) {
         if (ingredient instanceof SingleFluidStackIngredient) {
             JsonObject serialized = ingredient.serialize().getAsJsonObject();
-            String stackRepresentation = IFluidStack.of(SerializerHelper.deserializeFluid(serialized)).getCommandString();
+            String stackRepresentation = CrTFluidUtils.toCraftTweaker(SerializerHelper.deserializeFluid(serialized)).getCommandString();
             return imports.addImport(CrTConstants.CLASS_FLUID_STACK_INGREDIENT) + ".from(" + stackRepresentation + ")";
         } else if (ingredient instanceof TaggedFluidStackIngredient) {
             JsonObject serialized = ingredient.serialize().getAsJsonObject();
-            String tagRepresentation = CrTUtils.fluidTags().tag(serialized.get(JsonConstants.TAG).getAsString()).getCommandString();
+            String tagRepresentation = fluidTags.tag(serialized.get(JsonConstants.TAG).getAsString()).getCommandString();
             return imports.addImport(CrTConstants.CLASS_FLUID_STACK_INGREDIENT) + ".from(" + tagRepresentation + ", " + serialized.getAsJsonPrimitive(JsonConstants.AMOUNT) + ")";
         } else if (ingredient instanceof MultiFluidStackIngredient multiIngredient) {
             return getMultiIngredientRepresentation(imports, CrTConstants.CLASS_FLUID_STACK_INGREDIENT, multiIngredient, this::getIngredientRepresentation);

@@ -1,5 +1,6 @@
 package mekanism.common.advancements;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import mekanism.api.datagen.recipe.RecipeCriterion;
@@ -37,7 +38,6 @@ import net.minecraft.advancements.critereon.UsingItemTrigger;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class MekanismAdvancementProvider extends BaseAdvancementProvider {

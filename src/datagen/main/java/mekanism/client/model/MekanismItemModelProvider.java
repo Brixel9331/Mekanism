@@ -1,6 +1,7 @@
 package mekanism.client.model;
 
 import com.google.common.collect.Table.Cell;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import mekanism.common.Mekanism;
 import mekanism.common.registration.impl.ItemRegistryObject;
 import mekanism.common.registries.MekanismFluids;
@@ -10,7 +11,6 @@ import mekanism.common.resource.ResourceType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class MekanismItemModelProvider extends BaseItemModelProvider {
 
