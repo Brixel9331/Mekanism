@@ -177,6 +177,7 @@ public class Mekanism implements ModInitializer {
 
     private final ReloadListener recipeCacheManager = new ReloadListener();
     private final CommonPlayerTickHandler playerTickHandler = new CommonPlayerTickHandler();
+    private boolean initialized;
 
     public Mekanism() {
         instance = this;
@@ -245,10 +246,27 @@ public class Mekanism implements ModInitializer {
     }
 
     @Override
-    public void onInitialize() {
+    public synchronized void onInitialize() {
+        if (initialized) {
+            return;
+        }
         imcQueue();
         commonSetup();
         imcHandle();
+        initialized = true;
+    }
+
+    public static void initialize() {
+        Mekanism mekanism = instance;
+        if (mekanism == null) {
+            mekanism = FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class).stream()
+                  .filter(container -> container.getProvider().getMetadata().getId().equals(MODID))
+                  .map(container -> container.getEntrypoint())
+                  .filter(Mekanism.class::isInstance)
+                  .map(Mekanism.class::cast)
+                  .findFirst().orElseThrow(() -> new IllegalStateException("Missing Mekanism initializer"));
+        }
+        mekanism.onInitialize();
     }
 
     public static synchronized void addModule(IModModule modModule) {
