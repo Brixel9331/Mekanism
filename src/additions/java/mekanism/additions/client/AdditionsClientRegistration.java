@@ -25,31 +25,21 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.minecraft.client.renderer.entity.StrayRenderer;
 import net.minecraft.client.renderer.entity.WitherSkeletonRenderer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
-import net.minecraftforge.client.event.ModelEvent.RegisterAdditional;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-@Mod.EventBusSubscriber(modid = MekanismAdditions.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AdditionsClientRegistration {
 
     private AdditionsClientRegistration() {
     }
 
-    @SubscribeEvent
-    public static void init(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> ClientRegistrationUtil.setPropertyOverride(AdditionsItems.WALKIE_TALKIE, MekanismAdditions.rl("channel"), (stack, world, entity, seed) -> {
+    public static void init() {
+        ClientRegistrationUtil.setPropertyOverride(AdditionsItems.WALKIE_TALKIE, MekanismAdditions.rl("channel"), (stack, world, entity, seed) -> {
             ItemWalkieTalkie item = (ItemWalkieTalkie) stack.getItem();
             return item.getOn(stack) ? item.getChannel(stack) : 0;
-        }));
+        });
     }
 
-    @SubscribeEvent
-    public static void registerKeybindings(RegisterKeyMappingsEvent event) {
-        AdditionsKeyHandler.registerKeybindings(event);
+    public static void registerKeybindings() {
+        AdditionsKeyHandler.registerKeybindings();
     }
 
     public static void registerRenderers() {
@@ -69,13 +59,11 @@ public class AdditionsClientRegistration {
         EntityModelLayerRegistry.registerModelLayer(ModelBabyCreeper.ARMOR_LAYER, () -> ModelBabyCreeper.createBodyLayer(new CubeDeformation(1)));
     }
 
-    @SubscribeEvent
-    public static void registerAdditionalModels(RegisterAdditional event) {
+    public static void registerAdditionalModels(net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin.Context event) {
         AdditionsModelCache.INSTANCE.setup(event);
     }
 
-    @SubscribeEvent
-    public static void onModelBake(BakingCompleted event) {
+    public static void onModelBake(net.minecraft.client.resources.model.ModelManager event) {
         AdditionsModelCache.INSTANCE.onBake(event);
     }
 
