@@ -104,7 +104,13 @@ public final class EntityTeleportation {
 
     private static void synchronizePassengers(Entity entity) {
         if (!entity.getPassengers().isEmpty()) {
-            ((ServerLevel) entity.level()).getChunkSource().broadcast(entity, new ClientboundSetPassengersPacket(entity));
+            ClientboundSetPassengersPacket passengersPacket = new ClientboundSetPassengersPacket(entity);
+            ((ServerLevel) entity.level()).getChunkSource().broadcast(entity, passengersPacket);
+            for (Entity passenger : entity.getPassengers()) {
+                if (passenger instanceof ServerPlayer player && !(player instanceof FakePlayer) && player.connection != null) {
+                    player.connection.send(passengersPacket);
+                }
+            }
             if (entity.getControllingPassenger() instanceof ServerPlayer player && !(player instanceof FakePlayer) && player.connection != null) {
                 player.connection.send(new ClientboundMoveVehiclePacket(entity));
             }
