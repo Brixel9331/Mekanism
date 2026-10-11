@@ -10,7 +10,8 @@ import mekanism.additions.common.entity.baby.EntityBabyStray;
 import mekanism.additions.common.entity.baby.EntityBabyWitherSkeleton;
 import mekanism.common.registration.impl.EntityTypeDeferredRegister;
 import mekanism.common.registration.impl.EntityTypeRegistryObject;
-import net.minecraft.world.entity.EntityType;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.Creeper;
@@ -23,11 +24,11 @@ public class AdditionsEntityTypes {
 
     public static final EntityTypeDeferredRegister ENTITY_TYPES = new EntityTypeDeferredRegister(MekanismAdditions.MODID);
 
-    public static final EntityTypeRegistryObject<EntityBabyCreeper> BABY_CREEPER = ENTITY_TYPES.register("baby_creeper", EntityType.Builder.of(EntityBabyCreeper::new, MobCategory.MONSTER).sized(0.6F, 1.7F), Creeper::createAttributes);
-    public static final EntityTypeRegistryObject<EntityBabyEnderman> BABY_ENDERMAN = ENTITY_TYPES.register("baby_enderman", EntityType.Builder.of(EntityBabyEnderman::new, MobCategory.MONSTER).sized(0.6F, 2.9F), EnderMan::createAttributes);
-    public static final EntityTypeRegistryObject<EntityBabySkeleton> BABY_SKELETON = ENTITY_TYPES.register("baby_skeleton", EntityType.Builder.of(EntityBabySkeleton::new, MobCategory.MONSTER).sized(0.6F, 1.99F), AbstractSkeleton::createAttributes);
-    public static final EntityTypeRegistryObject<EntityBabyStray> BABY_STRAY = ENTITY_TYPES.register("baby_stray", EntityType.Builder.of(EntityBabyStray::new, MobCategory.MONSTER).sized(0.6F, 1.99F), AbstractSkeleton::createAttributes);
-    public static final EntityTypeRegistryObject<EntityBabyWitherSkeleton> BABY_WITHER_SKELETON = ENTITY_TYPES.register("baby_wither_skeleton", EntityType.Builder.of(EntityBabyWitherSkeleton::new, MobCategory.MONSTER).fireImmune().sized(0.7F, 2.4F), AbstractSkeleton::createAttributes);
-    public static final EntityTypeRegistryObject<EntityBalloon> BALLOON = ENTITY_TYPES.register("balloon", EntityType.Builder.of(EntityBalloon::new, MobCategory.MISC).sized(0.4F, 0.45F));
-    public static final EntityTypeRegistryObject<EntityObsidianTNT> OBSIDIAN_TNT = ENTITY_TYPES.register("obsidian_tnt", EntityType.Builder.of(EntityObsidianTNT::new, MobCategory.MISC).fireImmune().sized(0.98F, 0.98F));
+    public static final EntityTypeRegistryObject<EntityBabyCreeper> BABY_CREEPER = ENTITY_TYPES.register("baby_creeper", FabricEntityTypeBuilder.create(MobCategory.MONSTER, EntityBabyCreeper::new).dimensions(EntityDimensions.scalable(0.6F, 1.7F)), Creeper::createAttributes);
+    public static final EntityTypeRegistryObject<EntityBabyEnderman> BABY_ENDERMAN = ENTITY_TYPES.register("baby_enderman", FabricEntityTypeBuilder.create(MobCategory.MONSTER, EntityBabyEnderman::new).dimensions(EntityDimensions.scalable(0.6F, 2.9F)), EnderMan::createAttributes);
+    public static final EntityTypeRegistryObject<EntityBabySkeleton> BABY_SKELETON = ENTITY_TYPES.register("baby_skeleton", FabricEntityTypeBuilder.create(MobCategory.MONSTER, EntityBabySkeleton::new).dimensions(EntityDimensions.scalable(0.6F, 1.99F)), AbstractSkeleton::createAttributes);
+    public static final EntityTypeRegistryObject<EntityBabyStray> BABY_STRAY = ENTITY_TYPES.register("baby_stray", FabricEntityTypeBuilder.create(MobCategory.MONSTER, EntityBabyStray::new).dimensions(EntityDimensions.scalable(0.6F, 1.99F)), AbstractSkeleton::createAttributes);
+    public static final EntityTypeRegistryObject<EntityBabyWitherSkeleton> BABY_WITHER_SKELETON = ENTITY_TYPES.register("baby_wither_skeleton", FabricEntityTypeBuilder.create(MobCategory.MONSTER, EntityBabyWitherSkeleton::new).fireImmune().dimensions(EntityDimensions.scalable(0.7F, 2.4F)), AbstractSkeleton::createAttributes);
+    public static final EntityTypeRegistryObject<EntityBalloon> BALLOON = ENTITY_TYPES.register("balloon", FabricEntityTypeBuilder.create(MobCategory.MISC, EntityBalloon::new).dimensions(EntityDimensions.scalable(0.4F, 0.45F)));
+    public static final EntityTypeRegistryObject<EntityObsidianTNT> OBSIDIAN_TNT = ENTITY_TYPES.register("obsidian_tnt", FabricEntityTypeBuilder.create(MobCategory.MISC, EntityObsidianTNT::new).fireImmune().dimensions(EntityDimensions.scalable(0.98F, 0.98F)));
 }
