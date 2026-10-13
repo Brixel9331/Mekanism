@@ -6,7 +6,7 @@ import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -23,7 +23,7 @@ public class BlockPlasticFenceGate extends FenceGateBlock implements IColoredBlo
 
     public BlockPlasticFenceGate(EnumColor color) {
         super(BlockStateHelper.applyLightLevelAdjustments(BlockBehaviour.Properties.of().mapColor(color.getMapColor()).strength(5, 6)),
-              SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN);
+              WoodType.OAK);
         this.color = color;
         //Uses getDefaultState as starting state to take into account the stuff from super
         registerDefaultState(BlockStateHelper.getDefaultState(defaultBlockState()));
