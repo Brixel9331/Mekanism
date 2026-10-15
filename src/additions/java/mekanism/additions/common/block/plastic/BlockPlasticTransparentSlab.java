@@ -40,7 +40,6 @@ public class BlockPlasticTransparentSlab extends BlockPlasticSlab {
         return BlockPlasticTransparent.isSideInvisible(this, state, adjacentBlockState, side);
     }
 
-    @Override
     public float[] getBeaconColorMultiplier(BlockState state, LevelReader world, BlockPos pos, BlockPos beaconPos) {
         return getColor().getRgbCodeFloat();
     }
