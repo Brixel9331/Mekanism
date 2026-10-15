@@ -3,6 +3,7 @@ package mekanism.additions.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
+import mekanism.client.render.lib.ModelQuadRenderer;
 import mekanism.additions.client.model.AdditionsModelCache;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.entity.EntityBalloon;
@@ -63,7 +64,7 @@ public class RenderBalloon extends EntityRenderer<EntityBalloon> {
                 color[1] = balloonColor.getColor(1);
                 color[2] = balloonColor.getColor(2);
             }
-            builder.putBulkData(last, quad, color[0], color[1], color[2], color[3], light, OverlayTexture.NO_OVERLAY, false);
+            ModelQuadRenderer.render(last, builder, quad, color[0], color[1], color[2], color[3], light, OverlayTexture.NO_OVERLAY);
         }
         matrix.popPose();
         super.render(balloon, entityYaw, partialTick, matrix, renderer, light);
