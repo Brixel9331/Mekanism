@@ -8,7 +8,9 @@
     "FireIgnitionMixin",
     "BeaconColorMixin"
   ],
-  "client": [],
+  "client": [
+    "client.WalkieTalkieReequipMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
