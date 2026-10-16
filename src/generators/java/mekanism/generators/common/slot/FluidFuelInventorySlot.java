@@ -2,7 +2,6 @@ package mekanism.generators.common.slot;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import mekanism.api.Action;
@@ -14,8 +13,9 @@ import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.inventory.slot.FluidInventorySlot;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import mekanism.api.capabilities.CapabilityReference;
+import mekanism.api.fluid.IExtendedFluidHandlerItem;
+import mekanism.common.util.FluidContainerUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,9 +31,9 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
         Objects.requireNonNull(fuelCreator, "Fuel fluid stack creator cannot be null");
         Objects.requireNonNull(fuelValue, "Fuel value calculator cannot be null");
         return new FluidFuelInventorySlot(fluidTank, fuelValue, fuelCreator, stack -> {
-            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+            CapabilityReference<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack);
             if (cap.isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = cap.get();
+                IExtendedFluidHandlerItem fluidHandlerItem = cap.orElseThrow(IllegalStateException::new);
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     if (fluidTank.isFluidValid(fluidHandlerItem.getFluidInTank(tank))) {
                         //False if the items contents are still valid
@@ -46,9 +46,9 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
             // This might happen after a reload for example
             return fuelValue.applyAsInt(stack) == 0;
         }, stack -> {
-            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
+            CapabilityReference<IExtendedFluidHandlerItem> cap = FluidContainerUtils.getFluidHandler(stack);
             if (cap.isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = cap.get();
+                IExtendedFluidHandlerItem fluidHandlerItem = cap.orElseThrow(IllegalStateException::new);
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
                     if (!fluidInTank.isEmpty() && fluidTank.insert(fluidInTank, Action.SIMULATE, AutomationType.INTERNAL).getAmount() < fluidInTank.getAmount()) {
@@ -86,7 +86,8 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
                 //If filling from item failed, try doing it by conversion
                 int fuel = fuelValue.applyAsInt(current);
                 if (fuel > 0 && fuel <= needed) {
-                    boolean hasContainer = current.hasCraftingRemainingItem();
+                    ItemStack remainder = current.getRecipeRemainder();
+                    boolean hasContainer = !remainder.isEmpty();
                     if (hasContainer && current.getCount() > 1) {
                         //If we have a container but have more than a single stack of it somehow just exit
                         return;
@@ -94,7 +95,7 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
                     fluidTank.insert(fuelCreator.apply(fuel), Action.EXECUTE, AutomationType.INTERNAL);
                     if (hasContainer) {
                         //If the item has a container, then replace it with the container
-                        setStack(current.getCraftingRemainingItem());
+                        setStack(remainder);
                     } else {
                         //Otherwise, shrink the size of the stack by one
                         MekanismUtils.logMismatchedStackSize(shrinkStack(1, Action.EXECUTE), 1);
