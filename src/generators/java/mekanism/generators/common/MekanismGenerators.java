@@ -35,15 +35,10 @@ import mekanism.generators.common.registries.GeneratorsModules;
 import mekanism.generators.common.registries.GeneratorsSounds;
 import mekanism.generators.common.registries.GeneratorsTileEntityTypes;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 
-@Mod(MekanismGenerators.MODID)
-public class MekanismGenerators implements IModModule {
+public class MekanismGenerators implements IModModule, ModInitializer {
 
     public static final String MODID = "mekanismgenerators";
     private static final ConfigBasedCachedFLSupplier ETHENE_ENERGY_DENSITY = new ConfigBasedCachedFLSupplier(() -> {
@@ -68,11 +63,9 @@ public class MekanismGenerators implements IModModule {
     public static final MultiblockManager<FusionReactorMultiblockData> fusionReactorManager = new MultiblockManager<>("fusionReactor", FusionReactorCache::new, FusionReactorValidator::new);
 
     public MekanismGenerators() {
+        Mekanism.initialize();
         Mekanism.addModule(instance = this);
         MekanismGeneratorsConfig.registerConfigs();
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::imcQueue);
 
         GeneratorsItems.ITEMS.register();
         GeneratorsBlocks.BLOCKS.register();
@@ -84,7 +77,7 @@ public class MekanismGenerators implements IModModule {
         GeneratorsGases.GASES.register();
         GeneratorsModules.MODULES.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
-        versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
+        versionNumber = new Version(FabricLoader.getInstance().getModContainer(MODID).orElseThrow());
         packetHandler = new GeneratorsPacketHandler();
     }
 
@@ -96,27 +89,27 @@ public class MekanismGenerators implements IModModule {
         return new ResourceLocation(MekanismGenerators.MODID, path);
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            //Ensure our tags are all initialized
-            GeneratorTags.init();
-            //Add fuel attribute to ethene
-            MekanismGases.ETHENE.get().addAttribute(new Fuel(MekanismGeneratorsConfig.generators.ethyleneBurnTicks, ETHENE_ENERGY_DENSITY));
-            //Register dispenser behaviors
-            GeneratorsFluids.FLUIDS.registerBucketDispenserBehavior();
-            //Register extended build commands (in enqueue as it is not thread safe)
-            BuildCommand.register("turbine", GeneratorsLang.TURBINE, new TurbineBuilder());
-            BuildCommand.register("fission", GeneratorsLang.FISSION_REACTOR, new FissionReactorBuilder());
-            BuildCommand.register("fusion", GeneratorsLang.FUSION_REACTOR, new FusionReactorBuilder());
-        });
+    @Override
+    public void onInitialize() {
+        //Ensure our tags are all initialized
+        GeneratorTags.init();
+        //Add fuel attribute to ethene
+        MekanismGases.ETHENE.get().addAttribute(new Fuel(MekanismGeneratorsConfig.generators.ethyleneBurnTicks, ETHENE_ENERGY_DENSITY));
+        //Register dispenser behaviors
+        GeneratorsFluids.FLUIDS.registerBucketDispenserBehavior();
+        //Register extended build commands (in enqueue as it is not thread safe)
+        BuildCommand.register("turbine", GeneratorsLang.TURBINE, new TurbineBuilder());
+        BuildCommand.register("fission", GeneratorsLang.FISSION_REACTOR, new FissionReactorBuilder());
+        BuildCommand.register("fusion", GeneratorsLang.FUSION_REACTOR, new FusionReactorBuilder());
 
         packetHandler.initialize();
+        registerEquipmentModules();
 
         //Finalization
         Mekanism.logger.info("Loaded 'Mekanism: Generators' module.");
     }
 
-    private void imcQueue(InterModEnqueueEvent event) {
+    private void registerEquipmentModules() {
         MekanismIMC.addMekaSuitHelmetModules(GeneratorsModules.SOLAR_RECHARGING_UNIT);
         MekanismIMC.addMekaSuitPantsModules(GeneratorsModules.GEOTHERMAL_GENERATOR_UNIT);
     }
