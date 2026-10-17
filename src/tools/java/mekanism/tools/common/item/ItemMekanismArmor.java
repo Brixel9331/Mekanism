@@ -8,6 +8,7 @@ import mekanism.common.config.value.CachedIntValue;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
 import mekanism.tools.common.IHasRepairType;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.tools.common.material.MaterialCreator;
 import mekanism.tools.common.util.ToolsUtils;
 import net.minecraft.network.chat.Component;
@@ -25,13 +26,13 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IItemStackProperties, IAttributeRefresher {
 
     private final MaterialCreator material;
     private final AttributeCache attributeCache;
 
     public ItemMekanismArmor(MaterialCreator material, ArmorItem.Type armorType, Item.Properties properties) {
-        super(material, armorType, properties);
+        super(material.armorMaterial(), armorType, properties);
         this.material = material;
         CachedIntValue armorConfig = switch (armorType) {
             case BOOTS -> material.bootArmor;
@@ -80,7 +81,7 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
 
     @NotNull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot, @NotNull ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull ItemStack stack, @NotNull EquipmentSlot slot) {
         return slot == getEquipmentSlot() ? attributeCache.get() : ImmutableMultimap.of();
     }
 

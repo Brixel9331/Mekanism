@@ -2,16 +2,34 @@ package mekanism.tools.common.material;
 
 import mekanism.tools.common.MekanismTools;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 @MethodsReturnNonnullByDefault
-public abstract class BaseMekanismMaterial extends IItemTierHelper implements IArmorMaterialHelper, IPaxelMaterial {
+public abstract class BaseMekanismMaterial extends IItemTierHelper implements IPaxelMaterial {
+
+    private final ArmorMaterial armorMaterial = new MekanismArmorMaterial(this);
+
+    public ArmorMaterial armorMaterial() {
+        return armorMaterial;
+    }
+
+    public abstract int getDurabilityForType(ArmorItem.Type armorType);
+
+    public abstract int getDefenseForType(ArmorItem.Type armorType);
+
+    public abstract SoundEvent getEquipSound();
+
+    public abstract float getToughness();
+
+    public abstract float getKnockbackResistance();
 
     @Nullable
-    @Override
     public abstract TagKey<Block> getTag();//Force this to be implemented
 
     public abstract int getShieldDurability();
@@ -87,7 +105,6 @@ public abstract class BaseMekanismMaterial extends IItemTierHelper implements IA
         return getCommonEnchantability();
     }
 
-    @Override
     public int getArmorEnchantability() {
         return getCommonEnchantability();
     }
@@ -99,12 +116,10 @@ public abstract class BaseMekanismMaterial extends IItemTierHelper implements IA
         return getCommonRepairMaterial();
     }
 
-    @Override
     public Ingredient getArmorRepairMaterial() {
         return getCommonRepairMaterial();
     }
 
-    @Override
     public String getName() {
         return MekanismTools.MODID + ":" + getRegistryPrefix();
     }

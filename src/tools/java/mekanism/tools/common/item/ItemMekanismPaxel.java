@@ -11,6 +11,7 @@ import mekanism.api.gear.ToolAction;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
 import mekanism.tools.common.IHasRepairType;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.tools.common.ToolsTags;
 import mekanism.tools.common.material.IPaxelMaterial;
 import mekanism.tools.common.material.MaterialCreator;
@@ -41,12 +42,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.TierSortingRegistry;
+import mekanism.api.gear.IToolActionItem;
+import mekanism.common.util.ToolModification;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @ParametersAreNonnullByDefault
-public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IItemStackProperties, IAttributeRefresher, IToolActionItem {
 
     private static final ToolAction PAXEL_DIG = ToolAction.get("paxel_dig");
     private static final Set<ToolAction> PAXEL_ACTIONS = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -118,7 +120,7 @@ public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttri
         if (context.getClickedFace() == Direction.DOWN) {
             return InteractionResult.PASS;
         }
-        BlockState foundResult = blockstate.getToolModifiedState(context, ToolAction.SHOVEL_FLATTEN, false);
+        BlockState foundResult = ToolModification.getModifiedState(blockstate, context, ToolAction.SHOVEL_FLATTEN, false);
         if (foundResult != null && world.isEmptyBlock(blockpos.above())) {
             //We can flatten the item as a shovel
             world.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -170,7 +172,7 @@ public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttri
 
     @NotNull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot, @NotNull ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull ItemStack stack, @NotNull EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND ? attributeCache.get() : ImmutableMultimap.of();
     }
 
@@ -183,11 +185,11 @@ public class ItemMekanismPaxel extends AxeItem implements IHasRepairType, IAttri
     // Need to override both method as DiggerItem performs two different behaviors
     @Override
     public boolean isCorrectToolForDrops(BlockState state) {
-        return state.is(ToolsTags.Blocks.MINEABLE_WITH_PAXEL) && TierSortingRegistry.isCorrectTierForDrops(getTier(), state);
+        return state.is(ToolsTags.Blocks.MINEABLE_WITH_PAXEL) && getTier().getLevel() >= ToolsUtils.getRequiredMiningLevel(state);
     }
 
     @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+    public boolean isSuitableFor(ItemStack stack, BlockState state) {
         return this.isCorrectToolForDrops(state);
     }
 }

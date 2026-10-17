@@ -6,6 +6,7 @@ import java.util.List;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
 import mekanism.tools.common.IHasRepairType;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.tools.common.material.MaterialCreator;
 import mekanism.tools.common.util.ToolsUtils;
 import net.minecraft.network.chat.Component;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekanismSword extends SwordItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismSword extends SwordItem implements IHasRepairType, IItemStackProperties, IAttributeRefresher {
 
     private final MaterialCreator material;
     private final AttributeCache attributeCache;
@@ -63,7 +64,7 @@ public class ItemMekanismSword extends SwordItem implements IHasRepairType, IAtt
 
     @NotNull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot, @NotNull ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull ItemStack stack, @NotNull EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND ? attributeCache.get() : ImmutableMultimap.of();
     }
 

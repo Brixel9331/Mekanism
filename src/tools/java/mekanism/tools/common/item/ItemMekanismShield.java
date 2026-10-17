@@ -1,9 +1,8 @@
 package mekanism.tools.common.item;
 
 import java.util.List;
-import java.util.function.Consumer;
-import mekanism.tools.client.render.ToolsRenderPropertiesProvider;
 import mekanism.tools.common.IHasRepairType;
+import mekanism.common.item.interfaces.IItemStackProperties;
 import mekanism.tools.common.material.BaseMekanismMaterial;
 import mekanism.tools.common.util.ToolsUtils;
 import net.minecraft.network.chat.Component;
@@ -13,11 +12,10 @@ import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemMekanismShield extends ShieldItem implements IHasRepairType {
+public class ItemMekanismShield extends ShieldItem implements IHasRepairType, IItemStackProperties {
 
     private final BaseMekanismMaterial material;
 
@@ -26,10 +24,6 @@ public class ItemMekanismShield extends ShieldItem implements IHasRepairType {
         this.material = material;
     }
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(ToolsRenderPropertiesProvider.shield());
-    }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {

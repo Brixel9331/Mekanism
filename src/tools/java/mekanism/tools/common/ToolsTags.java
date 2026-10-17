@@ -37,11 +37,11 @@ public class ToolsTags {
         public static final TagKey<Block> NEEDS_STEEL_TOOL = tag("needs_steel_tool");
 
         private static TagKey<Block> forgeTag(String name) {
-            return BlockTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(net.minecraft.core.registries.Registries.BLOCK, new ResourceLocation("forge", name));
         }
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(MekanismTools.rl(name));
+            return TagKey.create(net.minecraft.core.registries.Registries.BLOCK, MekanismTools.rl(name));
         }
     }
 
@@ -140,7 +140,7 @@ public class ToolsTags {
         public static final TagKey<Item> ARMORS_BOOTS_STEEL = forgeTag("armors/boots/steel");
 
         private static TagKey<Item> forgeTag(String name) {
-            return ItemTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation("forge", name));
         }
     }
 }
