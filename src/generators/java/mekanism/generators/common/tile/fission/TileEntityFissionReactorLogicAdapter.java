@@ -1,6 +1,5 @@
 package mekanism.generators.common.tile.fission;
 
-import java.util.EnumSet;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.MathUtils;
@@ -26,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReactorCasing implements IReactorLogic<FissionReactorLogic> {
@@ -49,7 +47,7 @@ public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReact
                 if (side == null) {
                     //Not formed, just update all sides
                     world.updateNeighborsAt(getBlockPos(), getBlockType());
-                } else if (!ForgeEventFactory.onNeighborNotify(world, worldPosition, getBlockState(), EnumSet.of(side), false).isCanceled()) {
+                } else {
                     world.neighborChanged(worldPosition.relative(side), getBlockType(), worldPosition);
                 }
             }
