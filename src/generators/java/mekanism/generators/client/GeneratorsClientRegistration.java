@@ -2,11 +2,10 @@ package mekanism.generators.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import mekanism.api.gear.IModuleHelper;
 import mekanism.client.ClientRegistration;
 import mekanism.client.ClientRegistrationUtil;
-import mekanism.client.model.baked.ExtensionBakedModel.TransformedBakedModel;
+import mekanism.client.model.baked.ExtensionBakedModel;
 import mekanism.client.render.FluidRenderRegistration;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
@@ -42,33 +41,35 @@ import mekanism.generators.common.registries.GeneratorsModules;
 import mekanism.generators.common.registries.GeneratorsTileEntityTypes;
 import mekanism.generators.common.tile.TileEntityAdvancedSolarGenerator;
 import mekanism.generators.common.tile.TileEntitySolarGenerator;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
+import java.util.Collection;
+import java.util.List;
 
-@Mod.EventBusSubscriber(modid = MekanismGenerators.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GeneratorsClientRegistration {
 
     private GeneratorsClientRegistration() {
     }
 
-    @SubscribeEvent
-    public static void init(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-            //Set fluids to a translucent render layer
-            FluidRenderRegistration.register(GeneratorsFluids.FLUIDS);
-        });
+    public static void init() {
+        //Set fluids to a translucent render layer
+        FluidRenderRegistration.register(GeneratorsFluids.FLUIDS);
+        net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry.INSTANCE.setBlockTransparency(GeneratorsBlocks.LASER_FOCUS_MATRIX.getBlock(), true);
 
         // adv solar gen requires to be translated up 1 block, so handle the model separately
-        ClientRegistration.addCustomModel(GeneratorsBlocks.ADVANCED_SOLAR_GENERATOR, (orig, evt) -> new TransformedBakedModel<Void>(orig,
-              QuadTransformation.translate(0, 1, 0)));
+        ClientRegistration.addCustomModel(GeneratorsBlocks.ADVANCED_SOLAR_GENERATOR, (orig, evt) -> new ExtensionBakedModel(orig) {
+            @Override
+            protected QuadTransformation getTransformation() {
+                return QuadTransformation.translate(0, 1, 0);
+            }
+        });
         //TODO: Eventually make use of these custom model wrappers
         //ClientRegistration.addCustomModel(GeneratorsBlocks.FISSION_FUEL_ASSEMBLY, (orig, evt) -> new FuelAssemblyBakedModel(orig, 0.75));
         //ClientRegistration.addCustomModel(GeneratorsBlocks.CONTROL_ROD_ASSEMBLY, (orig, evt) -> new FuelAssemblyBakedModel(orig, 0.375));
@@ -79,15 +80,11 @@ public class GeneratorsClientRegistration {
     }
 
     public static void registerRenderers() {
+        ClientRegistrationUtil.bindTileEntityRenderer(RenderIndustrialTurbine::new, GeneratorsTileEntityTypes.TURBINE_CASING, GeneratorsTileEntityTypes.TURBINE_VALVE, GeneratorsTileEntityTypes.TURBINE_VENT);
+        ClientRegistrationUtil.bindTileEntityRenderer(RenderFissionReactor::new, GeneratorsTileEntityTypes.FISSION_REACTOR_CASING, GeneratorsTileEntityTypes.FISSION_REACTOR_PORT, GeneratorsTileEntityTypes.FISSION_REACTOR_LOGIC_ADAPTER);
         BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.BIO_GENERATOR.get(), RenderBioGenerator::new);
         BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.FUSION_REACTOR_CONTROLLER.get(), RenderFusionReactor::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.FISSION_REACTOR_CASING.get(), RenderFissionReactor::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.FISSION_REACTOR_PORT.get(), RenderFissionReactor::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.FISSION_REACTOR_LOGIC_ADAPTER.get(), RenderFissionReactor::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.TURBINE_CASING.get(), RenderIndustrialTurbine::new);
         BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.TURBINE_ROTOR.get(), RenderTurbineRotor::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.TURBINE_VALVE.get(), RenderIndustrialTurbine::new);
-        BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.TURBINE_VENT.get(), RenderIndustrialTurbine::new);
         BlockEntityRendererRegistry.register(GeneratorsTileEntityTypes.WIND_GENERATOR.get(), RenderWindGenerator::new);
     }
 
@@ -98,6 +95,22 @@ public class GeneratorsClientRegistration {
 
     public static void registerClientReloadListeners() {
         ClientRegistrationUtil.registerClientReloadListeners(RenderWindGeneratorItem.RENDERER);
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public ResourceLocation getFabricId() {
+                return MekanismGenerators.rl("model_cache");
+            }
+
+            @Override
+            public Collection<ResourceLocation> getFabricDependencies() {
+                return List.of(ResourceReloadListenerKeys.MODELS);
+            }
+
+            @Override
+            public void onResourceManagerReload(ResourceManager resources) {
+                onStitch();
+            }
+        });
     }
 
     @SuppressWarnings("Convert2MethodRef")
@@ -121,11 +134,7 @@ public class GeneratorsClientRegistration {
         ClientRegistrationUtil.registerScreen(GeneratorsContainerTypes.WIND_GENERATOR, GuiWindGenerator::new);
     }
 
-    @SubscribeEvent
-    public static void onStitch(TextureStitchEvent.Post event) {
-        if (!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS)) {
-            return;
-        }
+    public static void onStitch() {
         //Reset any cached models now that the atlases are built
         RenderBioGenerator.resetCachedModels();
         RenderFissionReactor.resetCachedModels();

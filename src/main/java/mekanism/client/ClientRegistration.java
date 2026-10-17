@@ -210,6 +210,11 @@ public class ClientRegistration {
 
         //Set fluids to a translucent render layer
         FluidRenderRegistration.register(MekanismFluids.FLUIDS);
+        for (net.minecraft.world.level.block.Block block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            if (block instanceof mekanism.common.block.prefab.BlockTileGlass) {
+                net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry.INSTANCE.setBlockTransparency(block, true);
+            }
+        }
         ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
               (stack, world, entity, seed) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(world, stack) == null ? 0 : 1);
 
