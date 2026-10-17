@@ -7,6 +7,7 @@ import mekanism.common.block.BlockCardboardBox;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.radiation.RadiationManager;
+import mekanism.common.item.interfaces.IItemUseFirst;
 import mekanism.common.lib.radiation.capability.RadiationEntityAccess;
 import mekanism.common.network.to_client.PacketPlayerData;
 import mekanism.common.network.to_client.PacketRadiationData;
@@ -30,6 +31,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
@@ -113,6 +115,10 @@ public class CommonPlayerTracker {
         } else if (player.isShiftKeyDown() && level.getBlockState(hit.getBlockPos()).getBlock() instanceof BlockCardboardBox) {
             InteractionResult result = level.getBlockState(hit.getBlockPos()).use(level, player, hand, hit);
             return result == InteractionResult.PASS ? InteractionResult.FAIL : result;
+        }
+        if (!itemInHand.isEmpty() && itemInHand.getItem() instanceof IItemUseFirst item &&
+            !player.getCooldowns().isOnCooldown(itemInHand.getItem()) && level.getBlockState(hit.getBlockPos()).getBlock().isEnabled(level.enabledFeatures())) {
+            return item.onItemUseFirst(itemInHand, new UseOnContext(player, hand, hit));
         }
         return InteractionResult.PASS;
     }

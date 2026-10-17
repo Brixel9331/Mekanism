@@ -1,5 +1,6 @@
 package mekanism.common.item.block;
 
+import mekanism.common.item.interfaces.IItemUseFirst;
 import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.api.security.ISecurityUtils;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> implements IItemStackProperties {
+public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> implements IItemUseFirst, IItemStackProperties {
 
     public ItemBlockCardboardBox(BlockCardboardBox block) {
         super(block, new Item.Properties().stacksTo(16));

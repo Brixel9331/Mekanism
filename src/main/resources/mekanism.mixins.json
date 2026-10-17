@@ -48,7 +48,8 @@
     "ItemEntityDestructionMixin",
     "PistonReactionMixin",
     "PortalFrameMixin",
-    "BiomeClimateAccessor"
+    "BiomeClimateAccessor",
+    "ServerSneakInteractionMixin"
   ],
   "client": [
     "client.LevelRendererFrustumAccessor",
@@ -72,7 +73,8 @@
     "client.CreativeModeInventoryScreenMixin",
     "client.MinecraftWorldLifecycleMixin",
     "client.MinecraftScreenMixin",
-    "client.ClientRecipesMixin"
+    "client.ClientRecipesMixin",
+    "client.ClientSneakInteractionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

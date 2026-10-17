@@ -1,5 +1,6 @@
 package mekanism.common.item;
 
+import mekanism.common.item.interfaces.ISneakBypassUseItem;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +65,7 @@ import mekanism.common.lib.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemConfigurator extends ItemEnergized implements IRadialEnumModeItem<ConfiguratorMode>, IItemHUDProvider {
+public class ItemConfigurator extends ItemEnergized implements ISneakBypassUseItem, IRadialEnumModeItem<ConfiguratorMode>, IItemHUDProvider {
 
     public static final Lazy<RadialData<ConfiguratorMode>> LAZY_RADIAL_DATA = Lazy.of(() ->
           IRadialDataHelper.INSTANCE.dataForEnum(Mekanism.rl("configurator_mode"), ConfiguratorMode.class));
