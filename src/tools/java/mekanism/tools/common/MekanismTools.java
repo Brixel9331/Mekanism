@@ -1,30 +1,17 @@
 package mekanism.tools.common;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Collection;
 import mekanism.common.Mekanism;
 import mekanism.common.base.IModModule;
 import mekanism.common.lib.Version;
 import mekanism.tools.common.config.MekanismToolsConfig;
-import mekanism.tools.common.material.BaseMekanismMaterial;
 import mekanism.tools.common.registries.ToolsCreativeTabs;
 import mekanism.tools.common.registries.ToolsItems;
 import mekanism.tools.common.registries.ToolsRecipeSerializers;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 
-@Mod(MekanismTools.MODID)
-public class MekanismTools implements IModModule {
+public class MekanismTools implements IModModule, ModInitializer {
 
     public static final String MODID = "mekanismtools";
 
@@ -36,49 +23,27 @@ public class MekanismTools implements IModModule {
     public final Version versionNumber;
 
     public MekanismTools() {
+        Mekanism.initialize();
         Mekanism.addModule(instance = this);
         MekanismToolsConfig.registerConfigs();
         //Register the listener for special mob spawning (mobs with Mekanism armor/tools)
-        MinecraftForge.EVENT_BUS.addListener(MobEquipmentHelper::onLivingSpecialSpawn);
 
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::commonSetup);
         ToolsItems.ITEMS.register();
         ToolsCreativeTabs.CREATIVE_TABS.register();
         ToolsRecipeSerializers.RECIPE_SERIALIZERS.register();
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
-        versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
+        versionNumber = new Version(FabricLoader.getInstance().getModContainer(MODID).orElseThrow());
     }
 
     public static ResourceLocation rl(String path) {
         return new ResourceLocation(MekanismTools.MODID, path);
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            //Ensure our tags are all initialized
-            ToolsTags.init();
-        });
-        registerTiers(MekanismToolsConfig.tools.bronze, MekanismToolsConfig.tools.lapisLazuli, MekanismToolsConfig.tools.osmium, MekanismToolsConfig.tools.steel,
-              MekanismToolsConfig.tools.refinedGlowstone, MekanismToolsConfig.tools.refinedObsidian);
+    @Override
+    public void onInitialize() {
+        //Ensure our tags are all initialized
+        ToolsTags.init();
         Mekanism.logger.info("Loaded 'Mekanism: Tools' module.");
-    }
-
-    @SuppressWarnings("deprecation")
-    private void registerTiers(BaseMekanismMaterial... tiers) {
-        Multimap<Integer, Tier> vanillaTiers = HashMultimap.create();
-        for (Tiers vanillaTier : Tiers.values()) {
-            vanillaTiers.put(vanillaTier.getLevel(), vanillaTier);
-        }
-        for (BaseMekanismMaterial tier : tiers) {
-            int level = tier.getLevel();
-            Collection<Tier> equivalent = vanillaTiers.get(level);
-            Collection<Tier> vanillaNext = vanillaTiers.get(level + 1);
-            //If the tier is equivalent to another tier then the equivalent one should be placed in the after list
-            // and if it is equivalent to a vanilla tier (like all ours are when equivalent), the next tier
-            // should also specify the next tier in the before list
-            TierSortingRegistry.registerTier(tier, rl(tier.getRegistryPrefix()), new ArrayList<>(equivalent), new ArrayList<>(vanillaNext));
-        }
     }
 
     @Override

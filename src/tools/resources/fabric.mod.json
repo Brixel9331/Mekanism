@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "mekanismtools",
+  "version": "${version}",
+  "name": "Mekanism: Tools",
+  "description": "Configurable tools, armor and shields for Mekanism.",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "mekanism.tools.common.MekanismTools"
+    ],
+    "client": [
+      "mekanism.tools.client.ToolsClientInitializer"
+    ]
+  },
+  "license": "MIT",
+  "icon": "logo.png",
+  "contact": {
+    "sources": "https://github.com/Brixel9331/Mekanism"
+  },
+  "depends": {
+    "fabricloader": ">=0.18.2",
+    "fabric-api": ">=0.92.6+1.20.1",
+    "minecraft": "1.20.1",
+    "java": ">=17",
+    "mekanism": "${version}"
+  }
+}
