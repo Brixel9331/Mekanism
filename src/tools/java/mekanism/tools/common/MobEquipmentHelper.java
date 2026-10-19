@@ -17,7 +17,8 @@ import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.event.entity.living.MobSpawnEvent;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 public class MobEquipmentHelper {
 
@@ -40,14 +41,13 @@ public class MobEquipmentHelper {
         return entity instanceof Zombie && !(entity instanceof Drowned) && !(entity instanceof ZombifiedPiglin);
     }
 
-    public static void onLivingSpecialSpawn(MobSpawnEvent.FinalizeSpawn event) {
-        LivingEntity entity = event.getEntity();
+    public static void onLivingSpecialSpawn(LivingEntity entity, ServerLevelAccessor world, DifficultyInstance difficulty) {
         boolean isZombie = isZombie(entity);
         if (isZombie || entity instanceof Skeleton || entity instanceof Stray || entity instanceof Piglin) {
             //Don't bother calculating random numbers unless the instanceof checks pass
-            RandomSource random = event.getLevel().getRandom();
-            boolean isHard = event.getDifficulty().getDifficulty() == Difficulty.HARD;
-            float difficultyMultiplier = event.getDifficulty().getSpecialMultiplier();
+            RandomSource random = world.getRandom();
+            boolean isHard = difficulty.getDifficulty() == Difficulty.HARD;
+            float difficultyMultiplier = difficulty.getSpecialMultiplier();
             GearType gearType = null;
             if (random.nextFloat() < MekanismToolsConfig.tools.armorSpawnChance.get() * difficultyMultiplier) {
                 //We can only spawn refined glowstone armor on piglins

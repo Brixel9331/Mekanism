@@ -13,6 +13,9 @@
       "mekanism.tools.client.ToolsClientInitializer"
     ]
   },
+  "mixins": [
+    "mekanismtools.mixins.json"
+  ],
   "license": "MIT",
   "icon": "logo.png",
   "contact": {
