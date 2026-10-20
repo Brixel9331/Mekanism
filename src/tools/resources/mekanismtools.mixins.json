@@ -6,7 +6,9 @@
   "mixins": [
     "MobEquipmentMixin"
   ],
-  "client": [],
+  "client": [
+    "client.GlowArmorMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
