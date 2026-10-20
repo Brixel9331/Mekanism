@@ -1,5 +1,7 @@
 package mekanism.common;
 
+import mekanism.common.entity.EntityRobit;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
@@ -199,6 +201,11 @@ public class Mekanism implements ModInitializer {
         });
         WorldLifecycle.register();
         BlockEntityLoadQueue.register();
+        ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+            if (entity instanceof EntityRobit robit) {
+                robit.onRemovedFromWorld();
+            }
+        });
         WorldLifecycle.LOAD.register(this::onWorldLoad);
         WorldLifecycle.UNLOAD.register(this::onWorldUnload);
         CommandRegistrationCallback.EVENT.register((dispatcher, registries, selection) -> registerCommands(dispatcher));

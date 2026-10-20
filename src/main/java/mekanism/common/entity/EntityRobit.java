@@ -121,7 +121,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import mekanism.common.lib.LivingDamageCallback;
 import org.jetbrains.annotations.NotNull;
@@ -271,7 +270,6 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
         return DISTANCE_MULTIPLIER.multiply(Math.sqrt(distanceToSqr(xo, yo, zo)));
     }
 
-    @Override
     public void onRemovedFromWorld() {
         if (level() != null && !level().isClientSide && getFollowing() && getOwner() != null) {
             //If this robit is currently following its owner and is being removed from the world (due to chunk unloading)
@@ -279,7 +277,6 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
             // (as it runs every 10 ticks, half a second), and then teleport to the owner.
             ((ServerLevel) level()).getChunkSource().addRegionTicket(ROBIT_CHUNK_UNLOAD, new ChunkPos(blockPosition()), 2, getId());
         }
-        super.onRemovedFromWorld();
     }
 
     @Override
@@ -635,7 +632,7 @@ public class EntityRobit extends PathfinderMob implements IRobit, IMekanismInven
     }
 
     @Override
-    public ItemStack getPickedResult(HitResult target) {
+    public ItemStack getPickResult() {
         return getItemVariant();
     }
 
