@@ -7,8 +7,7 @@
   },
   "itemInput": {
     "ingredient": {
-      "type": "forge:nbt",
-      "count": 1,
+      "fabric:type": "mekanism:strict_nbt",
       "item": "minecraft:bow",
       "nbt": "{Damage:0}"
     }
