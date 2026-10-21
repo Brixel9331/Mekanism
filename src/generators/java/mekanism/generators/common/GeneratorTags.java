@@ -38,7 +38,7 @@ public class GeneratorTags {
         public static final TagKey<Fluid> TRITIUM = forgeTag("tritium");
 
         private static TagKey<Fluid> forgeTag(String name) {
-            return FluidTags.create(new ResourceLocation("forge", name));
+            return TagKey.create(net.minecraft.core.registries.Registries.FLUID, new ResourceLocation("forge", name));
         }
     }
 

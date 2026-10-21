@@ -27,7 +27,6 @@ public class GeneratorsDataGenerator implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
         ExistingFileHelper existingFileHelper = MekanismDataGenerator.createFileHelper();
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         pack.addProvider((output, registries) -> new BasePackMetadataGenerator(output, GeneratorsLang.PACK_DESCRIPTION));
         //Client side data generators
         pack.addProvider((output, registries) -> new GeneratorsLangProvider(output));

@@ -133,9 +133,9 @@ public class ToolsRecipeProvider extends BaseRecipeProvider {
         tool(HOE, hoe, ingot, rod).category(RecipeCategory.TOOLS).build(consumer, MekanismTools.rl(baseToolsPath + "hoe"));
         PaxelShapedRecipeBuilder.shapedRecipe(paxel)
               .pattern(PAXEL)
-              .key(AXE_CHAR, ItemTags.create(new ResourceLocation("forge", "tools/axes/" + name)))
-              .key(PICKAXE_CHAR, ItemTags.create(new ResourceLocation("forge", "tools/pickaxes/" + name)))
-              .key(SHOVEL_CHAR, ItemTags.create(new ResourceLocation("forge", "tools/shovels/" + name)))
+              .key(AXE_CHAR, TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation("forge", "tools/axes/" + name)))
+              .key(PICKAXE_CHAR, TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation("forge", "tools/pickaxes/" + name)))
+              .key(SHOVEL_CHAR, TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation("forge", "tools/shovels/" + name)))
               .key(ROD_CHAR, rod)
               .build(consumer, MekanismTools.rl(baseToolsPath + "paxel"));
         //If we have a nugget that means we also want to add recipes for smelting tools/armor into the nugget
