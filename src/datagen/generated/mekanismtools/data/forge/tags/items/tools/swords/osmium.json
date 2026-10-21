@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_sword"
+    "mekanismtools:osmium_sword",
+    {
+      "id": "#c:swords/osmium",
+      "required": false
+    }
   ]
 }

@@ -17,6 +17,10 @@
     "mekanismgenerators:fusion_reactor_frame",
     "mekanismgenerators:fusion_reactor_logic_adapter",
     "mekanismgenerators:laser_focus_matrix",
-    "mekanismgenerators:reactor_glass"
+    "mekanismgenerators:reactor_glass",
+    {
+      "id": "#c:enderman_place_on_blacklist",
+      "required": false
+    }
   ]
 }

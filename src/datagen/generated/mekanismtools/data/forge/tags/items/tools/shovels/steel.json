@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_shovel"
+    "mekanismtools:steel_shovel",
+    {
+      "id": "#c:shovels/steel",
+      "required": false
+    }
   ]
 }

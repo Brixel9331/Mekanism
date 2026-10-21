@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_boots"
+    "mekanismtools:refined_obsidian_boots",
+    {
+      "id": "#c:armors/boots/refined_obsidian",
+      "required": false
+    }
   ]
 }

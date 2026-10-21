@@ -5,6 +5,10 @@
     "#forge:armors/leggings/osmium",
     "#forge:armors/leggings/refined_glowstone",
     "#forge:armors/leggings/refined_obsidian",
-    "#forge:armors/leggings/steel"
+    "#forge:armors/leggings/steel",
+    {
+      "id": "#c:armors/leggings",
+      "required": false
+    }
   ]
 }

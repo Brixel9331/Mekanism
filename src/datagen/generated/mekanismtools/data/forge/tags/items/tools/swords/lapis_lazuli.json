@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_sword"
+    "mekanismtools:lapis_lazuli_sword",
+    {
+      "id": "#c:swords/lapis_lazuli",
+      "required": false
+    }
   ]
 }

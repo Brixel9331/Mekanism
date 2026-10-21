@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_helmet"
+    "mekanismtools:steel_helmet",
+    {
+      "id": "#c:armors/helmets/steel",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_helmet"
+    "mekanismtools:refined_obsidian_helmet",
+    {
+      "id": "#c:armors/helmets/refined_obsidian",
+      "required": false
+    }
   ]
 }

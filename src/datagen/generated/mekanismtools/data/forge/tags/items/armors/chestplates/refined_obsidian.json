@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_chestplate"
+    "mekanismtools:refined_obsidian_chestplate",
+    {
+      "id": "#c:armors/chestplates/refined_obsidian",
+      "required": false
+    }
   ]
 }

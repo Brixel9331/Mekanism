@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:stone_paxel"
+    "mekanismtools:stone_paxel",
+    {
+      "id": "#c:paxels/stone",
+      "required": false
+    }
   ]
 }

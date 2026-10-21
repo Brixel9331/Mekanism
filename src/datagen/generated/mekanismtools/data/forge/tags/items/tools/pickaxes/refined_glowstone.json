@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_pickaxe"
+    "mekanismtools:refined_glowstone_pickaxe",
+    {
+      "id": "#c:pickaxes/refined_glowstone",
+      "required": false
+    }
   ]
 }

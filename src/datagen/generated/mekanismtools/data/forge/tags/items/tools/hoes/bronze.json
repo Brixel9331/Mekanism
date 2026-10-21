@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_hoe"
+    "mekanismtools:bronze_hoe",
+    {
+      "id": "#c:hoes/bronze",
+      "required": false
+    }
   ]
 }

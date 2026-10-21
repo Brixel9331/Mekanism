@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_helmet"
+    "mekanismtools:bronze_helmet",
+    {
+      "id": "#c:armors/helmets/bronze",
+      "required": false
+    }
   ]
 }

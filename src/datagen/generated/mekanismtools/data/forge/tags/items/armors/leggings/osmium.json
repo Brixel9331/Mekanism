@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_leggings"
+    "mekanismtools:osmium_leggings",
+    {
+      "id": "#c:armors/leggings/osmium",
+      "required": false
+    }
   ]
 }

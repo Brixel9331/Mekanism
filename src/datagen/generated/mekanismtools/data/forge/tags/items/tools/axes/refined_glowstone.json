@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_axe"
+    "mekanismtools:refined_glowstone_axe",
+    {
+      "id": "#c:axes/refined_glowstone",
+      "required": false
+    }
   ]
 }

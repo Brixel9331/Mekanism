@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_shovel"
+    "mekanismtools:osmium_shovel",
+    {
+      "id": "#c:shovels/osmium",
+      "required": false
+    }
   ]
 }

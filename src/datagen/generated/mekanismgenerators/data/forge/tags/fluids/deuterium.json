@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanismgenerators:deuterium",
-    "mekanismgenerators:flowing_deuterium"
+    "mekanismgenerators:flowing_deuterium",
+    {
+      "id": "#c:deuterium",
+      "required": false
+    }
   ]
 }

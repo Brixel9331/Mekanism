@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_shield"
+    "mekanismtools:refined_obsidian_shield",
+    {
+      "id": "#c:shields/refined_obsidian",
+      "required": false
+    }
   ]
 }

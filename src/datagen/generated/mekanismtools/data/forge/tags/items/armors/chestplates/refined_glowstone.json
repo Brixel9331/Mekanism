@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_chestplate"
+    "mekanismtools:refined_glowstone_chestplate",
+    {
+      "id": "#c:armors/chestplates/refined_glowstone",
+      "required": false
+    }
   ]
 }

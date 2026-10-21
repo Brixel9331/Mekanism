@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_shovel"
+    "mekanismtools:bronze_shovel",
+    {
+      "id": "#c:shovels/bronze",
+      "required": false
+    }
   ]
 }

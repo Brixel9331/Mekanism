@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_leggings"
+    "mekanismtools:bronze_leggings",
+    {
+      "id": "#c:armors/leggings/bronze",
+      "required": false
+    }
   ]
 }

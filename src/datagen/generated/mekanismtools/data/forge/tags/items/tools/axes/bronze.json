@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_axe"
+    "mekanismtools:bronze_axe",
+    {
+      "id": "#c:axes/bronze",
+      "required": false
+    }
   ]
 }

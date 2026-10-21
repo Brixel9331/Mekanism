@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_sword"
+    "mekanismtools:steel_sword",
+    {
+      "id": "#c:swords/steel",
+      "required": false
+    }
   ]
 }

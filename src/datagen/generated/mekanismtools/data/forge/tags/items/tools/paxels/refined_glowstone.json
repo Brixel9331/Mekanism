@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_paxel"
+    "mekanismtools:refined_glowstone_paxel",
+    {
+      "id": "#c:paxels/refined_glowstone",
+      "required": false
+    }
   ]
 }

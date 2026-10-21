@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_axe"
+    "mekanismtools:refined_obsidian_axe",
+    {
+      "id": "#c:axes/refined_obsidian",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_leggings"
+    "mekanismtools:refined_glowstone_leggings",
+    {
+      "id": "#c:armors/leggings/refined_glowstone",
+      "required": false
+    }
   ]
 }

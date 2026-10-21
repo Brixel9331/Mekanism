@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_shovel"
+    "mekanismtools:refined_glowstone_shovel",
+    {
+      "id": "#c:shovels/refined_glowstone",
+      "required": false
+    }
   ]
 }

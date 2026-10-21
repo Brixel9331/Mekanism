@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_pickaxe"
+    "mekanismtools:steel_pickaxe",
+    {
+      "id": "#c:pickaxes/steel",
+      "required": false
+    }
   ]
 }

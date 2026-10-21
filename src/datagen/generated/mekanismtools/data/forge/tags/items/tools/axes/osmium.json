@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_axe"
+    "mekanismtools:osmium_axe",
+    {
+      "id": "#c:axes/osmium",
+      "required": false
+    }
   ]
 }

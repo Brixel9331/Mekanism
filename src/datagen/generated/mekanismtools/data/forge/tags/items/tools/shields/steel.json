@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_shield"
+    "mekanismtools:steel_shield",
+    {
+      "id": "#c:shields/steel",
+      "required": false
+    }
   ]
 }

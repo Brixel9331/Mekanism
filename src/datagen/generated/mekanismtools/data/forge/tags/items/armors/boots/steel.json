@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_boots"
+    "mekanismtools:steel_boots",
+    {
+      "id": "#c:armors/boots/steel",
+      "required": false
+    }
   ]
 }

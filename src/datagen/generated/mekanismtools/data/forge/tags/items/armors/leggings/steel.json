@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_leggings"
+    "mekanismtools:steel_leggings",
+    {
+      "id": "#c:armors/leggings/steel",
+      "required": false
+    }
   ]
 }

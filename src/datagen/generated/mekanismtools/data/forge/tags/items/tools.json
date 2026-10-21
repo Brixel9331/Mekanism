@@ -1,5 +1,9 @@
 {
   "values": [
-    "#forge:tools/paxels"
+    "#forge:tools/paxels",
+    {
+      "id": "#c:tools",
+      "required": false
+    }
   ]
 }

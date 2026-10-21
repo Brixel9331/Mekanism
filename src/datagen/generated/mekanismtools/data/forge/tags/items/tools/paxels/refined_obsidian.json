@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_paxel"
+    "mekanismtools:refined_obsidian_paxel",
+    {
+      "id": "#c:paxels/refined_obsidian",
+      "required": false
+    }
   ]
 }

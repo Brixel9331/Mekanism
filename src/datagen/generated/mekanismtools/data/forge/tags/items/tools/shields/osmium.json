@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_shield"
+    "mekanismtools:osmium_shield",
+    {
+      "id": "#c:shields/osmium",
+      "required": false
+    }
   ]
 }

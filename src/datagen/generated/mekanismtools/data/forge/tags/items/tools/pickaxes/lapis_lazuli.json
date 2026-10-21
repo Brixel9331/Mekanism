@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_pickaxe"
+    "mekanismtools:lapis_lazuli_pickaxe",
+    {
+      "id": "#c:pickaxes/lapis_lazuli",
+      "required": false
+    }
   ]
 }

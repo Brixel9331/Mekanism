@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanismgenerators:bioethanol",
-    "mekanismgenerators:flowing_bioethanol"
+    "mekanismgenerators:flowing_bioethanol",
+    {
+      "id": "#c:bioethanol",
+      "required": false
+    }
   ]
 }

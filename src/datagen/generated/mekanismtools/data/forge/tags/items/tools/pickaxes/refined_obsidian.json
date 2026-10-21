@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_pickaxe"
+    "mekanismtools:refined_obsidian_pickaxe",
+    {
+      "id": "#c:pickaxes/refined_obsidian",
+      "required": false
+    }
   ]
 }

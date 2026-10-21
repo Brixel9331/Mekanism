@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_shield"
+    "mekanismtools:bronze_shield",
+    {
+      "id": "#c:shields/bronze",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_shovel"
+    "mekanismtools:lapis_lazuli_shovel",
+    {
+      "id": "#c:shovels/lapis_lazuli",
+      "required": false
+    }
   ]
 }

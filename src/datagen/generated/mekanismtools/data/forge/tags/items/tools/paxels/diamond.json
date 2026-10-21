@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:diamond_paxel"
+    "mekanismtools:diamond_paxel",
+    {
+      "id": "#c:paxels/diamond",
+      "required": false
+    }
   ]
 }

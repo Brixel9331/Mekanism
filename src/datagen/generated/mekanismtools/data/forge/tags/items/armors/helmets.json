@@ -5,6 +5,10 @@
     "#forge:armors/helmets/osmium",
     "#forge:armors/helmets/refined_glowstone",
     "#forge:armors/helmets/refined_obsidian",
-    "#forge:armors/helmets/steel"
+    "#forge:armors/helmets/steel",
+    {
+      "id": "#c:armors/helmets",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_shield"
+    "mekanismtools:refined_glowstone_shield",
+    {
+      "id": "#c:shields/refined_glowstone",
+      "required": false
+    }
   ]
 }

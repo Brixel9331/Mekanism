@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_pickaxe"
+    "mekanismtools:osmium_pickaxe",
+    {
+      "id": "#c:pickaxes/osmium",
+      "required": false
+    }
   ]
 }

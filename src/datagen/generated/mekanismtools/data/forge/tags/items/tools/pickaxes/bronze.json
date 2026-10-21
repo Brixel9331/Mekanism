@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_pickaxe"
+    "mekanismtools:bronze_pickaxe",
+    {
+      "id": "#c:pickaxes/bronze",
+      "required": false
+    }
   ]
 }

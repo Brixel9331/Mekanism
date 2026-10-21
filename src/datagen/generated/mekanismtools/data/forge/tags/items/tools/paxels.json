@@ -11,6 +11,10 @@
     "#forge:tools/paxels/osmium",
     "#forge:tools/paxels/refined_glowstone",
     "#forge:tools/paxels/refined_obsidian",
-    "#forge:tools/paxels/steel"
+    "#forge:tools/paxels/steel",
+    {
+      "id": "#c:paxels",
+      "required": false
+    }
   ]
 }

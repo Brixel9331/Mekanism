@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_axe"
+    "mekanismtools:lapis_lazuli_axe",
+    {
+      "id": "#c:axes/lapis_lazuli",
+      "required": false
+    }
   ]
 }

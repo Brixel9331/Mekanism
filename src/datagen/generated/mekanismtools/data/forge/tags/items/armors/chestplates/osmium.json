@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_chestplate"
+    "mekanismtools:osmium_chestplate",
+    {
+      "id": "#c:armors/chestplates/osmium",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_leggings"
+    "mekanismtools:lapis_lazuli_leggings",
+    {
+      "id": "#c:armors/leggings/lapis_lazuli",
+      "required": false
+    }
   ]
 }

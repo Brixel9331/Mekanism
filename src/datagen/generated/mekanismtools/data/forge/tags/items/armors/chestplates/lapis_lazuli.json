@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_chestplate"
+    "mekanismtools:lapis_lazuli_chestplate",
+    {
+      "id": "#c:armors/chestplates/lapis_lazuli",
+      "required": false
+    }
   ]
 }

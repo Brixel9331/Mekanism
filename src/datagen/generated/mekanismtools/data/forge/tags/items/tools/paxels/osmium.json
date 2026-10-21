@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_paxel"
+    "mekanismtools:osmium_paxel",
+    {
+      "id": "#c:paxels/osmium",
+      "required": false
+    }
   ]
 }

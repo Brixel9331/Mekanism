@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_helmet"
+    "mekanismtools:lapis_lazuli_helmet",
+    {
+      "id": "#c:armors/helmets/lapis_lazuli",
+      "required": false
+    }
   ]
 }

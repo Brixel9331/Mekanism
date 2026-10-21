@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_paxel"
+    "mekanismtools:lapis_lazuli_paxel",
+    {
+      "id": "#c:paxels/lapis_lazuli",
+      "required": false
+    }
   ]
 }

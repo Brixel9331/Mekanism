@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_hoe"
+    "mekanismtools:lapis_lazuli_hoe",
+    {
+      "id": "#c:hoes/lapis_lazuli",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_helmet"
+    "mekanismtools:refined_glowstone_helmet",
+    {
+      "id": "#c:armors/helmets/refined_glowstone",
+      "required": false
+    }
   ]
 }

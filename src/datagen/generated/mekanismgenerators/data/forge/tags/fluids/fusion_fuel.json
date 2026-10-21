@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanismgenerators:fusion_fuel",
-    "mekanismgenerators:flowing_fusion_fuel"
+    "mekanismgenerators:flowing_fusion_fuel",
+    {
+      "id": "#c:fusion_fuel",
+      "required": false
+    }
   ]
 }

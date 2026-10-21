@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_obsidian_sword"
+    "mekanismtools:refined_obsidian_sword",
+    {
+      "id": "#c:swords/refined_obsidian",
+      "required": false
+    }
   ]
 }

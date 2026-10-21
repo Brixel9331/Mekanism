@@ -56,7 +56,6 @@
           "name": "mekanismgenerators:gas_burning_generator"
         }
       ],
-      "name": "main",
       "rolls": 1.0
     }
   ],

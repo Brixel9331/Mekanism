@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_axe"
+    "mekanismtools:steel_axe",
+    {
+      "id": "#c:axes/steel",
+      "required": false
+    }
   ]
 }

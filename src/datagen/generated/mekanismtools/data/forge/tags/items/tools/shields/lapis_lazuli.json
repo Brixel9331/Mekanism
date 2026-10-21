@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_shield"
+    "mekanismtools:lapis_lazuli_shield",
+    {
+      "id": "#c:shields/lapis_lazuli",
+      "required": false
+    }
   ]
 }

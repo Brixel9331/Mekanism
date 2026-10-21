@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_helmet"
+    "mekanismtools:osmium_helmet",
+    {
+      "id": "#c:armors/helmets/osmium",
+      "required": false
+    }
   ]
 }

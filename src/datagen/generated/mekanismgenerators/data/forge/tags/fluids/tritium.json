@@ -1,6 +1,10 @@
 {
   "values": [
     "mekanismgenerators:tritium",
-    "mekanismgenerators:flowing_tritium"
+    "mekanismgenerators:flowing_tritium",
+    {
+      "id": "#c:tritium",
+      "required": false
+    }
   ]
 }

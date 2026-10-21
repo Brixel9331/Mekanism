@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_sword"
+    "mekanismtools:refined_glowstone_sword",
+    {
+      "id": "#c:swords/refined_glowstone",
+      "required": false
+    }
   ]
 }

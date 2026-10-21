@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:iron_paxel"
+    "mekanismtools:iron_paxel",
+    {
+      "id": "#c:paxels/iron",
+      "required": false
+    }
   ]
 }

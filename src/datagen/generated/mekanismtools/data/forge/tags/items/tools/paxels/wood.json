@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:wood_paxel"
+    "mekanismtools:wood_paxel",
+    {
+      "id": "#c:paxels/wood",
+      "required": false
+    }
   ]
 }

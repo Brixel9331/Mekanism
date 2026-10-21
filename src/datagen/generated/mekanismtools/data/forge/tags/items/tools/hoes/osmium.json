@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_hoe"
+    "mekanismtools:osmium_hoe",
+    {
+      "id": "#c:hoes/osmium",
+      "required": false
+    }
   ]
 }

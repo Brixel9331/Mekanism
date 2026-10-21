@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_chestplate"
+    "mekanismtools:bronze_chestplate",
+    {
+      "id": "#c:armors/chestplates/bronze",
+      "required": false
+    }
   ]
 }

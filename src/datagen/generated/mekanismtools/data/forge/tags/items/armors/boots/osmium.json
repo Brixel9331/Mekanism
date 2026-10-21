@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:osmium_boots"
+    "mekanismtools:osmium_boots",
+    {
+      "id": "#c:armors/boots/osmium",
+      "required": false
+    }
   ]
 }

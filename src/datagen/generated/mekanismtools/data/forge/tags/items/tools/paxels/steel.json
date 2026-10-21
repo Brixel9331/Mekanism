@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_paxel"
+    "mekanismtools:steel_paxel",
+    {
+      "id": "#c:paxels/steel",
+      "required": false
+    }
   ]
 }

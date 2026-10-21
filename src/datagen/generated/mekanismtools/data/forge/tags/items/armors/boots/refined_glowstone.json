@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:refined_glowstone_boots"
+    "mekanismtools:refined_glowstone_boots",
+    {
+      "id": "#c:armors/boots/refined_glowstone",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:lapis_lazuli_boots"
+    "mekanismtools:lapis_lazuli_boots",
+    {
+      "id": "#c:armors/boots/lapis_lazuli",
+      "required": false
+    }
   ]
 }

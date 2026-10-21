@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_paxel"
+    "mekanismtools:bronze_paxel",
+    {
+      "id": "#c:paxels/bronze",
+      "required": false
+    }
   ]
 }

@@ -5,6 +5,10 @@
     "#forge:tools/shields/osmium",
     "#forge:tools/shields/refined_glowstone",
     "#forge:tools/shields/refined_obsidian",
-    "#forge:tools/shields/steel"
+    "#forge:tools/shields/steel",
+    {
+      "id": "#c:shields",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:gold_paxel"
+    "mekanismtools:gold_paxel",
+    {
+      "id": "#c:paxels/gold",
+      "required": false
+    }
   ]
 }

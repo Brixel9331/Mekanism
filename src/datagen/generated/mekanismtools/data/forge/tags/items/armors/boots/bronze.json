@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:bronze_boots"
+    "mekanismtools:bronze_boots",
+    {
+      "id": "#c:armors/boots/bronze",
+      "required": false
+    }
   ]
 }

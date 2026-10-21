@@ -1,5 +1,9 @@
 {
   "values": [
-    "mekanismtools:steel_chestplate"
+    "mekanismtools:steel_chestplate",
+    {
+      "id": "#c:armors/chestplates/steel",
+      "required": false
+    }
   ]
 }
