@@ -1,5 +1,7 @@
 package mekanism.common.tile;
 
+import net.minecraft.world.level.block.Block;
+import mekanism.common.block.basic.BlockFluidTank;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Collections;
 import java.util.Map;
@@ -118,6 +120,14 @@ public class TileEntityFluidTank extends TileEntityMekanism implements IConfigur
     @Override
     protected void onUpdateServer() {
         super.onUpdateServer();
+        BlockState state = getBlockState();
+        if (state.getBlock() instanceof BlockFluidTank block) {
+            int light = block.getLightEmission(state, level, worldPosition);
+            if (state.getValue(BlockFluidTank.FLUID_LIGHT) != light) {
+                level.setBlock(worldPosition, state.setValue(BlockFluidTank.FLUID_LIGHT, light),
+                      Block.UPDATE_CLIENTS);
+            }
+        }
         if (valve > 0) {
             valve--;
             if (valve == 0) {

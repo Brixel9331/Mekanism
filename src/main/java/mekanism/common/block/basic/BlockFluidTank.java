@@ -1,5 +1,8 @@
 package mekanism.common.block.basic;
 
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.Block;
 import mekanism.api.fluid.FluidStack;
 import mekanism.api.security.ISecurityUtils;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
@@ -23,13 +26,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class BlockFluidTank extends BlockTileModel<TileEntityFluidTank, Machine<TileEntityFluidTank>> {
 
+    public static final IntegerProperty FLUID_LIGHT =
+          IntegerProperty.create("fluid_light", 0, 15);
+
     public BlockFluidTank(Machine<TileEntityFluidTank> type) {
-        super(type, properties -> properties.mapColor(BlockResourceInfo.STEEL.getMapColor()));
+        super(type, properties -> properties.mapColor(BlockResourceInfo.STEEL.getMapColor()).lightLevel(state -> state.getValue(FLUID_LIGHT)));
     }
 
     @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(FLUID_LIGHT);
+    }
+
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
-        int ambientLight = super.getLightEmission(state, world, pos);
+        int ambientLight = state.setValue(FLUID_LIGHT, 0).getLightEmission();
         if (ambientLight == 15) {
             //If we are already at the max light value don't bother looking up the tile to see if it has a fluid that gives off light
             return ambientLight;
