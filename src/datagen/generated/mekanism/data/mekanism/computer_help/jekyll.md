@@ -32,6 +32,22 @@ builtInTables:
         javaType: net.minecraft.world.item.Item
         type: String (Item)
     humanName: Table (ChemicalStack)
+  mekanism.api.fluid.FluidStack:
+    description: An amount of fluid
+    fields:
+      amount:
+        description: The amount in mB
+        javaType: int
+        type: Number (int)
+      name:
+        description: The Fluid's registered name, e.g. minecraft:water
+        javaType: net.minecraft.resources.ResourceLocation
+        type: String (ResourceLocation)
+      nbt:
+        description: Any NBT of the fluid, in Command JSON format
+        javaType: java.lang.String
+        type: String
+    humanName: Table (FluidStack)
   mekanism.common.content.filter.IFilter:
     description: |-
       Common Filter properties. Use the API Global to make constructing these a little easier.
@@ -263,22 +279,6 @@ builtInTables:
         javaType: java.util.Map
         type: Table
     humanName: Table (BlockState)
-  net.minecraftforge.fluids.FluidStack:
-    description: An amount of fluid
-    fields:
-      amount:
-        description: The amount in mB
-        javaType: int
-        type: Number (int)
-      name:
-        description: The Fluid's registered name, e.g. minecraft:water
-        javaType: net.minecraft.resources.ResourceLocation
-        type: String (ResourceLocation)
-      nbt:
-        description: Any NBT of the fluid, in Command JSON format
-        javaType: java.lang.String
-        type: String
-    humanName: Table (FluidStack)
 enums:
   mekanism.api.RelativeSide:
   - FRONT
@@ -632,7 +632,7 @@ methods:
   - description: Get the contents of the biofuel tank.
     methodName: getBioFuel
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the biofuel tank.
     methodName: getBioFuelCapacity
@@ -754,7 +754,7 @@ methods:
   - description: Get the contents of the water tank.
     methodName: getWater
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the water tank.
     methodName: getWaterCapacity
@@ -1086,7 +1086,7 @@ methods:
   - description: Get the contents of the fluid tank.
     methodName: getFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the fluid tank.
     methodName: getFluidCapacity
@@ -1594,7 +1594,7 @@ methods:
     returns:
       javaExtra:
       - mekanism.api.chemical.ChemicalStack
-      - net.minecraftforge.fluids.FluidStack
+      - mekanism.api.fluid.FluidStack
       javaType: com.mojang.datafixers.util.Either
       type: Table (ChemicalStack) or Table (FluidStack)
   - methodName: getTankCapacity
@@ -1637,7 +1637,7 @@ methods:
   - description: Get the contents of the buffer tank.
     methodName: getFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the buffer tank.
     methodName: getFluidCapacity
@@ -1684,7 +1684,7 @@ methods:
   - description: Get the contents of the input tank.
     methodName: getInput
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the input tank.
     methodName: getInputCapacity
@@ -2030,7 +2030,7 @@ methods:
     returns:
       javaExtra:
       - mekanism.api.chemical.ChemicalStack
-      - net.minecraftforge.fluids.FluidStack
+      - mekanism.api.fluid.FluidStack
       javaType: com.mojang.datafixers.util.Either
       type: Table (ChemicalStack) or Table (FluidStack)
   - methodName: getCoolantCapacity
@@ -2201,7 +2201,7 @@ methods:
   - description: Get the contents of the tank.
     methodName: getStored
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - methodName: incrementContainerEditMode
     requiresPublicSecurity: true
@@ -2220,7 +2220,7 @@ methods:
   - description: Get the contents of the buffer tank.
     methodName: getFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the buffer tank.
     methodName: getFluidCapacity
@@ -2550,7 +2550,7 @@ methods:
   - description: Get the contents of the water tank.
     methodName: getWater
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the water tank.
     methodName: getWaterCapacity
@@ -2690,7 +2690,7 @@ methods:
   - description: Get the contents of the lava tank.
     methodName: getLava
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the lava tank.
     methodName: getLavaCapacity
@@ -3212,7 +3212,7 @@ methods:
   Mechanical Pipe:
   - methodName: getBuffer
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - methodName: getCapacity
     returns:
@@ -3370,7 +3370,7 @@ methods:
   - description: Get the contents of the output tank.
     methodName: getOutput
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the output tank.
     methodName: getOutputCapacity
@@ -3640,7 +3640,7 @@ methods:
   - description: Get the contents of the fluid input.
     methodName: getInputFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the fluid input.
     methodName: getInputFluidCapacity
@@ -3941,7 +3941,7 @@ methods:
   - description: Get the contents of the fluid buffer.
     methodName: getBufferFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the fluid buffer.
     methodName: getBufferFluidCapacity
@@ -4149,7 +4149,7 @@ methods:
   - description: Get the contents of the fluid tank.
     methodName: getFluid
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the fluid tank.
     methodName: getFluidCapacity
@@ -4477,7 +4477,7 @@ methods:
   - description: Get the contents of the input tank.
     methodName: getInput
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the input tank.
     methodName: getInputCapacity
@@ -4507,7 +4507,7 @@ methods:
   - description: Get the contents of the output tank.
     methodName: getOutput
     returns:
-      javaType: net.minecraftforge.fluids.FluidStack
+      javaType: mekanism.api.fluid.FluidStack
       type: Table (FluidStack)
   - description: Get the capacity of the output tank.
     methodName: getOutputCapacity
@@ -4569,5 +4569,5 @@ methods:
     returns:
       javaType: boolean
       type: boolean
-version: 10.4.14
+version: 10.4.16
 ---

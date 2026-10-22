@@ -37,7 +37,7 @@ public class FactoryRegistry {
 
     public static void load() {
         boolean hasRegistry = false;
-        for (IComputerMethodRegistry registry : ServiceLoader.load(IComputerMethodRegistry.class)) {
+        for (IComputerMethodRegistry registry : ServiceLoader.load(IComputerMethodRegistry.class, IComputerMethodRegistry.class.getClassLoader())) {
             registry.register();
             hasRegistry = true;
         }
