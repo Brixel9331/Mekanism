@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "mekanism_gametest",
+  "version": "1.0.0",
+  "name": "Mekanism GameTests",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "mekanism.common.util.test.GameTestEventListeners"
+    ],
+    "fabric-gametest": [
+      "mekanism.common.lib.transmitter.TransmitterNetworkTest"
+    ]
+  },
+  "depends": {
+    "mekanism": "*",
+    "fabric-api": "*",
+    "minecraft": "1.20.1"
+  }
+}

@@ -99,6 +99,15 @@ sourceSets.datagenMain.java.exclude(
       'mekanism/common/recipe/compat/ILikeWoodBYGRecipeProvider.java'
 )
 
+sourceSets {
+    gameTest {
+        java.srcDirs = ['src/gameTest/main/java']
+        resources.srcDirs = ['src/gameTest/main/resources']
+        compileClasspath += sourceSets.api.output + sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.api.output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
 sourceSets.api.compileClasspath += configurations.compileClasspath
 sourceSets.api.runtimeClasspath += configurations.runtimeClasspath
 sourceSets.test.compileClasspath += sourceSets.api.output
@@ -106,16 +115,20 @@ sourceSets.test.runtimeClasspath += sourceSets.api.output
 modules.each { String moduleName ->
     sourceSets.test.compileClasspath += sourceSets.getByName(moduleName).output
     sourceSets.test.runtimeClasspath += sourceSets.getByName(moduleName).output
+    sourceSets.gameTest.compileClasspath += sourceSets.getByName(moduleName).output
+    sourceSets.gameTest.runtimeClasspath += sourceSets.getByName(moduleName).output
 }
 
 configurations {
     apiImplementation.extendsFrom implementation
     apiCompileOnly.extendsFrom compileOnly
     apiRuntimeOnly.extendsFrom runtimeOnly
+    gameTestImplementation.extendsFrom implementation
 }
 
 loom {
     createRemapConfigurations(sourceSets.test)
+    createRemapConfigurations(sourceSets.gameTest)
     (['main'] + modules).each { String moduleName ->
         createRemapConfigurations(sourceSets.getByName("datagen${moduleName.capitalize()}"))
     }
@@ -139,7 +152,16 @@ loom {
             server()
             programArg 'nogui'
         }
+        gameTest {
+            server()
+            source sourceSets.gameTest
+            property 'fabric-api.gametest'
+            property 'fabric-api.gametest.report-file', providers.gradleProperty('gameTestReportFile').getOrElse(layout.buildDirectory.file('reports/gametest/results.xml').get().asFile.absolutePath)
+            runDir project.relativePath(providers.gradleProperty('gameTestRunDir').getOrElse(layout.buildDirectory.dir('gametest-runtime').get().asFile.absolutePath))
+            ideConfigGenerated false
+        }
     }
+    mods.register('mekanism_gametest') { sourceSet sourceSets.gameTest }
     (['main'] + modules).each { String moduleName ->
         def data = sourceSets.getByName("datagen${moduleName.capitalize()}")
         def modId = "mekanism${moduleName == 'main' ? '' : moduleName}"
@@ -276,6 +298,26 @@ tasks.named('test', Test) {
     useJUnitPlatform()
     workingDir = layout.buildDirectory.dir('test-runtime')
     doFirst { workingDir.mkdirs() }
+}
+
+tasks.named('check') {
+    modules.each { String moduleName ->
+        dependsOn tasks.named("datagen${moduleName.capitalize()}Classes")
+    }
+}
+
+(['Client', 'Server', 'GameTest'] + (['main'] + modules).collect { "Datagen${it.capitalize()}" }).each { String runName ->
+    tasks.named("run${runName}") {
+        modules.each { String moduleName ->
+            classpath += sourceSets.getByName(moduleName).runtimeClasspath
+        }
+    }
+}
+
+tasks.withType(net.fabricmc.loom.task.AbstractRunTask).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 tasks.named('wrapper', Wrapper) {

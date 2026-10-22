@@ -6,24 +6,21 @@ import mekanism.common.Mekanism;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.test.GameTestUtils;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@PrefixGameTestTemplate(false)
-@GameTestHolder(Mekanism.MODID)
-public class TransmitterNetworkTest {
+public class TransmitterNetworkTest implements FabricGameTest {
 
-    private static final String BASE_PATH = "transmitter/";
+    private static final String BASE_PATH = "mekanism:transmitter/";
     //Note: We make all the tests in this class have a base setup time of 5 ticks to make sure everything has had a chance to load properly
     private static final int SETUP_TICKS = 5;
 

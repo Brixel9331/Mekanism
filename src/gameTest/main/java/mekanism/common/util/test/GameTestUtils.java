@@ -6,6 +6,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.UnaryOperator;
 import mekanism.common.Mekanism;
 import mekanism.common.util.WorldUtils;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestSequence;
@@ -15,18 +16,20 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.DistanceManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 public class GameTestUtils {
 
     //Note: We use reflection rather than ATs as this only happens at dev time so no need to do bytecode hacks on things that don't need it at runtime
-    private static final Method UPDATE_CHUNK_SCHEDULING = ObfuscationReflectionHelper.findMethod(DistanceManager.class, "m_7288_",
+    private static final Method UPDATE_CHUNK_SCHEDULING = findMethod(DistanceManager.class, "net.minecraft.class_3204", "method_14053",
+          "(JILnet/minecraft/class_3193;I)Lnet/minecraft/class_3193;",
           Long.TYPE, Integer.TYPE, ChunkHolder.class, Integer.TYPE);
-    private static final Method GET_CHUNK = ObfuscationReflectionHelper.findMethod(DistanceManager.class, "m_7316_", Long.TYPE);
-    private static final Method PROCESS_UNLOADS = ObfuscationReflectionHelper.findMethod(ChunkMap.class, "m_140353_", BooleanSupplier.class);
-    private static final Method ENSURE_SINGLE_FINAL_CHECK = ObfuscationReflectionHelper.findMethod(GameTestHelper.class, "m_177442_");
+    private static final Method GET_CHUNK = findMethod(DistanceManager.class, "net.minecraft.class_3204", "method_14038",
+          "(J)Lnet/minecraft/class_3193;", Long.TYPE);
+    private static final Method PROCESS_UNLOADS = findMethod(ChunkMap.class, "net.minecraft.class_3898", "method_20605",
+          "(Ljava/util/function/BooleanSupplier;)V", BooleanSupplier.class);
+    private static final Method ENSURE_SINGLE_FINAL_CHECK = findMethod(GameTestHelper.class, "net.minecraft.class_4516", "method_36048", "()V");
 
     public static final int INACCESSIBLE_LEVEL = ChunkMap.MAX_VIEW_DISTANCE + 1;
     private static final int UNLOAD_LEVEL = ChunkLevel.MAX_LEVEL + 1;
@@ -35,6 +38,17 @@ public class GameTestUtils {
     };
 
     static final boolean DEBUG_CHUNK_LOADING = false;
+
+    private static Method findMethod(Class<?> owner, String intermediaryOwner, String intermediaryName, String descriptor, Class<?>... parameters) {
+        String name = FabricLoader.getInstance().getMappingResolver().mapMethodName("intermediary", intermediaryOwner, intermediaryName, descriptor);
+        try {
+            Method method = owner.getDeclaredMethod(name, parameters);
+            method.setAccessible(true);
+            return method;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Cannot resolve GameTest method " + owner.getName() + "." + name, exception);
+        }
+    }
 
     public static void succeedIfSequence(GameTestHelper helper, UnaryOperator<GameTestSequence> sequence) {
         try {
