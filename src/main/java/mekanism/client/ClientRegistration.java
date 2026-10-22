@@ -184,6 +184,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
+import io.github.fabricators_of_create.porting_lib.models.geometry.GeometryLoaderManager;
 import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
@@ -416,7 +417,9 @@ public class ClientRegistration {
             loaders.put(Mekanism.rl("transmitter"), TransmitterLoader.INSTANCE);
             loaders.put(new ResourceLocation("forge", "obj"), mekanism.client.render.obj.ObjModelLoader.INSTANCE);
         });
+        GeometryLoaderManager.init();
         ModelLoadingPlugin.register(context -> {
+            GeometryLoaderManager.init();
             MekanismModelCache.INSTANCE.setup(context);
             context.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, bake) -> {
                 ResourceLocation id = bake.id();
