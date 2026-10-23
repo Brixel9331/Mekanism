@@ -25,7 +25,7 @@ public abstract class DynamicBufferedNetwork<ACCEPTOR, NETWORK extends DynamicBu
     protected long capacity;
     protected boolean needsUpdate;
     private boolean forceScaleUpdate;
-    private long lastSaveShareWriteTime;
+    private long lastSaveShareWriteTime = Long.MIN_VALUE;
     private long lastMarkDirtyTime;
     public float currentScale;
 
@@ -38,6 +38,7 @@ public abstract class DynamicBufferedNetwork<ACCEPTOR, NETWORK extends DynamicBu
     @Override
     public void onUpdate() {
         super.onUpdate();
+        lastSaveShareWriteTime = Long.MIN_VALUE;
         float scale = computeContentScale();
         if (scale != currentScale) {
             currentScale = scale;
