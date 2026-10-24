@@ -2,8 +2,8 @@
   "sources": [
     {
       "type": "minecraft:directory",
-      "source": "entity/robit",
-      "prefix": "entity/robit/"
+      "prefix": "entity/robit/",
+      "source": "entity/robit"
     },
     {
       "type": "minecraft:single",
@@ -79,11 +79,11 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "mekanism:slurry/dirty"
+      "resource": "mekanism:slurry/clean"
     },
     {
       "type": "minecraft:single",
-      "resource": "mekanism:slurry/clean"
+      "resource": "mekanism:slurry/dirty"
     },
     {
       "type": "minecraft:single",
