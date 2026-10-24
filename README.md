@@ -2,8 +2,12 @@
 
 # Mekanism Fabric for Minecraft 1.20.1 #
 
-Mekanism Fabric is a Fabric port of Mekanism, an independent Minecraft add-on featuring high-tech machinery that can be used to create powerful tools, 
-armor, and weapons. You can find more detail on the features on the [**Official Website**](http://aidancbrady.com/mekanism/).
+Mekanism Fabric is an **unofficial Fabric port of Mekanism for Minecraft 1.20.1**, maintained independently by
+[Brixel9331](https://github.com/Brixel9331). **It is not affiliated with, endorsed by, or supported by the official Mekanism team.**
+
+The original Mekanism project is available at [mekanism/Mekanism](https://github.com/mekanism/Mekanism).
+Mekanism is a Minecraft add-on featuring high-tech machinery that can be used to create powerful tools,
+armor, and weapons. More information about the original mod is available on the [official Mekanism wiki](https://wiki.aidancbrady.com/wiki/Mekanism).
 With features ranging from jetpacks and balloons to factories and energy cubes, the mod does not have a single unifying goal.
 Nevertheless, these features combine coherently to create a rich gameplay experience that players will enjoy.
 
@@ -15,13 +19,19 @@ world by using tier installers.
 After using Mekanism for a while, players can obtain a near-indestructible suit of Refined Obsidian Armor, receive five 
 ingots for each ore mined, fly with hydrogen-powered jetpacks, and have cute robotic friends following them around while they mine. :)
 
-# Discord #
+# Fabric support and issue reports #
 
-Mekanism has a [discord server](https://discord.gg/nmSjMGc) where you can chat with other Mekanism users and the developers. Join us!
+Report bugs, crashes, compatibility problems, and other issues with this Fabric port in
+[this repository's Issues](https://github.com/Brixel9331/Mekanism/issues).
+**Please do not report Fabric port problems to the official Mekanism issue tracker.**
+
+Include your Minecraft, Mekanism Fabric, Fabric Loader, and Fabric API versions, steps to reproduce the issue,
+and the relevant crash report or logs.
 
 # Translating #
 
-If you would like to help translate Mekanism, you can do so through [Crowdin](https://crowdin.com/project/mekanism).
+Translations inherited from the official Mekanism project are managed on [Crowdin](https://crowdin.com/project/mekanism).
+For translation issues specific to this Fabric port, use this repository's Issues.
 
 # License #
 
@@ -41,7 +51,7 @@ The upstream Forge artifacts are available on [ModMaven](https://modmaven.dev/).
 This Fabric branch builds its own artifacts. Build this branch and use the jars in
 `build/libs/` for Fabric development; see [Development](docs/Development.md).
 
-# Credits #
+# Upstream credits #
 
   * [aidancbrady](https://twitter.com/aidancbrady) - [Patreon](https://www.patreon.com/user?u=260704)
   * thommy101
@@ -56,9 +66,3 @@ This Fabric branch builds its own artifacts. Build this branch and use the jars 
   * micdoodle
   * Bluexin
   * JaSpr
-
-## YourKit ##
-YourKit supports open source projects with innovative and intelligent tools for monitoring and 
-profiling Java and .NET applications. YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler), 
-[YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/) and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
-Mekanism uses YourKit for all our profiling needs!
