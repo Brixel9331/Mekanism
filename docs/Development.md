@@ -46,7 +46,7 @@ Mekanism Fabric is developed for Minecraft 1.20.1 using Fabric.
 
 Mod jars are written to `build/libs/`. Filenames include the Minecraft and mod versions.
 
-### Mekanism.jar
+### Mekanism-Fabric.jar
 
 * /assets - From /src/main/resources/assets and /src/datagen/generated/mekanism/assets
 * /data - From /src/main/resources/data and /src/datagen/generated/mekanism/data
@@ -55,7 +55,7 @@ Mod jars are written to `build/libs/`. Filenames include the Minecraft and mod v
 * LICENSE
 * logo.png
 
-### MekanismAdditions.jar
+### MekanismAdditions-Fabric.jar
 
 * /assets - From /src/additions/resources/assets and /src/datagen/generated/mekanismadditions/assets
 * /data - From /src/additions/resources/data and /src/datagen/generated/mekanismadditions/data
@@ -64,7 +64,7 @@ Mod jars are written to `build/libs/`. Filenames include the Minecraft and mod v
 * LICENSE
 * logo.png
 
-### MekanismGenerators.jar
+### MekanismGenerators-Fabric.jar
 
 * /assets - From /src/generators/resources/assets and /src/datagen/generated/mekanismgenerators/assets
 * /data - From /src/generators/resources/data and /src/datagen/generated/mekanismgenerators/data
@@ -73,7 +73,7 @@ Mod jars are written to `build/libs/`. Filenames include the Minecraft and mod v
 * LICENSE
 * logo.png
 
-### MekanismTools.jar
+### MekanismTools-Fabric.jar
 
 * /assets - From /src/tools/resources/assets and /src/datagen/generated/mekanismtools/assets
 * /data - From /src/tools/resources/data and /src/datagen/generated/mekanismtools/data
@@ -84,7 +84,7 @@ Mod jars are written to `build/libs/`. Filenames include the Minecraft and mod v
 
 ### Source jars
 
-The core mod has a corresponding `-sources.jar` containing its Java sources and API sources.
+Each mod has a corresponding `-sources.jar` containing its sources. The core source jar also includes the API sources.
 
 ## Building
 

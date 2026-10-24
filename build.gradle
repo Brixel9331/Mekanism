@@ -1,4 +1,5 @@
 import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
 
 plugins {
     id 'fabric-loom' version "${loom_version}"
@@ -6,8 +7,8 @@ plugins {
 }
 
 group = 'mekanism'
-version = "${minecraft_version}-${mod_version}." + (System.getenv('BUILD_NUMBER') ?: 'homebaked')
-base.archivesName = 'Mekanism'
+version = "${minecraft_version}-${mod_version}.fabric." + (System.getenv('BUILD_NUMBER') ?: '1')
+base.archivesName = 'Mekanism-Fabric'
 
 def modules = ['additions', 'generators', 'tools']
 
@@ -250,11 +251,19 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(ProcessResources).configureEach {
-    exclude '**/.cache/**', '**/*.blend', '**/*.bbmodel'
+    exclude '**/.cache/**', '**/*.blend', '**/*.bbmodel', 'META-INF/mods.toml', 'META-INF/accesstransformer.cfg'
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') {
         expand version: project.version
     }
+}
+
+tasks.withType(Jar).configureEach {
+    exclude 'META-INF/mods.toml', 'META-INF/accesstransformer.cfg'
+}
+
+tasks.withType(RemapJarTask).configureEach {
+    doFirst { delete archiveFile.get().asFile }
 }
 
 tasks.named('jar', Jar) {
@@ -270,7 +279,7 @@ modules.each { String moduleName ->
         from module.output
         from('LICENSE')
         from('logo.png')
-        archiveBaseName = "Mekanism${moduleName.capitalize()}"
+        archiveBaseName = "Mekanism${moduleName.capitalize()}-Fabric"
         archiveClassifier = 'dev'
         destinationDirectory = layout.buildDirectory.dir('devlibs')
         duplicatesStrategy = DuplicatesStrategy.FAIL
@@ -278,20 +287,32 @@ modules.each { String moduleName ->
     def remap = tasks.register("remap${moduleName.capitalize()}Jar", RemapJarTask) {
         dependsOn moduleJar
         inputFile = moduleJar.flatMap { it.archiveFile }
-        archiveBaseName = "Mekanism${moduleName.capitalize()}"
+        archiveBaseName = "Mekanism${moduleName.capitalize()}-Fabric"
         archiveClassifier = ''
+        addNestedDependencies = false
         classpath.from sourceSets.api.output, sourceSets.main.output, module.compileClasspath
     }
+    def moduleSources = tasks.register("${moduleName}SourcesJar", Jar) {
+        from module.allSource
+        from('LICENSE')
+        archiveBaseName = "Mekanism${moduleName.capitalize()}-Fabric"
+        archiveClassifier = 'sources-dev'
+        destinationDirectory = layout.buildDirectory.dir('devlibs')
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+    }
+    def remapSources = tasks.register("remap${moduleName.capitalize()}SourcesJar", RemapSourcesJarTask) {
+        dependsOn moduleSources
+        inputFile = moduleSources.flatMap { it.archiveFile }
+        archiveBaseName = "Mekanism${moduleName.capitalize()}-Fabric"
+        archiveClassifier = 'sources'
+    }
     tasks.named('assemble') {
-        dependsOn remap
+        dependsOn remap, remapSources
     }
 }
 
 tasks.named('sourcesJar', Jar) {
     from sourceSets.api.allSource
-    modules.each { String moduleName ->
-        from sourceSets.getByName(moduleName).allSource
-    }
 }
 
 tasks.named('test', Test) {
