@@ -11,6 +11,9 @@
     ],
     "client": [
       "mekanism.tools.client.ToolsClientInitializer"
+    ],
+    "jei_mod_plugin": [
+      "mekanism.tools.client.jei.ToolsJEI"
     ]
   },
   "mixins": [

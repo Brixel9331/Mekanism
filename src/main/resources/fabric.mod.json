@@ -8,6 +8,7 @@
   "entrypoints": {
     "main": ["mekanism.common.Mekanism"],
     "client": ["mekanism.client.MekanismClientInitializer"],
+    "jei_mod_plugin": ["mekanism.client.jei.MekanismJEI"],
     "jade": ["mekanism.common.integration.lookingat.jade.MekanismJadePlugin"]
   },
   "mixins": ["mekanism.mixins.json"],

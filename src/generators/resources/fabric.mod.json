@@ -11,6 +11,9 @@
     ],
     "client": [
       "mekanism.generators.client.GeneratorsClientInitializer"
+    ],
+    "jei_mod_plugin": [
+      "mekanism.generators.client.jei.GeneratorsJEI"
     ]
   },
   "license": "MIT",
