@@ -1,16 +1,21 @@
-name: General Issue
-description: Report a bug or problem with Mekanism
+name: Mekanism Fabric issue
+description: Report a bug or problem with the unofficial Fabric port for Minecraft 1.20.1
 body:
   - type: markdown
     attributes:
-      value: "*Please use the search functionality before reporting an issue. Also take a look at the closed issues!*"
+      value: |
+        This form is for the unofficial Mekanism Fabric port for Minecraft 1.20.1.
+        Search this repository's open and closed issues before reporting a problem.
+        For feature requests, open a blank issue in this repository.
   - type: textarea
+    id: issue-description
     attributes:
       label: Issue description
       description: A clear and concise description of the issue and if appropriate what the expected outcome should have been.
     validations:
       required: true
   - type: textarea
+    id: steps-to-reproduce
     attributes:
       label: Steps to reproduce
       description: If there are specific steps that need to be taken to reproduce the issue list them here.
@@ -22,37 +27,42 @@ body:
     id: minecraft-version
     attributes:
       label: Minecraft version
-      description: What version of Minecraft are you using?
+      description: This Fabric port targets Minecraft 1.20.1.
       options:
-        - 1.20.1 (Latest)
-        - 1.19.x or earlier (No longer being developed)
+        - "1.20.1"
     validations:
       required: true
   - type: input
+    id: fabric-loader-version
     attributes:
-      label: (Neo)Forge version
-      description: What version of (Neo)Forge are you using? (Please specify whether you are using Forge or NeoForge)
-      placeholder: e.g. 47.1.35 NeoForge
+      label: Fabric Loader version
+      description: What version of Fabric Loader are you using?
+      placeholder: e.g. 0.18.2
     validations:
       required: true
-  - type: dropdown
+  - type: input
+    id: fabric-api-version
+    attributes:
+      label: Fabric API version
+      description: What version of Fabric API are you using?
+      placeholder: e.g. 0.92.6+1.20.1
+    validations:
+      required: true
+  - type: input
     id: mekanism-version
     attributes:
-      label: Mekanism version
-      description: What version of Mekanism are you using?
-      options:
-        - Current Dev Branch (Manually Compiled, specify git commit hash)
-        - 10.4.6 (Latest)
-        - 10.4.5
-        - 10.4.4
-        - Older
+      label: Mekanism Fabric version
+      description: Provide the full Fabric port version or jar filename. For manual builds, include the git commit hash.
+      placeholder: e.g. Mekanism-Fabric-1.20.1-10.4.16.fabric.1.jar
     validations:
       required: true
   - type: textarea
+    id: other-versions
     attributes:
       label: Other relevant versions
       description: If this issue is related to any other mods list their versions here.
-  - type: input
+  - type: textarea
+    id: logs
     attributes:
-      label: "If a (crash)log is relevant for this issue, link it here: (It's almost always relevant)"
-      description: "Please provide a [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc link here. (Make sure that it isn't set to expire!)"
+      label: Logs or crash report
+      description: Attach the latest.log or crash report from the affected run, or paste the relevant excerpt.
