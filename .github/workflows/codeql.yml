@@ -2,11 +2,12 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "1.20.x", "master" ]
+    branches: [ "port/fabric-1.20.1" ]
   pull_request:
-    branches: [ "1.20.x" ]
+    branches: [ "port/fabric-1.20.1" ]
   schedule:
     - cron: "57 19 * * 4"
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -21,28 +22,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ java ]
+        language: [ java-kotlin ]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
+      - name: Set up JDKs
+        uses: actions/setup-java@v6
         with:
-          distribution: zulu
-          java-version: 17
+          distribution: temurin
+          java-version: |
+            17
+            21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
+          build-mode: manual
           queries: +security-and-quality
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+      - name: Build Fabric for analysis
+        run: ./gradlew --no-daemon --no-build-cache clean build -x test
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"

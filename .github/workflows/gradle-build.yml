@@ -1,0 +1,43 @@
+name: Build Fabric
+
+on:
+  push:
+    branches: [ "port/fabric-1.20.1" ]
+  pull_request:
+    branches: [ "port/fabric-1.20.1" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDKs
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build Fabric
+        run: ./gradlew --no-daemon build
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+
+      - name: Upload Fabric artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Mekanism-Fabric-${{ github.sha }}
+          path: build/libs/*-Fabric-*.jar
+          if-no-files-found: error
